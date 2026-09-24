@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GitHarness Figure 2 · Six visual candidates</title>
+  <style>
+    :root { color-scheme: light; }
+    body { font: 15px/1.45 system-ui, sans-serif; color: #1f334e; background: #f4f7f8; margin: 0; padding: 26px; }
+    header { max-width: 1900px; margin: 0 auto 22px; }
+    h1 { font-size: 28px; margin: 0 0 6px; }
+    header p { max-width: 1050px; color: #52667d; margin: 0; }
+    .toolbar { display: flex; gap: 9px; margin-top: 15px; }
+    button { background: white; color: #1f334e; border: 1px solid #a8b8c3; padding: 7px 13px; border-radius: 20px; cursor: pointer; }
+    button.active { color: white; background: #1f334e; }
+    main { max-width: 1900px; margin: auto; display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 19px; }
+    article { background: white; border: 1px solid #dce5e9; border-radius: 9px; padding: 15px; min-width: 0; }
+    .heading { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; margin-bottom: 9px; }
+    h2 { margin: 0; font-size: 18px; }
+    .tag { font-size: 11px; font-weight: 700; letter-spacing: .06em; color: #b35f2f; white-space: nowrap; }
+    .visual { display: block; background: white; border: 1px solid #e5ecef; }
+    .visual img { display: block; width: 100%; height: auto; }
+    .lesson { min-height: 42px; margin: 10px 0 5px; }
+    .links { font-size: 13px; }
+    a { color: #24568f; }
+    body.three main { grid-template-columns: repeat(3,minmax(0,1fr)); }
+    @media (max-width: 950px) { main, body.three main { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>GitHarness Figure 2 · six visual candidates</h1>
+    <p>All six use the same v6 / v4 / v7 example. These are independent full-method designs for comparing visual language, not revisions of one master template. Click an image for the 3000-px rendering; the editable SVG and audit sit below it.</p>
+    <div class="toolbar"><button id="two" class="active">Two columns</button><button id="three">Three columns</button></div>
+  </header>
+  <main>
+    <article><div class="heading"><h2>01 · Branch canopy</h2><span class="tag">HISTORY GRAPH</span></div><a class="visual" href="candidate_01/figure.png"><img src="candidate_01/paper_width_preview.png" alt="Candidate 01: branching historical paired-version graph"></a><p class="lesson">The real v4 branch carries selection, fork, candidate work, and v7.</p><div class="links"><a href="candidate_01/figure.svg">Editable SVG</a> · <a href="candidate_01/design_rationale.md">Rationale</a> · <a href="candidate_01/technical_audit.md">Technical audit</a></div></article>
+    <article><div class="heading"><h2>02 · State metamorphosis</h2><span class="tag">WORK TRANSFORMATION</span></div><a class="visual" href="candidate_02/figure.png"><img src="candidate_02/paper_width_preview.png" alt="Candidate 02: aligned historical, forked, and changed work artifacts"></a><p class="lesson">A large, aligned artifact makes preserved, updated, and excluded work visible.</p><div class="links"><a href="candidate_02/figure.svg">Editable SVG</a> · <a href="candidate_02/design_rationale.md">Rationale</a> · <a href="candidate_02/technical_audit.md">Technical audit</a></div></article>
+    <article><div class="heading"><h2>03 · Requirement field</h2><span class="tag">COMPATIBILITY</span></div><a class="visual" href="candidate_03/figure.png"><img src="candidate_03/paper_width_preview.png" alt="Candidate 03: historical graph viewed under resolved requirement"></a><p class="lesson">The resolved requirement acts on the only historical graph; v4 is compatible despite v6 being HEAD.</p><div class="links"><a href="candidate_03/figure.svg">Editable SVG</a> · <a href="candidate_03/design_rationale.md">Rationale</a> · <a href="candidate_03/technical_audit.md">Technical audit</a></div></article>
+    <article><div class="heading"><h2>04 · Field-notebook scene</h2><span class="tag">RESTRAINED ILLUSTRATION</span></div><a class="visual" href="candidate_04/figure.png"><img src="candidate_04/paper_width_preview.png" alt="Candidate 04: illustrated policy, historical specimen, isolated candidate"></a><p class="lesson">An original policy character, a historical specimen, and a translucent candidate form one scientific scene.</p><div class="links"><a href="candidate_04/figure.svg">Editable SVG</a> · <a href="candidate_04/design_rationale.md">Rationale</a> · <a href="candidate_04/technical_audit.md">Technical audit</a></div></article>
+    <article><div class="heading"><h2>05 · Policy orbit</h2><span class="tag">DECISION CENTER</span></div><a class="visual" href="candidate_05/figure.png"><img src="candidate_05/paper_width_preview.png" alt="Candidate 05: central policy surrounded by feedback, history, routing, construction, and training"></a><p class="lesson">The same Git Agent is the inference controller and the sole destination of the training loop.</p><div class="links"><a href="candidate_05/figure.svg">Editable SVG</a> · <a href="candidate_05/design_rationale.md">Rationale</a> · <a href="candidate_05/technical_audit.md">Technical audit</a></div></article>
+    <article><div class="heading"><h2>06 · Paired-version loom</h2><span class="tag">BOUND Q / W STATES</span></div><a class="visual" href="candidate_06/figure.png"><img src="candidate_06/paper_width_preview.png" alt="Candidate 06: vertical historical graph of bound requirement and work states"></a><p class="lesson">Tall paired nodes emphasize that each committed version binds Q_i to its recoverable W_i.</p><div class="links"><a href="candidate_06/figure.svg">Editable SVG</a> · <a href="candidate_06/design_rationale.md">Rationale</a> · <a href="candidate_06/technical_audit.md">Technical audit</a></div></article>
+  </main>
+  <script>
+    const two=document.getElementById('two'),three=document.getElementById('three');
+    two.onclick=()=>{document.body.classList.remove('three');two.classList.add('active');three.classList.remove('active')};
+    three.onclick=()=>{document.body.classList.add('three');three.classList.add('active');two.classList.remove('active')};
+  </script>
+</body>
+</html>
