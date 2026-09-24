@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GitHarness · Method Figure Research</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f7f8fa;color:#1d3046;font-family:Arial,"Microsoft YaHei",sans-serif}
+header{padding:38px max(24px,6vw);background:#172c43;color:#fff}h1{font-size:32px;margin:0 0 12px}
+header p{max-width:850px;line-height:1.5;margin:0}header nav{margin-top:18px;display:flex;gap:18px;flex-wrap:wrap}header a{color:#b8e2d3}
+.toolbar{display:flex;gap:14px;align-items:center;padding:22px max(24px,6vw);font-size:15px;flex-wrap:wrap}
+.toolbar button{font:inherit;border:1px solid #aac1b8;background:#fff;border-radius:7px;padding:8px 12px;cursor:pointer}
+.toolbar button[aria-pressed=true]{background:#d9eee6}
+main{padding:0 max(24px,6vw) 50px;display:grid;grid-template-columns:repeat(auto-fit,minmax(430px,1fr));gap:18px}
+article{background:#fff;border:1px solid #d9e1e6;border-radius:9px;overflow:hidden}
+.figure{height:290px;padding:20px;display:grid;place-items:center;background:#fff}
+.figure img{max-width:100%;max-height:100%;object-fit:contain;cursor:zoom-in}
+.detail{padding:18px 22px 22px;border-top:1px solid #e6ecef}.tag{font-size:13px;color:#a45c31;font-weight:bold;letter-spacing:.04em}
+h2{font-size:19px;line-height:1.25;margin:9px 0 7px}.detail p{color:#576b7c;margin:0 0 14px}
+.detail nav{display:flex;gap:14px;flex-wrap:wrap}.detail a{font-size:14px;color:#266a5b}
+dialog{max-width:96vw;max-height:96vh;border:none;box-shadow:0 15px 70px #0005;padding:10px}dialog img{max-width:93vw;max-height:91vh}
+footer{padding:10px 6vw 35px;color:#5d6c78;font-size:14px}
+@media(max-width:500px){main{grid-template-columns:1fr}.figure{height:230px}}
+</style></head>
+<body>
+<header><h1>GitHarness · Academic Method Figures</h1>
+<p>12篇原始论文，逐张核验方法图。缩略图用于比较整体结构；点击可查看清晰裁图。图像版权归原作者及出版方，供研究阅读。</p>
+<nav><a href="survey.md">视觉调研报告</a><a href="comparison.md">跨图比较</a><a href="git_harness_design_directions.md">四种原创草图</a></nav></header>
+<div class="toolbar"><strong>View:</strong><button id="preview" aria-pressed="true">Paper-scale preview</button><button id="full" aria-pressed="false">Clear crop</button><span>680px宽为约180mm@96dpi屏幕代理，并非印刷校样。</span></div>
+<main><!-- CARDS --></main>
+<footer>图号、保存PDF物理页码、图注证据与来源详见对应分析及manifest.json。</footer>
+<dialog><img alt="Expanded original paper figure"></dialog>
+<script>
+const imgs=[...document.querySelectorAll('article img')];
+const buttons={preview:document.getElementById('preview'),full:document.getElementById('full')};
+for(const key of Object.keys(buttons)) buttons[key].onclick=()=>{
+  imgs.forEach(img=>img.src=img.dataset[key]);
+  for(const other of Object.keys(buttons)) buttons[other].setAttribute('aria-pressed',String(other===key));
+};
+const dialog=document.querySelector('dialog');
+imgs.forEach(img=>img.onclick=()=>{dialog.querySelector('img').src=img.dataset.full;dialog.showModal()});
+dialog.onclick=()=>dialog.close();
+</script>
+</body></html>

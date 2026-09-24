@@ -1,0 +1,42 @@
+{
+  "title": "Tree of Thoughts: Deliberate Problem Solving with Large Language Models",
+  "venue": "NeurIPS 2023",
+  "venue_verification_source": "https://proceedings.neurips.cc/paper_files/paper/2023/hash/271db9922b8d1f4dd7aaef84ed5ac703-Abstract-Conference.html",
+  "source_url": "https://proceedings.neurips.cc/paper_files/paper/2023/hash/271db9922b8d1f4dd7aaef84ed5ac703-Abstract-Conference.html",
+  "pdf_url": "https://proceedings.neurips.cc/paper_files/paper/2023/file/271db9922b8d1f4dd7aaef84ed5ac703-Paper-Conference.pdf",
+  "verified_date": "2026-09-23",
+  "verification_status": "Verified: downloaded original PDF; rendered and visually inspected; caption and nearby method read",
+  "figures": [
+    {
+      "figure": 1,
+      "pdf_page_1based": 2,
+      "crop_pdf_points": [
+        138,
+        69,
+        483,
+        238
+      ],
+      "screenshot": "02_figures/tree_of_thoughts_fig1_pdfp2.png",
+      "original_page": "02_figures/tree_of_thoughts_pdfp2_page.png",
+      "paper_scale_preview": "02_figures/tree_of_thoughts_fig1_180mm_150dpi.png"
+    },
+    {
+      "figure": 2,
+      "pdf_page_1based": 5,
+      "crop_pdf_points": [
+        126,
+        323,
+        484,
+        433
+      ],
+      "screenshot": "02_figures/tree_of_thoughts_fig2_pdfp5.png",
+      "original_page": "02_figures/tree_of_thoughts_pdfp5_page.png",
+      "paper_scale_preview": "02_figures/tree_of_thoughts_fig2_180mm_150dpi.png",
+      "paper_scale_preview_96dpi": "02_figures/tree_of_thoughts_fig2_180mm_96dpi.png"
+    }
+  ],
+  "technical_relevance": 4,
+  "visual_value": 5,
+  "score_scale": "1 low to 5 high; subjective design assessment",
+  "paper_scale_check": "Both 180mm at 150dpi and approximately 180mm at 96dpi (680px wide) rendered and visually inspected; no physical print check."
+}

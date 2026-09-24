@@ -1,0 +1,120 @@
+<RXDUHLQWKHPLGGOHRIDURRP 
+>@7DVNFOHDQVRPHSDQDQGSXW 
+LWLQFRXQWHUWRS
+'HFLVLRQPDNLQJ
+7DVN<RXDUHJLYHQDOLVWRIWZR 
+VWULQJV>@RIRSHQ
+
+RUFORVH 
+
+
+SDUHQWKHVHVRQO\>@
+3URJUDPPLQJ
+7DVN:KDWSURIHVVLRQGRHV-RKQ 
+/DQFKHVWHUDQG$ODQ'HDQ)RVWHU 
+KDYHLQFRPPRQ"
+5HDVRQLQJ
+>@
+$FWLRQWDNHSDQIURPVWRYHEXUQHU
+2EV1RWKLQJKDSSHQV>@
+$FWLRQFOHDQSDQZLWKVLQNEDVLQ
+2EV1RWKLQJKDSSHQV>@
+7KLQN>@QRYHOLVWMRXUQDOLVW 
+FULWLF>@QRYHOLVW 
+VFUHHQZULWHU>@FRPPRQLV 
+QRYHOLVWDQGVFUHHQZULWHU
+$FWLRQ²QRYHOLVWVFUHHQZULWHU³
+GHIPDWFKBSDUHQVOVW
+LIVFRXQW
+
+ 
+VFRXQW
+
+  VFRXQW
+
+ 
+VFRXQW
+
+>@
+UHWXUQ
+1R
+6HOIJHQHUDWHGXQLWWHVWVIDLO
+DVVHUWPDWFKBSDUHQV
+(QYLURQPHQW%LQDU\5HZDUG
+
+5XOH/0+HXULVWLF
++DOOXFLQDWLRQ
+>@IDLOHGEHFDXVH,LQFRUUHFWO\ 
+DVVXPHGWKDWWKH\ERWKKDGWKH 
+VDPHPXOWLSOHSURIHVVLRQV>@ 
+DFFXUDWHO\LGHQWLI\LQJWKHLU 
+SURIHVVLRQV
+>@ZURQJEHFDXVHLWRQO\FKHFNV 
+LIWKHWRWDOFRXQWRIRSHQDQG 
+FORVHSDUHQWKHVHVLVHTXDO>@ 
+RUGHURIWKHSDUHQWKHVHV>@
+>@WULHGWRSLFNXSWKHSDQLQ 
+VWRYHEXUQHU>@EXWWKHSDQ 
+ZDVQRWLQVWRYHEXUQHU>@
+>@
+UHWXUQ
+<HV
+LIFKHFN6RU 
+FKHFN6HOVH
+1R
+7KLQN>@6RWKHSURIHVVLRQ 
+-RKQ/DQFKHVWHUDQG$ODQ'HDQ 
+)RVWHUKDYHLQFRPPRQLVQRYHOLVW
+$FWLRQ²QRYHOLVW³
+>@$FWLRQWDNHSDQIURP
+VWRYHEXUQHU
+>@2EV<RXSXWWKHSDQLQ 
+FRXQWHUWRS
+F
+(YDOXDWLRQ
+G
+5HIOHFWLRQ
+H1H[W
+7UDMHFWRU\
+E
+7UDMHFWRU\
+D7DVN
+LQWHUQDOH[WHUQDO
+Figure 1: Reflexion works on decision-making 4.1, programming 4.3, and reasoning 4.2 tasks.
+accomplish complex tasks in a few-shot manner – by reflecting on their previous failures in order to
+form an improved plan of attack for the next attempt. For example, in figure 1, a Reflexion agent
+learns to optimize its own behavior to solve decision-making, programming, and reasoning tasks
+through trial, error, and self-reflection.
+Generating useful reflective feedback is challenging since it requires a good understanding of where
+the model made mistakes (i.e. the credit assignment problem [25]) as well as the ability to generate
+a summary containing actionable insights for improvement. We explore three ways for doing
+this – simple binary environment feedback, pre-defined heuristics for common failure cases, and
+self-evaluation such as binary classification using LLMs (decision-making) or self-written unit
+tests (programming). In all implementations, the evaluation signal is amplified to natural language
+experience summaries which can be stored in long-term memory.
+Reflexion has several advantages compared to more traditional RL approaches like policy or value-
+based learning: 1) it is lightweight and doesn’t require finetuning the LLM, 2) it allows for more
+nuanced forms of feedback (e.g. targeted changes in actions), compared to scalar or vector rewards
+that are challenging to perform accurate credit assignment with, 3) it allows for a more explicit and
+interpretable form of episodic memory over prior experiences, and 4) it provides more explicit hints
+for actions in future episodes. At the same time, it does have the disadvantages of relying on the
+power of the LLM’s self-evaluation capabilities (or heuristics) and not having a formal guarantee for
+success. However, as LLM capabilities improve, we only expect this paradigm to get better over time.
+We perform experiments on (1) decision-making tasks to test sequential action choices over long
+trajectories, (2) reasoning tasks to test knowledge-intensive, single-step generation improvement,
+and (3) programming tasks to teach the agent to effectively use external tools such as compilers
+and interpreters. Across all three types of tasks, we observe Reflexion agents are better decision-
+makers, reasoners, and programmers. More concretely, Reflexion agents improve on decision-making
+AlfWorld [24] tasks over strong baseline approaches by an absolute 22% in 12 iterative learning
+steps, and on reasoning questions in HotPotQA [28] by 20%, and Python programming tasks on
+HumanEval [6] by as much as 11%.
+To summarize, our contributions are the following:
+• We propose Reflexion, a new paradigm for ‘verbal‘ reinforcement that parameterizes a
+policy as an agent’s memory encoding paired with a choice of LLM parameters.
+• We explore this emergent property of self-reflection in LLMs and empirically show that
+self-reflection is extremely useful to learn complex tasks over a handful of trials.
+• We introduce LeetcodeHardGym, a code-generation RL gym environment consisting of 40
+challenging Leetcode questions (‘hard-level‘) in 19 programming languages.
+• We show that Reflexion achieves improvements over strong baselines across several tasks,
+and achieves state-of-the-art results on various code generation benchmarks.
+2

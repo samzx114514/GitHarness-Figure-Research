@@ -1,0 +1,75 @@
+Inventory (5/36): {'oak_planks': 3, 'stick': 
+4, 'crafting_table': 1, 'stone': 3, 
+'wooden_pickaxe': 1}
+Biome: river
+Inventory (4/36): {'sugar_cane': 3, 'paper': 
+3, 'fishing_rod': 1, 'wooden_pickaxe': 1}
+Nearby entities: pig, cat, villager
+Health: 12/20
+Hunger: 0/20
+Inventory (6/36): {'furnace': 1, 
+'stone_pickaxe': 1, 'oak_planks': 7, 
+'crafting_table': 1, 'raw_iron': 4, 'coal': 1} 
+Time: night
+Nearby entities: zombie
+Equipment: 'stone_sword', 'shield'
+Reasoning: Since you have a wooden pickaxe and some stones, it would be 
+beneficial to upgrade your pickaxe to a stone pickaxe for better efficiency.
+Task: Craft 1 stone pickaxe.
+Reasoning: Since you have a fishing rod in your inventory and you are near a river 
+biome, it would be a good opportunity to catch some fish for food and experience. 
+Task: Catch 1 fish.
+Reasoning: Your hunger is at 0, which means you need to find food to replenish 
+your hunger. Since there are pigs nearby, you can kill one to obtain raw porkchops.
+Task: Kill 1 pig.
+Reasoning: You have raw iron and coal, and you have a furnace. It's time to smelt 
+the iron to make iron ingots, which can be used to craft better tools and armor.
+Task: Smelt 4 raw iron.
+Reasoning: Since it's night and there's a zombie nearby, it's a good opportunity to 
+try killing the zombie now that you have a stone sword and a shield equipped.
+Task: Kill 1 zombie.
+GPT-4
+GPT-4
+GPT-4
+GPT-4
+GPT-4
+Figure 3: Tasks proposed by the automatic curriculum. We only display the partial prompt for brevity.
+See Appendix, Sec. A.3 for the full prompt structure.
+Each program is indexed by the embedding of its description, which can be retrieved in similar
+situations in the future. Complex skills can be synthesized by composing simpler programs, which
+compounds VOYAGER’s capabilities rapidly over time and alleviates catastrophic forgetting in other
+continual learning methods [31, 32].
+However, LLMs struggle to produce the correct action code consistently in one shot [41]. To address
+this challenge, we propose an iterative prompting mechanism that: (1) executes the generated
+program to obtain observations from the Minecraft simulation (such as inventory listing and nearby
+creatures) and error trace from the code interpreter (if any); (2) incorporates the feedback into GPT-4’s
+prompt for another round of code refinement; and (3) repeats the process until a self-verification
+module confirms the task completion, at which point we commit the program to the skill library (e.g.,
+craftStoneShovel() and combatZombieWithSword()) and query the automatic curriculum for
+the next milestone (Fig. 2).
+Empirically, VOYAGER demonstrates strong in-context lifelong learning capabilities. It can construct
+an ever-growing skill library of action programs that are reusable, interpretable, and generalizable
+to novel tasks. We evaluate VOYAGER systematically against other LLM-based agent techniques
+(e.g., ReAct [29], Reflexion [30], AutoGPT [28]) in MineDojo [23], an open-source Minecraft AI
+framework. VOYAGER outperforms prior SOTA by obtaining 3.3× more unique items, unlocking key
+tech tree milestones up to 15.3× faster, and traversing 2.3× longer distances. We further demonstrate
+that VOYAGER is able to utilize the learned skill library in a new Minecraft world to solve novel tasks
+from scratch, while other methods struggle to generalize.
+2
+Method
+VOYAGER consists of three novel components: (1) an automatic curriculum (Sec. 2.1) that suggests
+objectives for open-ended exploration, (2) a skill library (Sec. 2.2) for developing increasingly
+complex behaviors, and (3) an iterative prompting mechanism (Sec. 2.3) that generates executable
+code for embodied control. Full prompts are presented in Appendix, Sec. A.
+2.1
+Automatic Curriculum
+Embodied agents encounter a variety of objectives with different complexity levels in open-ended
+environments. An automatic curriculum offers numerous benefits for open-ended exploration, ensur-
+ing a challenging but manageable learning process, fostering curiosity-driven intrinsic motivation
+for agents to learn and explore, and encouraging the development of general and flexible problem-
+solving strategies [42–44]. Our automatic curriculum capitalizes on the internet-scale knowledge
+contained within GPT-4 by prompting it to provide a steady stream of new tasks or challenges. The
+curriculum unfolds in a bottom-up fashion, allowing for considerable adaptability and responsiveness
+to the exploration progress and the agent’s current state (Fig. 3). As VOYAGER progresses to harder
+self-driven goals, it naturally learns a variety of skills, such as “mining a diamond”.
+3

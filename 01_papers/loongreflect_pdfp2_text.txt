@@ -1,0 +1,117 @@
+bility is particularly important over long horizons, where lo-
+calized errors—such as irrelevant retrievals, spurious entity
+associations, or stale memory updates—can enter the active
+context and influence many subsequent decisions. Without
+an explicit mechanism for isolating and correcting such er-
+rors, state contamination compounds as the trajectory grows,
+becoming a major obstacle to reliable agent behavior (Zhu
+et al. 2025; Jiang et al. 2025a,b; Zhang et al. 2026).
+Despite its importance, learning effective reflection faces
+two fundamental challenges, as illustrated in Figure 1. ❶
+(C1) Learning-signal dilemma. The value of a reflective
+decision is mediated by many subsequent actions and is re-
+vealed only through the final task outcome. Outcome-based
+reinforcement learning therefore provides sparse, delayed,
+and weakly attributable supervision for reflection. Yet as-
+signing reflection an explicit intermediate reward is equally
+problematic and prone to reward hacking, as it may encour-
+age excessive or superficial reflection without improving task
+success. ❷(C2) Local–global perspective gap. Reflection is
+performed from the context of the current branch, whereas
+its true value depends on how that branch contributes to the
+complete trajectory. A local reflector cannot directly observe
+whether continuing, revising, or abandoning the branch will
+ultimately improve the outcome. Together, these challenges
+create a fundamental mismatch: effective reflection must
+be learned from dense local guidance, yet evaluated and
+calibrated from a global trajectory perspective.
+Existing approaches address only part of this problem. ❶
+One line of work improves intermediate judgment through
+step-level verification or action evaluation (Lightman et al.
+2024; Wang et al. 2024; Liu et al. 2026b,a; Guo et al. 2025).
+❷Another provides denser learning signals through privi-
+leged feedback or error-localized supervision (Agarwal et al.
+2024; Zhao et al. 2026a,b; Li, Hong, and Lan 2026; Huang
+et al. 2026). However, these approaches either treat reflection
+primarily as local judgment or rely on misaligned supervi-
+sion signals that are not fully consistent with long-horizon
+outcomes. They therefore fall short of learning reflection as
+trajectory-level control for long-horizon agents.
+To address C1&C2, we propose LoongReflect, a train-
+ing framework that formulates reflection as a memory-
+control policy, designed for long-horizon setting. Rather
+than treating reflection as unconstrained verbal feedback,
+LoongReflectturns it into explicit, structured decisions
+over what the agent should retain, revise, or discard from
+its reasoning memory. Specifically, the agent operates over
+a reversible trajectory tree with an explicit active path and
+two control actions: <reflect> and <backtrack>. The
+<reflect> action consolidates verified facts, missing evi-
+dence, and branch-specific risks into working memory. When
+the current branch is deemed unreliable, the <backtrack>
+action removes its contaminated suffix from the active con-
+text, restores a validated state, and preserves a concise cor-
+rective lesson for subsequent decisions.
+We train this memory-control policy through two com-
+plementary learning channels designed to resolve the two
+challenges jointly. ❶A fast channel distills reflective be-
+havior from a privileged teacher, with supervision restricted
+to reflection and backtracking tokens. This token-level su-
+pervision provides the dense learning signal missing from
+outcome-based reinforcement learning, thereby addressing
+C1. Moreover, because the teacher observes the trajectory
+tree and terminal outcome, it can evaluate a local branch
+from a global perspective, thereby addressing C2. To prevent
+answer imitation, the teacher produces answer-masked feed-
+back that focuses exclusively on state diagnosis, missing evi-
+dence, branch risks, and control decisions. ❷A slow channel
+applies outcome-based GRPO to complete trajectories, en-
+suring that the distilled reflective behavior remains aligned
+with final task success. We coordinate the two channels
+through a look-ahead, extragradient-style update, in which
+the slow objective evaluates and calibrates the update direc-
+tion proposed by the fast channel before the combined update
+is committed. Our contributions are as follows:
+• We formulate reflection as a memory-control policy
+for long-horizon agents and instantiate it through ex-
+plicit <reflect> and <backtrack> actions over a
+reversible trajectory tree.
+• We introduce a two-channel learning framework that
+combines answer-masked teacher distillation for dense,
+globally informed reflective supervision with outcome-
+based GRPO for trajectory-level alignment, coordinated
+through a look-ahead, extragradient-style update.
+• LoongReflect consistently outperforms outcome-only
+RL and self-distillation baselines on multi-hop RAG and
+mathematical benchmarks, demonstrating the contribu-
+tions of structured reflection, reversible backtracking, and
+two-channel optimization.
+2
+Related Work
+Long-Horizon Agents
+Large language models increasingly serve as the policy back-
+bone of agents that interleave reasoning, retrieval, and tool
+use over extended interactions (Yao et al. 2022; Schick et al.
+2023; Asai et al. 2024). Recent studies apply reinforcement
+learning to optimize long-horizon interaction and search
+policies directly from task outcomes (Chen et al. 2025; Gao
+et al. 2025). Memory-oriented approaches further support ex-
+tended execution by compressing interaction histories or ex-
+plicitly manipulating intermediate states (Jiang et al. 2025a;
+Zhang et al. 2026). For example, MEM1 jointly optimizes
+reasoning and compact memory, while AgenticRAG-R1 in-
+troduces stack-based memory with planning, summarization,
+and backtracking actions (Zhou et al. 2025; Jiang et al.
+2025b). However, these methods largely rely on task-level
+objectives or generic action-quality signals, offering limited
+supervision for identifying which local decision corrupted
+the execution state or whether a recovery action was effective.
+A complementary line of work provides denser corrective
+signals through on-policy distillation: OPSD distills a priv-
+ileged self-teacher on trajectories generated by the current
+policy, whereas ROSD localizes supervision to the first erro-
+neous span to preserve valid prefixes (Zhao et al. 2026a,b).
+Nevertheless, these methods are primarily designed for linear
+reasoning traces and provide limited support for reversible
+branch-level recovery or for aligning local corrections
+with delayed task outcomes.

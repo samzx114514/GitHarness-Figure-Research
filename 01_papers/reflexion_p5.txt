@@ -1,0 +1,57 @@
+learned over several trials, which is a key advantage of Reflexion agents over other LLM action
+choice works.
+The Reflexion process
+Reflexion is formalized as an iterative optimization process in 1. In the
+first trial, the Actor produces a trajectory τ0 by interacting with the environment. The Evaluator then
+produces a score r0 which is computed as rt = Me(τ0). rt is only a scalar reward for trial t that
+improves as task-specific performance increases. After the first trial, to amplify r0 to a feedback form
+that can be used for improvement by an LLM, the Self-Reflection model analyzes the set of {τ0, r0}
+to produce a summary sr0 which is stored in the memory mem. srt is a verbal experience feedback
+for trial t. The Actor, Evaluator, and Self-Reflection models work together through trials in a loop
+until the Evaluator deems τt to be correct. As mentioned in 3, the memory component of Reflexion
+is crucial to its effectiveness. After each trial t, srt, is appended mem. In practice, we bound mem
+by a maximum number of stored experiences, Ω(usually set to 1-3) to adhere to max context LLM
+limitations.
+4
+Experiments
+We evaluate various natural language RL setups on decision-making, reasoning, and code generation
+tasks. Specifically, we challenge an agent to perform search-based question answering on HotPotQA
+[28], multi-step tasks in common household environments in AlfWorld [24], and code writing tasks
+in competition-like environments with interpreters and compilers in HumanEval [6], MBPP [2],
+and LeetcodeHard, a new benchmark. Most notably, Reflexion improves performance over strong
+baselines by 22% in AlfWorld, 20% in HotPotQA, and 11% on HumanEval.
+4.1
+Sequential decision making: ALFWorld
+AlfWorld is a suite of text-based environments that challenge an agent to solve multi-step tasks
+in a variety of interactive environments based on TextWorld [8]. Following Yao et al. [30], we
+run the agent in 134 AlfWorld environments across six different tasks, including finding hidden
+objects (e.g., finding a spatula in a drawer), moving objects (e.g., moving a knife to the cutting
+board), and manipulating objects with other objects (e.g., chilling a tomato in the fridge). We use
+ReAct [30] as the action generator as Yao et al. [30] has shown success in long trajectory decision-
+making using explicit intermediate thoughts. AlfWorld tasks naturally require a self-evaluation step
+as the environment can only signal if a task is complete. To achieve fully autonomous behavior,
+we implement two self-evaluation techniques: natural language classification using an LLM and a
+hand-written heuristic. The heuristic is simple: if the agent executes the same action and receives the
+same response for more than 3 cycles, or if the number of actions taken in the current environment
+exceeds 30 (inefficient planning), we self-reflect. In the baseline runs, if self-reflection is suggested,
+we skip the self-reflection process, reset the environment, and start a new trial. In the Reflexion runs,
+the agent uses self-reflection to find its mistake, update its memory, reset the environment, and start a
+new trial. To avoid very long prompt windows that may exceed the maximum limit, we truncate the
+agent’s memory to the last 3 self-reflections (experiences).
+To avoid syntactic errors, we provide two domain-specific few-shot trajectories to the agent. We use
+the same few-shot trajectory examples as Yao et al. [30] with GPT-3 for the LLM. AlfWorld tasks,
+ReAct few-shot prompts, and Reflexion examples are included in the appendix.
+Results
+ReAct + Reflexion significantly outperforms ReAct by completing 130 out of 134 tasks
+using the simple heuristic to detect hallucinations and inefficient planning. Further, ReAct + Reflexion
+learns to solve additional tasks by learning in 12 consecutive trials. In the ReAct-only approach, we
+see that performance increase halts between trials 6 and 7.
+Analysis
+A common error in baseline failed AlfWorld trajectories is when an agent thinks that it
+has possession of an item but does not actually have the item. The agent proceeds to execute several
+actions in a long trajectory and is not able to backtrack its actions to find the mistake. Reflexion
+eliminates almost all of these cases by using self-reflection to distill long, failed trajectories into
+relevant experiences that can are used as "self-hints" in the future. There are two main cases in which
+long-term memory helps an agent in AlfWorld: 1) An early mistake in a long trajectory can be easily
+identified. The agent can suggest a new action choice or even a new long-term plan. 2) There are too
+5

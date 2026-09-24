@@ -1,0 +1,322 @@
+Method
+In-Domain F1 (%)
+Out-of-Domain F1 (%)
+Average F1 (%)
+Paradigm
+Approach
+2Wiki
+HotpotQA
+Bamboogle
+FRAMES
+MuSiQue
+NQ
+TriviaQA
+Avg.
+Qwen2.5-3B
+No RAG
+Base
+23.98
+24.08
+9.45
+8.01
+9.70
+14.27
+38.84
+18.33
+CoT
+18.90
+23.82
+20.80
+7.16
+10.47
+16.53
+39.62
+19.61
+Naive RAG
+FS-RAG
+15.47
+25.85
+10.48
+10.42
+7.64
+19.84
+45.38
+19.30
+FL-RAG
+16.80
+26.78
+11.05
+9.19
+7.29
+21.93
+48.50
+20.22
+Agentic RAG
+ReAct
+25.09
+34.37
+24.86
+10.53
+13.92
+27.19
+46.04
+26.00
+IRCoT
+15.89
+24.50
+25.27
+6.79
+12.43
+27.86
+49.19
+23.13
+TCRAG
+28.47
+21.94
+17.59
+7.69
+8.99
+20.74
+50.46
+22.27
+ReSearch
+27.23
+33.96
+15.09
+10.00
+9.47
+34.61
+53.93
+26.33
+RL-based
+Search-R1
+29.90
+37.24
+29.90
+10.76
+13.53
+34.73
+55.08
+30.16
+AEPO
+23.01
+28.71
+22.09
+12.26
+11.70
+26.76
+47.78
+24.62
+ARPO
+29.55
+36.48
+27.32
+13.49
+13.38
+33.29
+53.66
+29.60
+Mem1
+18.06
+20.15
+5.19
+4.99
+4.47
+19.18
+33.09
+15.02
+AgenticRAG-R1
+32.92
+44.00
+31.48
+16.23
+16.48
+37.15
+56.62
+33.55
+LoongReflect
+48.01
+56.17
+35.25
+23.51
+31.02
+55.37
+73.72
+46.15
+Qwen2.5-7B
+No RAG
+Base
+25.41
+26.63
+17.86
+12.52
+12.15
+19.72
+49.08
+23.34
+CoT
+23.55
+29.10
+37.56
+17.60
+14.35
+22.47
+49.33
+27.71
+Naive RAG
+FS-RAG
+17.71
+29.21
+16.86
+12.52
+10.74
+16.82
+35.02
+19.84
+FL-RAG
+19.78
+34.42
+24.10
+12.10
+12.46
+19.72
+42.66
+23.61
+Agentic RAG
+ReAct
+27.51
+42.81
+27.63
+15.29
+19.34
+30.01
+54.55
+31.02
+IRCoT
+36.45
+26.29
+21.90
+6.78
+8.39
+19.63
+49.43
+24.12
+TCRAG
+29.70
+40.83
+25.13
+16.46
+17.56
+29.01
+54.78
+30.50
+ReSearch
+30.03
+30.39
+30.42
+15.61
+12.58
+23.69
+48.25
+27.28
+RL-based
+Search-R1
+35.03
+38.89
+42.04
+18.01
+19.08
+29.59
+55.91
+34.08
+AEPO
+19.88
+13.85
+13.24
+7.24
+5.85
+9.93
+17.53
+12.50
+ARPO
+30.71
+25.20
+32.94
+12.18
+12.71
+17.80
+40.16
+24.53
+Mem1
+25.29
+29.98
+36.50
+14.15
+14.13
+26.38
+51.04
+28.21
+AgenticRAG-R1
+38.34
+45.15
+49.21
+19.44
+22.01
+23.60
+58.45
+36.60
+LoongReflect
+54.44
+53.27
+53.89
+23.17
+25.81
+58.98
+74.91
+49.21
+Table 1: Performance comparison (F1, %) on multi-hop and open-domain QA benchmarks across no-RAG, naive-RAG, agentic-
+RAG, and RL-based paradigms using Qwen2.5-3B and 7B. 2Wiki and HotpotQA are in-domain; Others are out-of-domain.
+Main Result Analysis
+To answer RQ1, Table 1 compares LoongReflect with
+representative baselines across the seven QA benchmarks.
+LoongReflect achieves the highest F1 on every bench-
+mark with both model sizes. Its average F1 reaches 46.15
+with Qwen2.5-3B and 49.21 with Qwen2.5-7B, exceeding
+the strongest baseline, AgenticRAG-R1, by 12.60 and 12.61
+points, respectively. The improvement extends beyond the
+training distribution. On Qwen2.5-3B, LoongReflect raises
+the in-domain average from 38.46 to 52.09 and the out-of-
+domain average from 31.59 to 43.77 relative to AgenticRAG-
+R1. On Qwen2.5-7B, the corresponding averages increase
+from 41.75 to 53.86 and from 34.54 to 47.35. The consistent
+gains across model scales and evaluation regimes indicate
+that explicit reflection generalize beyond the training bench-
+marks rather than merely fitting the in-domain tasks.
+Transfer to Mathematical Reasoning
+To answer RQ2, Table 3 evaluates whether the learned re-
+flection policy transfers beyond retrieval. With Qwen2.5-3B,
+LoongReflect obtains 56.0 F1 on MATH and 82.4 F1 on
+GSM8K. It improves over AgenticRAG-R1 by 1.2 and 1.8
+points, and over RLSD by 2.4 and 1.7 points, respectively. Al-
+though LoongReflect is motivated by long-horizon search,
+the gains on both datasets suggest that its learned diagno-
+sis and recovery behavior also benefits multi-step reasoning
+without external retrieval.
+Contributions of the Training Stages
+To answer RQ3, Table 4 separates the effects of curated
+supervised fine-tuning and two-channel reinforcement learn-
+ing. SFT improves average F1 over the raw instruction model
+by 4.43 points for Qwen2.5-3B and 3.54 points for Qwen2.5-
+7B, establishing an initial policy for reflection and backtrack-
+ing. Applying two-channel RL yields a further 11.39-point
+gain for 3B and a 7.94-point gain for 7B. Overall, the com-
+plete pipeline improves over the raw backbones by 15.82
+and 11.48 points. These results show that SFT provides a
+useful reflective prior, while globally calibrated two-channel
+optimization contributes the larger performance gain.
+Ablation and Analysis
+❶Component Ablation. To answer RQ4, Table 2 first ex-
+amines the two memory-control actions. Removing reflection
+reduces average F1 from 46.15 to 30.84 (−15.31), while re-
+moving backtracking lowers it to 33.09 (−13.06). The former
+result shows the importance of diagnosing the active state;

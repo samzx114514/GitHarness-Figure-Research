@@ -1,0 +1,37 @@
+{
+  "slug": "amem",
+  "title": "A-Mem: Agentic Memory for LLM Agents",
+  "venue": "NeurIPS 2025",
+  "venue_source": "https://proceedings.neurips.cc/paper_files/paper/2025/hash/19909c36f51abc4856b4560aff3d36d6-Abstract-Conference.html",
+  "pdf_url": "https://papers.neurips.cc/paper_files/paper/2025/file/19909c36f51abc4856b4560aff3d36d6-Paper-Conference.pdf",
+  "figure": 2,
+  "technical_score": 4,
+  "visual_score": 3,
+  "method_sections": [
+    "3.2 Link Generation",
+    "3.3 Memory Evolution"
+  ],
+  "text_pages": [
+    4,
+    5
+  ],
+  "source_url": "https://proceedings.neurips.cc/paper_files/paper/2025/hash/19909c36f51abc4856b4560aff3d36d6-Abstract-Conference.html",
+  "pdf_page_1based": 4,
+  "printed_page": 4,
+  "crop_pdf_points": [
+    108,
+    70,
+    505,
+    260
+  ],
+  "crop_coordinate_system": "PDF points; top-left origin; [x0,y0,x1,y1]",
+  "verification_status": "Verified: PDF rendered and visually inspected, caption and nearby methods read",
+  "pdf_path": "01_papers/amem.pdf",
+  "screenshot": "02_figures/amem_fig2_pdfp4.png",
+  "full_page_screenshot": "02_figures/amem_pdfp4_full.png",
+  "paper_scale_screenshot": "02_figures/amem_fig2_pdfp4_180mm.png",
+  "paper_scale_check": "680 px width, approximately 180 mm at 96 dpi; visually inspected, not a physical print proof",
+  "accessed": "2026-09-23",
+  "sha256": "c3a1ab47a15868d91ecbcfb10e0e2dde41342f79939a23a405f54e60ca7c9b52",
+  "pdf_pages": 28
+}

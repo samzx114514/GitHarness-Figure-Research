@@ -1,0 +1,419 @@
+{
+  "date": "2026-09-24",
+  "papers": [
+    {
+      "slug": "ace",
+      "title": "Agentic Context Engineering: Evolving Contexts for Self-Improving Language Models",
+      "venue": "ICLR 2026",
+      "source_url": "https://iclr.cc/virtual/2026/poster/10008343",
+      "pdf_url": "https://arxiv.org/pdf/2510.04618",
+      "local_pdf": "01_papers/ace.pdf",
+      "pdf_sha256": "51050ced82df75c143b151262d5af8763916968ca50374bd8ff778f40552b0ad",
+      "analysis": "03_analysis/ace.md",
+      "figures": [
+        {
+          "number": 4,
+          "pdf_page_1based": 5,
+          "crop_pdf_points": [
+            108,
+            80,
+            505,
+            206
+          ],
+          "screenshot": "02_figures/ace_fig4_pdfp5.png",
+          "preview": "02_figures/ace_fig4_pdfp5_180mm.png",
+          "whole_page": "02_figures/ace_pdfp5_full.png"
+        }
+      ],
+      "technical_relevance_1to5": 4,
+      "visual_transfer_1to5": 5,
+      "status": "Verified: PDF rendered and visually inspected, caption and nearby methods read"
+    },
+    {
+      "slug": "agent_lightning",
+      "title": "Agent Lightning: Train ANY AI Agents with Reinforcement Learning",
+      "venue": "arXiv preprint, 2025",
+      "source_url": "https://arxiv.org/abs/2508.03680",
+      "pdf_url": "https://arxiv.org/pdf/2508.03680v1",
+      "local_pdf": "01_papers/agent_lightning.pdf",
+      "pdf_sha256": "e223648a09b021785a46f60dd5ce13301622eca930ff91a5b45e971b53422561",
+      "analysis": "03_analysis/agent_lightning.md",
+      "figures": [
+        {
+          "number": 1,
+          "pdf_page_1based": 2,
+          "crop_pdf_points": [
+            70,
+            65,
+            525,
+            210
+          ],
+          "screenshot": "02_figures/agent_lightning_fig1_pdfp2.png",
+          "preview": "02_figures/agent_lightning_fig1_pdfp2_180mm.png",
+          "whole_page": "02_figures/agent_lightning_page_02.png"
+        },
+        {
+          "number": 2,
+          "pdf_page_1based": 6,
+          "crop_pdf_points": [
+            70,
+            65,
+            540,
+            210
+          ],
+          "screenshot": "02_figures/agent_lightning_fig2_pdfp6.png",
+          "preview": "02_figures/agent_lightning_fig2_pdfp6_180mm.png",
+          "whole_page": "02_figures/agent_lightning_page_06.png"
+        },
+        {
+          "number": 3,
+          "pdf_page_1based": 8,
+          "crop_pdf_points": [
+            70,
+            65,
+            535,
+            217
+          ],
+          "screenshot": "02_figures/agent_lightning_fig3_pdfp8.png",
+          "preview": "02_figures/agent_lightning_fig3_pdfp8_180mm.png",
+          "whole_page": "02_figures/agent_lightning_page_08.png"
+        },
+        {
+          "number": 4,
+          "pdf_page_1based": 9,
+          "crop_pdf_points": [
+            155,
+            65,
+            445,
+            217
+          ],
+          "screenshot": "02_figures/agent_lightning_fig4_pdfp9.png",
+          "preview": "02_figures/agent_lightning_fig4_pdfp9_180mm.png",
+          "whole_page": "02_figures/agent_lightning_page_09.png"
+        }
+      ],
+      "technical_relevance_1to5": 4,
+      "visual_transfer_1to5": 4,
+      "status": "Verified: original PDF and figure inspected"
+    },
+    {
+      "slug": "agenticrag_r1",
+      "title": "AgenticRag-R1: Agentic Reinforcement Learning with Stack Memory for Multi-Step Reasoning, Retrieval and Memorizing",
+      "venue": "arXiv preprint, 2026; venue unverified",
+      "source_url": "https://arxiv.org/abs/2608.29622",
+      "pdf_url": "https://arxiv.org/pdf/2608.29622v1",
+      "local_pdf": "01_papers/agenticrag_r1.pdf",
+      "pdf_sha256": "0813b237f6b47aecbbaf4d83c674fc9b3f817ddd5cb96dc1a00dc89dd50e3ffa",
+      "analysis": "03_analysis/agenticrag_r1.md",
+      "figures": [
+        {
+          "number": 2,
+          "pdf_page_1based": 4,
+          "crop_pdf_points": [
+            68,
+            65,
+            530,
+            263
+          ],
+          "screenshot": "02_figures/agenticrag_r1_fig2_pdfp4.png",
+          "preview": "02_figures/agenticrag_r1_fig2_pdfp4_180mm.png",
+          "whole_page": "02_figures/agenticrag_r1_page_04.png"
+        }
+      ],
+      "technical_relevance_1to5": 4,
+      "visual_transfer_1to5": 5,
+      "status": "Verified: original PDF and figure inspected"
+    },
+    {
+      "slug": "amem",
+      "title": "A-Mem: Agentic Memory for LLM Agents",
+      "venue": "NeurIPS 2025",
+      "source_url": "https://proceedings.neurips.cc/paper_files/paper/2025/hash/19909c36f51abc4856b4560aff3d36d6-Abstract-Conference.html",
+      "pdf_url": "https://papers.neurips.cc/paper_files/paper/2025/file/19909c36f51abc4856b4560aff3d36d6-Paper-Conference.pdf",
+      "local_pdf": "01_papers/amem.pdf",
+      "pdf_sha256": "c3a1ab47a15868d91ecbcfb10e0e2dde41342f79939a23a405f54e60ca7c9b52",
+      "analysis": "03_analysis/amem.md",
+      "figures": [
+        {
+          "number": 2,
+          "pdf_page_1based": 4,
+          "crop_pdf_points": [
+            108,
+            70,
+            505,
+            260
+          ],
+          "screenshot": "02_figures/amem_fig2_pdfp4.png",
+          "preview": "02_figures/amem_fig2_pdfp4_180mm.png",
+          "whole_page": "02_figures/amem_pdfp4_full.png"
+        }
+      ],
+      "technical_relevance_1to5": 4,
+      "visual_transfer_1to5": 3,
+      "status": "Verified: PDF rendered and visually inspected, caption and nearby methods read"
+    },
+    {
+      "slug": "awm",
+      "title": "Agent Workflow Memory",
+      "venue": "ICML 2025",
+      "source_url": "https://proceedings.mlr.press/v267/wang25bx.html",
+      "pdf_url": "https://raw.githubusercontent.com/mlresearch/v267/main/assets/wang25bx/wang25bx.pdf",
+      "local_pdf": "01_papers/awm.pdf",
+      "pdf_sha256": "ce49b6b138c803342619504f9736116d25afbab30412509971a7ce4bbe0901a1",
+      "analysis": "03_analysis/awm.md",
+      "figures": [
+        {
+          "number": 2,
+          "pdf_page_1based": 3,
+          "crop_pdf_points": [
+            54,
+            80,
+            292,
+            230
+          ],
+          "screenshot": "02_figures/awm_fig2_pdfp3.png",
+          "preview": "02_figures/awm_fig2_pdfp3_180mm.png",
+          "whole_page": "02_figures/awm_pdfp3_full.png"
+        },
+        {
+          "number": 3,
+          "pdf_page_1based": 3,
+          "crop_pdf_points": [
+            304,
+            430,
+            542,
+            505
+          ],
+          "screenshot": "02_figures/awm_fig3_pdfp3.png",
+          "preview": "02_figures/awm_fig3_pdfp3_180mm.png",
+          "whole_page": "02_figures/awm_pdfp3_full.png"
+        }
+      ],
+      "technical_relevance_1to5": 4,
+      "visual_transfer_1to5": 4,
+      "status": "Verified: PDF rendered and visually inspected, caption and nearby methods read"
+    },
+    {
+      "slug": "ds_agent",
+      "title": "DS-Agent: Automated Data Science by Empowering Large Language Models with Case-Based Reasoning",
+      "venue": "ICML 2024",
+      "source_url": "https://proceedings.mlr.press/v235/guo24b.html",
+      "pdf_url": "https://raw.githubusercontent.com/mlresearch/v235/main/assets/guo24b/guo24b.pdf",
+      "local_pdf": "01_papers/ds_agent.pdf",
+      "pdf_sha256": "6fd64ed02e8c54e01035505cc7b4c75d97a1fede5137d5183b5e6566f9c2a3a0",
+      "analysis": "03_analysis/ds_agent.md",
+      "figures": [
+        {
+          "number": 3,
+          "pdf_page_1based": 4,
+          "crop_pdf_points": [
+            53,
+            65,
+            544,
+            251
+          ],
+          "screenshot": "02_figures/ds_agent_fig3_pdfp4.png",
+          "preview": "02_figures/ds_agent_fig3_pdfp4_180mm.png",
+          "whole_page": "02_figures/ds_agent_page_04.png"
+        }
+      ],
+      "technical_relevance_1to5": 4,
+      "visual_transfer_1to5": 3,
+      "status": "Verified: original PDF and figure inspected"
+    },
+    {
+      "slug": "expel",
+      "title": "ExpeL: LLM Agents Are Experiential Learners",
+      "venue": "AAAI 2024",
+      "source_url": "https://ojs.aaai.org/index.php/AAAI/article/view/29936",
+      "pdf_url": "https://yongjinliu.github.io/files/2024-ExpeL_LLM_Agents_Are_Experiential_Learners.pdf",
+      "local_pdf": "01_papers/expel.pdf",
+      "pdf_sha256": "c465fb454cf7261820e4e6cef650a31aa3a8f9e06010c92ec48212cfccb96ac3",
+      "analysis": "03_analysis/expel.md",
+      "figures": [
+        {
+          "number": 1,
+          "pdf_page_1based": 3,
+          "crop_pdf_points": [
+            50,
+            38,
+            562,
+            380
+          ],
+          "screenshot": "02_figures/expel_fig1_pdfp3.png",
+          "preview": "02_figures/expel_fig1_180mm96dpi.png",
+          "whole_page": "02_figures/expel_pdfp3_full.png"
+        }
+      ],
+      "technical_relevance_1to5": 4,
+      "visual_transfer_1to5": 5,
+      "status": "Verified: downloaded PDF; rendered full page and crop; inspected crop and 680px proof; caption and adjacent method text checked"
+    },
+    {
+      "slug": "lats",
+      "title": "Language Agent Tree Search Unifies Reasoning, Acting, and Planning in Language Models",
+      "venue": "ICML 2024",
+      "source_url": "https://proceedings.mlr.press/v235/zhou24r.html",
+      "pdf_url": "https://raw.githubusercontent.com/mlresearch/v235/main/assets/zhou24r/zhou24r.pdf",
+      "local_pdf": "01_papers/lats.pdf",
+      "pdf_sha256": "a6b84613eeeaa3beb979ac3e34cbb3575bceb7ccf6050a2c2fc677d5e3a3ab19",
+      "analysis": "03_analysis/lats.md",
+      "figures": [
+        {
+          "number": 1,
+          "pdf_page_1based": 1,
+          "crop_pdf_points": [
+            330,
+            188,
+            513,
+            299
+          ],
+          "screenshot": "02_figures/lats_fig1_pdfp1.png",
+          "preview": "02_figures/lats_fig1_180mm_150dpi.png",
+          "whole_page": "02_figures/lats_pdfp1_page.png"
+        },
+        {
+          "number": 2,
+          "pdf_page_1based": 5,
+          "crop_pdf_points": [
+            52,
+            66,
+            562,
+            244
+          ],
+          "screenshot": "02_figures/lats_fig2_pdfp5.png",
+          "preview": "02_figures/lats_fig2_180mm_96dpi.png",
+          "whole_page": "02_figures/lats_pdfp5_page.png"
+        }
+      ],
+      "technical_relevance_1to5": 4,
+      "visual_transfer_1to5": 4,
+      "status": "Verified: downloaded original PDF; rendered and visually inspected; caption and nearby method read"
+    },
+    {
+      "slug": "loongreflect",
+      "title": "LoongReflect: Boosting Long-Horizon Reflection in Search Agents via Global Perspective Distillation",
+      "venue": "arXiv preprint 2026; no conference venue verified",
+      "source_url": "https://arxiv.org/abs/2608.11967",
+      "pdf_url": "https://arxiv.org/pdf/2608.11967",
+      "local_pdf": "01_papers/loongreflect.pdf",
+      "pdf_sha256": "398c0f30428b80b2c3d0fd965f3105ff5df84e023a2a6ca13915ebf834e95810",
+      "analysis": "03_analysis/loongreflect.md",
+      "figures": [
+        {
+          "number": 2,
+          "pdf_page_1based": 4,
+          "crop_pdf_points": [
+            76,
+            49,
+            537,
+            306
+          ],
+          "screenshot": "02_figures/loongreflect_fig2_pdfp4.png",
+          "preview": "02_figures/loongreflect_fig2_180mm_96dpi.png",
+          "whole_page": "02_figures/loongreflect_pdfp4_page.png"
+        }
+      ],
+      "technical_relevance_1to5": 5,
+      "visual_transfer_1to5": 4,
+      "status": "Verified: downloaded original PDF; rendered and visually inspected; caption and nearby method read"
+    },
+    {
+      "slug": "reflexion",
+      "title": "Reflexion: Language Agents with Verbal Reinforcement Learning",
+      "venue": "NeurIPS 2023",
+      "source_url": "https://proceedings.neurips.cc/paper_files/paper/2023/hash/1b44b878bb782e6954cd888628510e90-Abstract-Conference.html",
+      "pdf_url": "https://papers.nips.cc/paper_files/paper/2023/file/1b44b878bb782e6954cd888628510e90-Paper-Conference.pdf",
+      "local_pdf": "01_papers/reflexion.pdf",
+      "pdf_sha256": "efba04cd48b779131fc4c3c58ae49e8523ded534f9225a7c57c7bdad0823803d",
+      "analysis": "03_analysis/reflexion.md",
+      "figures": [
+        {
+          "number": 2,
+          "pdf_page_1based": 4,
+          "crop_pdf_points": [
+            102,
+            37,
+            510,
+            298
+          ],
+          "screenshot": "02_figures/reflexion_fig2_pdfp4.png",
+          "preview": "02_figures/reflexion_fig2_180mm96dpi.png",
+          "whole_page": "02_figures/reflexion_pdfp4_full.png"
+        }
+      ],
+      "technical_relevance_1to5": 3,
+      "visual_transfer_1to5": 3,
+      "status": "Verified: downloaded PDF; rendered full page and crop; inspected crop and 680px proof; caption and adjacent method text checked"
+    },
+    {
+      "slug": "tree_of_thoughts",
+      "title": "Tree of Thoughts: Deliberate Problem Solving with Large Language Models",
+      "venue": "NeurIPS 2023",
+      "source_url": "https://proceedings.neurips.cc/paper_files/paper/2023/hash/271db9922b8d1f4dd7aaef84ed5ac703-Abstract-Conference.html",
+      "pdf_url": "https://proceedings.neurips.cc/paper_files/paper/2023/file/271db9922b8d1f4dd7aaef84ed5ac703-Paper-Conference.pdf",
+      "local_pdf": "01_papers/tree_of_thoughts.pdf",
+      "pdf_sha256": "6939cadebd84c8cdcc6ff3c2082b75851a86e2ef82008848d0af692f80521fa7",
+      "analysis": "03_analysis/tree_of_thoughts.md",
+      "figures": [
+        {
+          "number": 1,
+          "pdf_page_1based": 2,
+          "crop_pdf_points": [
+            138,
+            69,
+            483,
+            238
+          ],
+          "screenshot": "02_figures/tree_of_thoughts_fig1_pdfp2.png",
+          "preview": "02_figures/tree_of_thoughts_fig1_180mm_150dpi.png",
+          "whole_page": "02_figures/tree_of_thoughts_pdfp2_page.png"
+        },
+        {
+          "number": 2,
+          "pdf_page_1based": 5,
+          "crop_pdf_points": [
+            126,
+            323,
+            484,
+            433
+          ],
+          "screenshot": "02_figures/tree_of_thoughts_fig2_pdfp5.png",
+          "preview": "02_figures/tree_of_thoughts_fig2_180mm_96dpi.png",
+          "whole_page": "02_figures/tree_of_thoughts_pdfp5_page.png"
+        }
+      ],
+      "technical_relevance_1to5": 4,
+      "visual_transfer_1to5": 5,
+      "status": "Verified: downloaded original PDF; rendered and visually inspected; caption and nearby method read"
+    },
+    {
+      "slug": "voyager",
+      "title": "Voyager: An Open-Ended Embodied Agent with Large Language Models",
+      "venue": "TMLR 2024",
+      "source_url": "https://rpl.cs.utexas.edu/publications/2024/03/14/wang-tmlr24-voyager/",
+      "pdf_url": "https://arxiv.org/pdf/2305.16291",
+      "local_pdf": "01_papers/voyager.pdf",
+      "pdf_sha256": "769a4e33ddeeb73870849232eece49afe882c2d146362e33917ccb432ba0efb8",
+      "analysis": "03_analysis/voyager.md",
+      "figures": [
+        {
+          "number": 2,
+          "pdf_page_1based": 2,
+          "crop_pdf_points": [
+            102,
+            34,
+            510,
+            282
+          ],
+          "screenshot": "02_figures/voyager_fig2_pdfp2.png",
+          "preview": "02_figures/voyager_fig2_180mm96dpi.png",
+          "whole_page": "02_figures/voyager_pdfp2_full.png"
+        }
+      ],
+      "technical_relevance_1to5": 4,
+      "visual_transfer_1to5": 5,
+      "status": "Verified: downloaded PDF; rendered full page and crop; inspected crop and 680px proof; caption and adjacent method text checked"
+    }
+  ]
+}

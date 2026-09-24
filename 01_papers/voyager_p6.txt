@@ -1,0 +1,72 @@
+Inventory (8/36): {'oak_planks': 5, 'cobblestone': 2, 
+'porkchop': 2, 'wooden_sword': 1, 'coal': 5, 'wooden_pickaxe': 
+1, 'oak_log': 3, 'dirt': 9}
+Task: Mine 5 coal ores
+Inventory (10/36): {'raw_copper': 9, 'copper_ingot': 3, 
+'acacia_planks': 1, 'raw_iron': 1, 'stick': 1, 'iron_sword': 1, 
+'iron_pickaxe': 1, 'iron_ingot': 3, 'crafting_table': 1, 'furnace': 1}
+Task: Craft a spyglass
+Inventory (7/36): {'oak_log': 5, 'oak_planks': 1, 
+'wooden_pickaxe': 1, 'wooden_sword': 1, 'porkchop': 2, 
+'white_wool': 2, 'mutton': 6}
+Task: Kill 3 sheep
+Inventory (9/36): {'string': 4, 'coal': 1, 'rotten_flesh': 1, 
+'iron_sword': 1, 'furnace': 1, 'dirt': 6, 'stone_shovel': 1, 
+'wooden_pickaxe': 1, 'granite': 5}
+Task: Kill 1 zombie
+Reasoning: Mining coal_ore in Minecraft will get coal. You have 5 coal in your 
+inventory.
+Success: True
+Reasoning: To craft a spyglass, you need 2 copper ingots and 1 amethyst shard. 
+You have 3 copper ingots, but you don't have any amethyst shards.
+Success: False
+Critique: Find and mine an amethyst shard underground.
+Reasoning: You have 2 white_wool and 6 mutton in your inventory, which indicates 
+that you killed 2 sheep. You needed to kill 3 sheep.
+Success: False
+Critique: Find and kill one more sheep to complete the task.
+Reasoning: You have 1 rotten_flesh in your inventory, which means you have killed 
+at least 1 zombie.
+Success: True
+GPT-4
+GPT-4
+GPT-4
+GPT-4
+Figure 6: Self-verification examples. We only display the partial prompt for brevity. See Appendix,
+Sec. A.5 for the full prompt structure.
+the task’s completion, at which point we add this new skill to the skill library and ask the automatic
+curriculum for a new objective (Fig. 2). If the agent gets stuck after 4 rounds of code generation, then
+we query the curriculum for another task. This iterative prompting approach significantly improves
+program synthesis for embodied control, enabling VOYAGER to continuously acquire diverse skills
+without human intervention.
+3
+Experiments
+3.1
+Experimental Setup
+We leverage OpenAI’s gpt-4-0314 [35] and gpt-3.5-turbo-0301 [50] APIs for text completion,
+along with text-embedding-ada-002 [51] API for text embedding. We set all temperatures to
+0 except for the automatic curriculum, which uses temperature = 0.1 to encourage task diversity. Our
+simulation environment is built on top of MineDojo [23] and leverages Mineflayer [52] JavaScript
+APIs for motor controls. See Appendix, Sec. B.1 for more details.
+3.2
+Baselines
+Because there is no LLM-based agents that work out of the box for Minecraft, we make our best
+effort to select a number of representative algorithms as baselines. These methods are originally
+designed only for NLP tasks without embodiment, therefore we have to re-interpret them to be
+executable in MineDojo and compatible with our experimental setting:
+ReAct [29] uses chain-of-thought prompting [46] by generating both reasoning traces and action
+plans with LLMs. We provide it with our environment feedback and the agent states as observations.
+Reflexion [30] is built on top of ReAct [29] with self-reflection to infer more intuitive future actions.
+We provide it with execution errors and our self-verification module.
+AutoGPT [28] is a popular software tool that automates NLP tasks by decomposing a high-level
+goal into multiple subgoals and executing them in a ReAct-style loop. We re-implement AutoGPT
+by using GPT-4 to do task decomposition and provide it with the agent states, environment feedback,
+and execution errors as observations for subgoal execution. Compared with VOYAGER, AutoGPT
+lacks the skill library for accumulating knowledge, self-verification for assessing task success, and
+automatic curriculum for open-ended exploration.
+Note that we do not directly compare with prior methods that take Minecraft screen pixels as input
+and output low-level controls [53–55]. It would not be an apple-to-apple comparison, because we rely
+on the high-level Mineflayer [52] API to control the agent. Our work’s focus is on pushing the limits
+of GPT-4 for lifelong embodied agent learning, rather than solving the 3D perception or sensorimotor
+control problems. VOYAGER is orthogonal and can be combined with gradient-based approaches like
+6

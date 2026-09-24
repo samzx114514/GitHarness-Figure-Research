@@ -1,0 +1,80 @@
+Language Agent Tree Search Unifies Reasoning, Acting, and Planning in
+Language Models
+Andy Zhou 1 2 Kai Yan 1 Michal Shlapentokh-Rothman 1 Haohan Wang 1 Yu-Xiong Wang 1
+Abstract
+While language models (LMs) have shown po-
+tential across a range of decision-making tasks,
+their reliance on simple acting processes limits
+their broad deployment as autonomous agents. In
+this paper, we introduce Language Agent Tree
+Search (LATS) – the first general framework that
+synergizes the capabilities of LMs in reasoning,
+acting, and planning. By leveraging the in-context
+learning ability of LMs, we integrate Monte Carlo
+Tree Search into LATS to enable LMs as agents,
+along with LM-powered value functions and
+self-reflections for proficient exploration and en-
+hanced decision-making. A key feature of our ap-
+proach is the incorporation of an environment for
+external feedback, which offers a more deliberate
+and adaptive problem-solving mechanism that sur-
+passes the constraints of existing techniques. Our
+experimental evaluation across diverse domains,
+including programming, interactive question-
+answering (QA), web navigation, and math, val-
+idates the effectiveness and generality of LATS
+in decision-making while maintaining compet-
+itive or improved reasoning performance. No-
+tably, LATS achieves state-of-the-art pass@1 ac-
+curacy (92.7%) for programming on HumanEval
+with GPT-4 and demonstrates gradient-free per-
+formance (average score of 75.9) comparable to
+gradient-based fine-tuning for web navigation on
+WebShop with GPT-3.5.
+Code can be found
+at
+https://github.com/lapisrocks/
+LanguageAgentTreeSearch.
+1. Introduction
+General autonomous agents capable of reasoning and
+decision-making in a variety of environments (Wooldridge
+1University of Illinois Urbana-Champaign. 2Lapis Labs. Corre-
+spondence to: Andy Zhou <andyz3@illinois.edu>.
+Proceedings of the 41 st International Conference on Machine
+Learning, Vienna, Austria. PMLR 235, 2024. Copyright 2024 by
+the author(s).
+Figure 1. Overview of LATS. Serving as a unified framework,
+LATS leverages an external environment and an MCTS-based
+search algorithm to improve reasoning and decision-making.
+and Jennings, 1995) have been of longstanding interest in
+the field of artificial intelligence. While this has tradition-
+ally been studied in reinforcement learning, the recent rise
+of language models (LMs) (Brown et al., 2020; Chowdh-
+ery et al., 2023; Touvron et al., 2023; OpenAI, 2023) with
+strong reasoning and general adaptability offers an alter-
+native paradigm. Not only have LMs excelled in standard
+natural language processing (NLP) tasks such as summariza-
+tion (Nallapati et al., 2016) and language inference (Bow-
+man et al., 2015), but they have also been adapted to an
+increasingly diverse set of tasks that often require advanced
+common-sense reasoning or quantitative skills (Cobbe et al.,
+2021; Saparov and He, 2023). In addition, LMs are capable
+of performing in complex environments that involve knowl-
+edge and reasoning, such as web navigation (Yao et al.,
+2022; Deng et al., 2023), tool-use (Schick et al., 2023), and
+open-ended games (Fan et al., 2022).
+Reasoning and acting abilities have been further improved
+by prompting techniques that augment LMs with feedback
+or observations from an external environment, as exempli-
+fied by ReAct (Yao et al., 2023b) and other work (Gao et al.,
+2023; Shinn et al., 2023). This eliminates the need to rely en-
+tirely on the base abilities of LMs, enhancing them through
+external tools or semantic feedback. Despite such strengths,
+these methods are reflexive and fall short of humans’ deliber-
+ate and thoughtful decision-making characteristics to solve
+problems (Sloman, 1996; Evans, 2010). In particular, they
+fail to consider multiple reasoning paths or to plan ahead.
+Recent search-guided LM work (Xie et al., 2023; Yao et al.,
+2023a; Hao et al., 2023) addresses this issue by searching
+over multiple reasoning chains. While enabling planning,
+1

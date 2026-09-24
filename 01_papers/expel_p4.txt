@@ -1,0 +1,117 @@
+ing (Watkins and Dayan 1992), in which the agent can learn
+from experiences of a behavior policy. During the evaluation
+stage, the agent attempts unseen tasks with a single try, aug-
+mented with extracted insights and successful trajectories in
+its experience pool gathered from the training stage. Refer
+to Fig. 1 for detailed information on our agent framework.
+4.1
+Gathering Experiences
+To gather diverse experiences that can be useful to extract
+information from, we leverage Reflexion (Shinn et al. 2023)
+to continuously retry the training task at most Z times.
+In particular, the agent will be given a training task tn
+at the z-th trial, fewshot examples Fmanual and past reflec-
+tions νn,z (initially, νn,0 is the empty string). At first, the
+agent will attempt the task with fewshot examples concate-
+nated with its current trajectory τn,0 as the context, and
+use ReAct (Yao et al. 2023b) as the base planning algo-
+rithm, LLMReAct(· | τn,0, Fmanual, νn,0). On the z-th trial,
+when the agent finishes the task or the maximum number
+of steps H is reached, the ExpeL agent’s experience pool
+B ingests the trajectory τn,z. Then, if the agent succeeds,
+it moves on to the next task. However, if the agent fails,
+it will look at its failed trajectory and self-reflect to pro-
+duce νn,z+1 = concat(νn,z, LLMreflect(τn,z)) to see where
+it can do better on the next retry, concatenated with the pre-
+vious reflections. In the next retry, the agent will augment its
+context with reflection νn,z+1, the input to the LLM policy,
+LLMReAct(· | τn,z+1, Fmanual, νn,z+1).
+To highlight, this trial and error way of gathering expe-
+riences not only improves the chances of getting more pos-
+itive examples for experience recall during evaluation but
+also allows for collecting valuable success/failure pairs used
+for comparisons during insight extraction (Sec. 4.2). The
+pseudo-code can be found in Alg. 1.
+4.2
+Learning from Experiences
+Human learning occurs mainly either by storing successful
+trajectories in memory, which can be later recalled as spe-
+cific examples, or by extracting high-level insights from ex-
+periences, enabling generalization to novel situations. Ex-
+peL considers both of these learning modes to boost task
+performance. Concretely, an instruction I given to an LLM
+agent can be broken down into task specifications and few-
+shot examples. We can augment task specifications with an
+agent’s extracted insights from past experiences, where an
+instruction-following LLM can be leveraged (OpenAI 2023)
+to follow them closely. For fewshot examples, we can al-
+low the agent to retrieve from its experience pool with top-k
+relevant examples to aid its decisions. Next, we detail our
+experience recall and insight extraction mechanisms.
+Similar Experiences as Demonstrations
+Works have
+shown that using in-context examples that are semantically
+similar to the task at hand results in better performance (Liu
+et al. 2022). Moreover, when involved in a novel situation,
+humans also recall from their memory similar tasks they’ve
+solved as references when attempting the task (Kahneman
+2011). Motivated by these observations, we propose experi-
+ence recall to retrieve successful trajectories from the expe-
+rience pool gathered during training based on task similarity.
+Concretely, we used the Faiss vectorstore (Johnson,
+Douze, and J´egou 2019) as the experience pool, kNN re-
+triever and all-mpnet-base-v2 (Song et al. 2020) em-
+bedder to obtain top-k successful trajectories that have the
+maximum inner-product task similarity with the evaluation
+task. The advantage of using task similarity as the retrieval
+rank is that if the agent repeats a task or does a task simi-
+lar to an existing successful trajectory from the experience
+pool, the agent only needs to closely imitate the successful
+trajectory and have less burden on ability extrapolation.
+Learning from Successes and Failures
+To leverage the
+diverse outcomes gathered during the experience collection
+phase, we believe the agent should analyze experiences in
+two distinct ways. First, we let the agent compare a failed
+trajectory with a successful trajectory for the same task. This
+comparison offers a concrete understanding of the agent’s
+shortcomings, highlighting the correct and incorrect actions.
+Second, we let the agent identify patterns within a set of
+successful trajectories from different tasks. This approach
+sheds light on common “good practices” that the agent can
+adopt to ensure success in evaluation tasks.
+For the implementation, we give the agent’s instruction-
+following LLMinsights several operators to apply on an ex-
+isting set of insights ˆι. We initialize the set of insights to
+an empty set ˆι = ∅and iteratively provide the LLM with
+fail/success pairs or lists of L successes (created by sam-
+pling without replacement) from the experience pool. The
+operations the LLM can perform are: ADD a new insight,
+EDIT the content of an existing insight, DOWNVOTE to dis-
+agree with an existing insight, or UPVOTE to agree with an
+existing insight. A newly added insight will have an initial
+importance count of two associated with it, and the count
+will increment if subsequent operators UPVOTE or EDIT
+are applied to it and will decrement when DOWNVOTE is ap-
+plied to it. If an insight’s importance count reaches zero, it
+will be removed. This particular design choice robustifies the
+process since even successful trajectories can be suboptimal
+and mislead the generated insights. The prompt template we
+used can be found in Fig. 2. We kept the maximum size for a
+list of successes to L and used gpt-4-0613 as the default
+LLMinsights. We empirically found that gpt-4-0613 is bet-
+ter than gpt-3.5-turbo-0613 at following instructions
+on how to use the insight extraction operators and halluci-
+nated less. Pseudo-code for this process can be found in Alg.
+2. Finally, ExpeL utilizes these generated insights ˆι in the
+task inference phase, described next.
+4.3
+Task Inference
+After the agent gathers experiences, extracts insights from
+them, and sets up a vectorstore of successful trajectories, it
+can proceed to the evaluation. For each task, the task specifi-
+cations will be augmented with the concatenation of the full
+list of extracted insights ˆι = concat(ι1, ι2, ι3, ...), and the
+top-k trajectories with the highest task similarity will be re-
+trieved and used as fewshot in-context examples, Fsimilar tasks.
+Fig. 3 shows an example prompt template structure, and a

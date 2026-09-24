@@ -1,0 +1,49 @@
+{
+  "slug": "awm",
+  "title": "Agent Workflow Memory",
+  "venue": "ICML 2025",
+  "venue_source": "https://proceedings.mlr.press/v267/wang25bx.html",
+  "pdf_url": "https://raw.githubusercontent.com/mlresearch/v267/main/assets/wang25bx/wang25bx.pdf",
+  "figure": 2,
+  "technical_score": 4,
+  "visual_score": 4,
+  "method_sections": [
+    "2.3 Inducing and Using Workflows"
+  ],
+  "text_pages": [
+    3
+  ],
+  "additional_figures": [
+    {
+      "figure": 3,
+      "pdf_page_1based": 3,
+      "crop_pdf_points": [
+        304,
+        430,
+        542,
+        505
+      ],
+      "screenshot": "02_figures/awm_fig3_pdfp3.png",
+      "paper_scale_screenshot": "02_figures/awm_fig3_pdfp3_180mm.png"
+    }
+  ],
+  "source_url": "https://proceedings.mlr.press/v267/wang25bx.html",
+  "pdf_page_1based": 3,
+  "printed_page": 3,
+  "crop_pdf_points": [
+    54,
+    80,
+    292,
+    230
+  ],
+  "crop_coordinate_system": "PDF points; top-left origin; [x0,y0,x1,y1]",
+  "verification_status": "Verified: PDF rendered and visually inspected, caption and nearby methods read",
+  "pdf_path": "01_papers/awm.pdf",
+  "screenshot": "02_figures/awm_fig2_pdfp3.png",
+  "full_page_screenshot": "02_figures/awm_pdfp3_full.png",
+  "paper_scale_screenshot": "02_figures/awm_fig2_pdfp3_180mm.png",
+  "paper_scale_check": "680 px width, approximately 180 mm at 96 dpi; visually inspected, not a physical print proof",
+  "accessed": "2026-09-23",
+  "sha256": "ce49b6b138c803342619504f9736116d25afbab30412509971a7ce4bbe0901a1",
+  "pdf_pages": 15
+}

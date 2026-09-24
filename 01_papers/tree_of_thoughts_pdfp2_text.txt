@@ -1,0 +1,67 @@
+GĮŔũƜ
+jũƜŔũƜ
+GĮŔũƜ
+jũƜŔũƜ
+GĮŔũƜ
+ˤjũƜŔũƜ
+ʱçʲˤòĦƙˤĵĮŝƓŝŤòĮçƆˤ
+ƀƓƜĎˤĵÉˤʱĵÉˁʲ
+aÊĠĵŗƓŤƆˤſĵŤò
+GĮŔũƜ
+ˤjũƜŔũƜ
+ʱíʲˤÉŗòòˤĵƙˤĎĵũĈĎŤŝˤʱÉĵÉʲ
+ʟʟ
+ʟʟ
+ʟʟ
+ʟʟ
+ʟʟ
+ˤˤƛĎĵũĈĎƜ
+ʱçʲˤĎÊđĮˤĵƙˤĎĵũĈĎƜˤ
+ŗĵĭŔƜđĮĈˤʱĵÉʲ
+ʱÊʲˤGĮŔũƜˁjũƜŔũƜˤ
+ŗĵĭŔƜđĮĈˤʱGjʲ
+Figure 1: Schematic illustrating various approaches to problem solving with LLMs. Each rectangle
+box represents a thought, which is a coherent language sequence that serves as an intermediate
+step toward problem solving. See concrete examples of how thoughts are generated, evaluated, and
+searched in Figures 2,4,6.
+choices instead of just picking one, and (2) evaluates its current status and actively looks ahead or
+backtracks to make more global decisions.
+To design such a planning process, we return to the origins of artificial intelligence (and cognitive
+science), drawing inspiration from the planning processes explored by Newell, Shaw, and Simon
+starting in the 1950s [21, 22]. Newell and colleagues characterized problem solving [21] as search
+through a combinatorial problem space, represented as a tree. We thus propose the Tree of Thoughts
+(ToT) framework for general problem solving with language models. As Figure 1 illustrates, while
+existing methods (detailed below) sample continuous language sequences for problem solving, ToT
+actively maintains a tree of thoughts, where each thought is a coherent language sequence that serves
+as an intermediate step toward problem solving (Table 1). Such a high-level semantic unit allows the
+LM to self-evaluate the progress different intermediate thoughts make towards solving the problem
+through a deliberate reasoning process that is also instantiated in language (Figures 2,4,6). This
+implementation of search heuristics via LM self-evaluation and deliberation is novel, as previous
+search heuristics are either programmed or learned. Finally, we combine this language-based
+capability to generate and evaluate diverse thoughts with search algorithms, such as breadth-first
+search (BFS) or depth-first search (DFS), which allow systematic exploration of the tree of thoughts
+with lookahead and backtracking.
+Empirically, we propose three new problems that challenge existing LM inference methods even with
+the state-of-the-art language model, GPT-4 [23]: Game of 24, Creative Writing, and Crosswords
+(Table 1). These tasks require deductive, mathematical, commonsense, lexical reasoning abilities,
+and a way to incorporate systematic planning or search. We show ToT obtains superior results on
+all three tasks by being general and flexible enough to support different levels of thoughts, different
+ways to generate and evaluate thoughts, and different search algorithms that adapt to the nature of
+different problems. We also analyze how such choices affect model performances via systematic
+ablations and discuss future directions to better train and use LMs.
+2
+Background
+We first formalize some existing methods that use large language models for problem-solving,
+which our approach is inspired by and later compared with. We use pθ to denote a pre-trained LM
+with parameters θ, and lowercase letters x, y, z, s, · · · to denote a language sequence, i.e. x =
+(x[1], · · · , x[n]) where each x[i] is a token, so that pθ(x) = Qn
+i=1 pθ(x[i]|x[1...i]). We use uppercase
+letters S, · · · to denote a collection of language sequences.
+Input-output (IO) prompting is the most common way to turn a problem input x into output
+y with LM: y ∼pθ(y|promptIO(x)), where promptIO(x) wraps input x with task instructions
+and/or few-shot input-output examples. For simplicity, let us denote pprompt
+θ
+(output | input) =
+pθ(output | prompt(input)), so that IO prompting can be formulated as y ∼pIO
+θ (y|x).
+2

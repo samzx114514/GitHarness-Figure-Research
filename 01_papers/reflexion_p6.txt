@@ -1,0 +1,116 @@
+0
+2
+4
+6
+8
+10
+Trial Number
+0.5
+0.6
+0.7
+0.8
+0.9
+1.0
+Proportion of Solved Environments
+(a) ALFWorld Success Rate
+ReAct only
+ReAct + Reflexion (Heuristic)
+ReAct + Reflexion (GPT)
+0
+2
+4
+6
+8
+10
+Trial Number
+0.0
+0.1
+0.2
+0.3
+0.4
+0.5
+Proportion of Environments
+(a) ALFWorld Success Rate
+ReAct only - hallucination
+ReAct only - inefficient planning
+ReAct + Reflexion - hallucination
+ReAct + Reflexion - inefficient planning
+Figure 3: (a) AlfWorld performance across 134 tasks showing cumulative proportions of solved tasks
+using self-evaluation techniques of (Heuristic) and (GPT) for binary classification. (b) Classification
+of AlfWorld trajectories by reason of failure.
+many surfaces/containers to check for an item. The agent can exploit its experience memory over
+several trials to thoroughly search a room. In 3, the learning curve suggests that the learning process
+occurs over several experiences, meaning that the agent is successfully balancing cases 1 and 2 shown
+in the immediate spike in the improvement between the first two trials, then a steady increase over
+the next 11 trials to a near-perfect performance. On the other hand, 3 shows a ReAct-only agent
+converging at a hallucination rate of 22% with no signs of long-term recovery.
+4.2
+Reasoning: HotpotQA
+HotPotQA [28] is a Wikipedia-based dataset with 113k question-and-answer pairs that challenge
+agents to parse content and reason over several supporting documents. To test improvement in
+reasoning only ability, we implement Reflexion + Chain-of-Thought (CoT) [26] for step-by-step
+Q →A and Q, Cgt →A implementations, where Q is the question, Cgt is the ground truth context
+from the dataset, and A is the final answer. Since CoT is not a multi-step decision-making technique,
+we give Cgt to the agent so that we can isolate the reasoning behavior over large sections of the
+provided text. To test holistic question and answering ability, which requires reasoning and action
+choice, we implement a Reflexion + ReAct [30] agent that can retrieve relevant context using a
+Wikipedia API and infer answers using step-by-step explicit thinking. For CoT implementations, we
+use 6-shot prompting; for ReAct, we use 2-shot prompting, and for self-reflection, we use 2-shot
+prompting. All examples can be found in the appendix.
+Robustly evaluating natural language answers is a long-standing problem in NLP. Therefore, between
+trials, we use exact match answer grading using the environment to give a binary success signal to
+the agent. After each trial, the self-reflection loop is employed to amplify the binary signal, similar to
+the decision-making setup 4.1 in AlfWorld with a memory size of 3 experiences.
+0
+2
+4
+6
+Trial Number
+0.2
+0.4
+0.6
+0.8
+Proportion of Solved Tasks
+(a) HotPotQA Success Rate
+CoT only
+ReAct only
+CoT + Reflexion
+ReAct + Reflexion
+0
+1
+2
+3
+4
+5
+6
+7
+Trial Number
+0.4
+0.6
+0.8
+1.0
+Proportion of Solved Tasks
+(b) HotPotQA CoT (GT)
+CoT (GT) only
+CoT (GT) + Reflexion
+0
+1
+2
+3
+4
+Trial Number
+0.5
+0.6
+0.7
+0.8
+0.9
+1.0
+Proportion of Solved Tasks
+(c) HotPotQA Episodic Memory
+CoT (GT) only
+CoT (GT) EPM
+CoT (GT) EPM + Reflexion
+Figure 4: Chain-of-Thought (CoT) and ReAct. Reflexion improves search, information retrieval,
+and reasoning capabilities on 100 HotPotQA questions. (a) Reflexion ReAct vs Reflexion CoT (b)
+Reflexion CoT (GT) for reasoning only (c) Reflexion vs episodic memory ablation.
+6

@@ -1,0 +1,1646 @@
+Agent Workflow Memory
+Zora Zhiruo Wang 1 Jiayuan Mao 2 Daniel Fried 1 Graham Neubig 1
+Abstract
+Despite the potential of language model-based
+agents to solve real-world tasks such as web nav-
+igation, current methods still struggle with long-
+horizon tasks with complex action trajectories. In
+contrast, humans can flexibly solve complex tasks
+by learning reusable task workflows from past ex-
+periences and using them to guide future actions.
+To build agents that can similarly benefit from this
+process, we introduce Agent Workflow Memory
+(AWM), a method for inducing commonly reused
+routines, i.e., workflows, and selectively provid-
+ing workflows to the agent to guide subsequent
+generations. AWM flexibly applies to both offline
+and online scenarios, where agents induce work-
+flows from training examples beforehand or from
+test queries on the fly. We experiment on two
+major web navigation benchmarks — Mind2Web
+and WebArena — that collectively cover 1000+
+tasks from 200+ domains across travel, shopping,
+and social media, among others. AWM substan-
+tially improves the baseline results by 24.6% and
+51.1% relative success rate on Mind2Web and
+WebArena while reducing the number of steps
+taken to solve WebArena tasks successfully. Fur-
+thermore, online AWM robustly generalizes in
+cross-task, website, and domain evaluations, sur-
+passing baselines from 8.9 to 14.0 absolute points
+as train-test task distribution gaps widen.1
+1. Introduction
+Language model (LM) based agents are rapidly improving,
+and are now able to tackle digital tasks such as navigating
+the web (Zhou et al., 2024; Deng et al., 2023) or operating
+mobile apps (Rawles et al., 2023; 2024). Current agents
+mostly integrate a fixed set of given examples via training
+1Carnegie
+Mellon
+University
+2Massachusetts
+Institute
+of Technology.
+Correspondence to:
+Zora Zhiruo Wang
+<zhiruow@cs.cmu.edu>.
+Proceedings of the 42 nd International Conference on Machine
+Learning, Vancouver, Canada. PMLR 267, 2025. Copyright 2025
+by the author(s).
+1https://github.com/zorazrw/agent-workflow-memory
+Get the 
+coordinates 
+of a place
+Get the zip 
+code of a place
+Decide if can 
+drive from A to B 
+in a given time
+Find a place 
+by its name
+Find cafe 
+near a place
+Get driving time 
+from A to B
+Display the route 
+from place A to B
+Find a Hilton hotel 
+near this location, 
+then show me the 
+shortest walking 
+path to a nearby 
+supermarket … 
+Gap widens to 22.5 
+after 40 examples
+AWM
+baseline
+Figure 1. AWM enables agents to continuously induce and apply
+workflows to improve performance, compared to stagnant base-
+lines. We show results by AWM on the WebArena map split as an
+example.
+(Fu et al., 2024; Murty et al., 2024) or in-context learning
+(Zheng et al., 2024). This allows them to perform well on ac-
+tion sequences similar to those presented in these examples,
+but results in a lack of robustness to changes in task contexts
+or environments (Deng et al., 2023). Essentially, they fail to
+grasp the key to disentangling increasingly complex tasks —
+to extract and learn reusable task workflows shared across
+similar tasks and environments (Yu et al., 2023; Wang et al.,
+2024a). Moreover, as agents solve each task separately,
+they do not learn from past successes and failures, and are
+therefore unable to adapt over time (Yoran et al., 2024).
+Motivated by how humans abstract common task routines
+from past experiences and apply such knowledge to guide
+future activities (Chi et al., 1981; 2014), we propose agent
+workflow memory (AWM) (§2) to realize a similar mech-
+anism in agents. AWM induces workflows from agent
+trajectories by extracting reusable routines, and then inte-
+grates these workflows into agent memory to guide future
+task-solving processes. Each workflow represents a goal
+with a common routine extracted from available action tra-
+jectories, which allows it to effectively capture the most
+essential and reusable skills agents need to acquire to suc-
+cessfully solve increasingly complex tasks. As an example,
+Figure 1 shows workflows induced by AWM on the We-
+bArena map test split of the benchmark (Zhou et al., 2024).
+AWM starts with a basic set of built-in actions and solves
+new tasks in a streaming manner, continuously inducing
+workflows from the task at hand, e.g., learning to “find a
+1
+
+Agent Workflow Memory
+place by its name” from the first few examples. Moreover,
+AWM continues to build more complex workflows on top
+of new experiences and previously acquired workflows. For
+example, the “find a place by its name” workflow, once
+induced, effectively serves as a subgoal to build a more com-
+plex workflow “get the zip code of a place.” Such continual
+learning mechanisms create a snowball effect to induce and
+apply increasingly complex workflows while expanding the
+agent memory, often yielding a substantial performance gap
+over a vanilla agent that does not adapt. This gap over the
+baseline rises as high as 22.5 points on WebArena after
+rolling over only tens of examples (as shown by Figure 1).
+AWM readily operates in both offline and online scenar-
+ios, where annotated examples are either available or non-
+existent. When high-quality annotated examples are avail-
+able for a task, AWM operating in an offline fashion can
+extract reusable workflows from these canonical examples
+and integrate them into memory to assist test-time inference.
+Even if no annotated examples exist, AWM online can also
+run in an supervision-free setting, where it iteratively in-
+duces workflows from self-generated past predictions that
+are judged correct by an evaluator module.
+We evaluate AWM on two agent web navigation bench-
+marks (§3): WebArena, which provides rigorous execution-
+based evaluation (Zhou et al., 2024), and Mind2Web, which
+emphasizes broad tasks and domain coverage (Deng et al.,
+2023). On WebArena, AWM improves over the top pub-
+lished autonomous method (Drouin et al., 2024) by 51.1%
+relative success rate, and even outperforms methods using
+human expert written workflows (Sodhi et al., 2023) by
+7.9%. On Mind2Web, AWM effectively improves the cross-
+task results by 24.6% in relative step-wise success rate.
+We further demonstrate the generalizability of AWM on
+both datasets. On WebArena, we create a cross-template
+subset where each example is instantiated from different task
+templates. AWM still consistently surpasses all baseline
+approaches, demonstrating its reliable cross-task workflow
+adaptability (§3.1). On Mind2Web, we evaluate AWM on
+the cross-website and cross-domain test splits to examine its
+domain generality, where it scores 8.9–14.0 absolute points
+higher over baseline, and the margins become more substan-
+tial as the train-test distribution gap widens (§3.2). Both
+results show the superior generalization of AWM across
+tasks, websites, and domains.
+2. Agent Workflow Memory
+In this section, we first describe the web navigation task
+(§2.1), then introduce the workflow representation (§2.2),
+and describe the mechanism of AWM as well as various
+usage scenarios (§2.3).
+2.1. Problem Statement
+For the purpose of this paper, we consider agents with a lan-
+guage model backbone L and text-based memory M, where
+the base memory contains documentation of built-in actions
+such as CLICK and TYPE.2 To solve a task specified by
+a natural language (NL) instruction q, the agent acts in an
+environment defined by a transition function T. For each
+time step ti, the environment state si gives observation oi,
+which is then passed into the model to generate action ai
+via L(q, M, oi) →ai. The action is executed in the envi-
+ronment and changes the state as T(si, ai) →si+1. This
+observe-act loop iterates until the model predicts the stop
+action ai =STOP, or reaches a task termination condition,
+e.g., a maximum pre-determined number of steps.
+Each completed task forms an experience e, which com-
+prises an NL instruction q and a trajectory of steps attempt-
+ing to solve the task, where each step p contains the agent
+observation o obtained from the current state, and action
+taken by the agent a, formulated as p = (o, a). Our goal
+is to induce useful workflows W = {w} from the set of
+experiences E = {e} constructed from past or collected
+examples, using an induction module I via I(E) →W.
+We add induced workflows into the agent memory M as
+guidance for subsequent task-solving.
+Next, we introduce the workflow representation design,
+workflow induction method, and agent memory update with
+workflows in varied setups.
+2.2. Workflow Representation
+Similar to an experience, a workflow comprises two com-
+ponents: first, a textual description of the workflow d; and
+second, a series of steps to finish the workflow (p1, p2, · · · ),
+as shown in Figure 2.
+Workflow Description
+To present workflows in a format
+where agents can learn from them properly, it is impor-
+tant to describe the high-level goal of the series of actions.
+Therefore, we associate each workflow with an NL task
+description d, essentially a summary of the workflow’s func-
+tion, by heuristically extracting from experience instructions
+or summarizing with an LM (see §2.3).
+Workflow Trajectory
+The workflow trajectory contains
+a series of steps (p1, p2, · · · ) to finish the process described
+in d. Each p consists of three parts, demonstrated in pn
+in Figure 2, Step 3. (1) A description of the current envi-
+ronment state in NL, such as “Order {id} is shown”; (2)
+The reasoning process elaborated by the agent to decide
+which action to generate based on observations, such as
+“Order {id} is found, I will now terminate the task.”; and
+2Memory is usually implemented as a system prompt or auxil-
+iary information in the main prompt context.
+2
+
+Agent Workflow Memory
+Environment
+state s
+LM 
+Backbone
+Memory
+Agent
+action
+observation
+Who ordered 
+order #0130?
+# I need to click the “Orders” link to see all orders.
+click(‘126’) # id of the button
+# I need to ﬁnd order 0130 in the current page.
+scroll(0, 200)
+… … … …
+# The current page shows order 0130.
+send_msg_to_user(“Emma Lopez”)
+stop()
+Step 1. Obtain Actions (annotate/generate/…)
+Step 2. 
+Trajectory Evaluation
+Query solved correctly?
+YES
+NO
+pass
+Step 3. Induce Workﬂows
+❖Workﬂow Description d
+This workﬂow aims to ﬁnd an 
+customer order with speciﬁed ID.
+❖Workﬂow Trajectory
+[env desc] The current page shows.. 
+[reason] I need to click “Orders” to..
+[action] click(‘order-link-id’)
+… … … …
+[env desc] Order {id} is shown.
+[reason] Order {id} is found, I will 
+now terminate the task.
+[action] stop()
+p1
+pn
+…
+integrate into 
+memory
+Figure 2. Illustration of our AWM pipeline: an agent takes actions
+to solve given queries, induces workflows from successful ones,
+and integrates them into memory.
+(3) an action represented as an executable program over the
+environment, i.e., stop() that realizes termination.
+2.3. Inducing and Using Workflows
+At the core of AWM is an induction module I that induces a
+set of workflows W from one or more past agent experiences
+E = {ei}m
+i=1. Each experience e = (q, P e) contains an NL
+task instruction q and an action trajectory that consists of a
+sequence of steps (observation and action) P e = (pe
+1, ..., pe
+n)
+that were taken to solve q. The workflow induction module
+operates by taking in E and producing a set of workflows,
+as I(E) →W = {w} = {(dj, P d
+j )}.
+LM-based Workflow Induction
+To produce workflows
+that more accurately capture reusable trajectories across
+tasks, we propose an LM-based module I that prompts the
+agent to extract common sub-routines from one or more
+input experiences.
+Different from task instructions that specify concrete, less-
+repetitive tasks, e.g., “Buy dry cat food on Amazon and
+deliver to my address”, we deliberately prompt models to in-
+duce workflows at finer granularities, i.e., a sub-task “search
+for a product on Amazon” that frequently re-appears as
+part of multiple similar instructions. Meanwhile, instead
+of giving example-specific values (e.g., “dry cat food”), we
+enhance workflow generality by abstracting out example-
+specific contexts, i.e., replacing “dry cat food” with a more
+general name “{product-name}” by specifying this in the
+workflow induction prompts. These workflows are seg-
+mented (based on double-line breaks in the model output)
+and stored separately in the workflow memory. Refer to §A
+for the exact model prompts, example workflows, and an
+examination of quality.3
+3We also explore a rule-based workflow induction method. See
+§B for more detailed experiments.
+After the workflows W are induced, they are then integrated
+into the agent as auxiliary memory, M + W →Mw, where
+M stands for the original agent memory, and Mw stands
+for the agent memory augmented with induced workflows.
+When solving a given instruction q, the agent now produces
+a series of actions by L(q, Mw, o) = L(q, M + W, o) →a.
+Next, we introduce AWM in use in two scenarios:
+Offline Scenario
+AWM can operate in an offline scenario
+when additional canonical experiences are available, such
+as data annotated by humans or synthesized by models. In
+this case, we perform workflow induction and utilization
+in two standalone processes. As shown in Figure 3 (left),
+AWM first takes in all training examples from a website by
+concatenating them into a single prompt, and feeds them
+to the LM to create a set of workflows at ‘training’ time;
+I(Etrain) →Woffline. Second, AWM incorporates all in-
+duced workflows into the agent memory at inference time
+to solve test instructions L(q, M + Woffline, otest
+i
+) →atest
+i
+.
+Since the workflows are fully induced before test-time infer-
+ence, the agent uses the same workflow memory Woffline
+to solve each test.
+Online Scenario
+Extra canonical experiences are not al-
+ways available or easy to collect, especially those that cover
+the same domains and tasks as the test instructions. AWM
+also works in an online, supervision-free setting, where
+only test queries are needed. As in Figure 3 (right), agents
+with AWMonline process test queries in a streaming fashion,
+where the agents conduct the loop of induce, integrate, and
+utilize workflows after running inference for each test task.
+“Training” w/ 
+extra examples
+Infer test examples
+w/ workﬂows
+apply 
+workﬂows
+2
+workﬂow add into memory
+      induce 
+workﬂows
+1
+Test examples 
+passed in a stream
+Continuously adding 
+workﬂows into agent 
+memory
+… …
+     induce
+1
+1
+2
+2 apply
+grow 
+over 
+time
+…
+apply workﬂows 
+for test inference
+Figure 3. Illustration of AWMoffline (left) and AWMonline (right).
+Concretely, the agent starts with the default memory M;
+given the t-th test instruction qt passed into the agent, the
+agent attempts to solve the task by generating an action
+trajectory (pt
+1, pt
+2, · · · ), which collectively forms an expe-
+rience et = (qt, {pt}). We adopt the LM-based evalua-
+tion model of Pan et al. (2024) to output a binary label,
+Leval(et) ∈{0, 1}, that judges if et successfully solves qt
+by prompting a neural model. If et is predicted as success,
+i.e., 1, we then transform it into workflow(s) I(et) →{wt}
+and add {wt} into the agent memory M t + {wt} →M t+1,
+which serves as the agent memory to process the t + 1-th
+instruction. As depicted in Figure 3 (right), we continue this
+memory-updating process by iteratively predicting actions
+for and inducing workflows from streamed test instructions,
+until all tests are processed. We evaluate the success rate of
+3
+
+Agent Workflow Memory
+predicted action trajectories {pt} for all tests.
+3. Experiments
+In this section, we experiment on two major web naviga-
+tion benchmarks – WebArena (§3.1) and Mind2Web (§3.2).
+For each benchmark, we first introduce the benchmark and
+top-performing baseline methods, then present our AWM
+approach and showcase its ability to achieve superior task
+success and generalization across varied setups.
+For both benchmarks, we conduct AWM on a website ba-
+sis. In other words, we group examples by their associated
+websites, and respectively run AWM on each group. This
+mechanism maintains a small collection of workflows that
+are nonetheless relevant to the test tasks.
+3.1. WebArena
+WebArena (Zhou et al., 2024) provides 812 web navigation
+tasks on five websites that cover four common application
+domains: e-commerce, social forum discussions, collabora-
+tive software development, and content management. Most
+importantly, WebArena supports rigorous evaluation on the
+functional correctness of agent trajectories.
+We adopt the current state-of-the-art method without human-
+annotated site-specific knowledge, BrowserGym (Drouin
+et al., 2024), which altered the agent default action space.
+We adopt the BrowserGym framework and its default action
+space, and represent webpages using accessibility trees, fol-
+lowing the environment representation in Zhou et al. (2024).
+Because BrowserGym inputs both webpage HTML and
+accessibility tree representations, to keep a fair compari-
+son with our method, we also run the BrowserGym ver-
+sion with only accessibility tree webpage representations,
+denoted as BrowserGymax−tree. We also compare to the
+SteP method (Sodhi et al., 2023), which uses 14 human ex-
+pert written workflows tailored to solving WebArena. Our
+method, in contrast, uses no human supervision and is not
+tailored to the WebArena setting.
+Following the baseline approaches, we use GPT-4o
+(gpt-4o-2024-05-13) with a temperature of 0.0 to en-
+sure mostly stable model outputs. Because WebArena only
+has test examples and no additional high-quality, domain-
+aligned examples exist, we only conduct AWM in the online
+setting as in §2.3.
+3.1.1. MAIN RESULTS
+As shown in Table 1, our AWM achieves the best published
+results on WebArena, surpassing the BrowserGym base-
+line by 12.0 absolute points and 51.1% relative increase in
+overall success rate. Notably, AWM also outperforms SteP,
+which uses strong domain-specific supervision from human-
+written workflows, by a 7.6% relative increase in overall
+success rate. According to the breakdown on five websites,
+our AWM method substantially enhances the agent perfor-
+mance across all websites over the BrowserGym baseline,
+by 11.8–30.7 absolute points, indicating its general applica-
+bility across varied domains and tasks.
+Beyond task success, we also evaluate the average number
+of steps the agent takes to solve a task, as shown in the right-
+most column in Table 1. AWM conducts about 2.0 fewer
+steps per example than the BrowserGym baseline. Further
+compared to the Autoeval (Pan et al., 2024) method, which
+necessitates additional evaluation and refinement steps to
+solve tasks correctly, our AWM approach uses 40.8 fewer
+steps on average. See §D for more efficiency discussions.
+Both comparisons show that AWM obtains high success
+rates while maintaining efficient trajectories.
+Rapid 
+learning 
+phase
+Stable 
+inference 
+phase
+Figure 4. AWM enables rapid learning from a small amount of
+data (about 40 queries), using WebArena map split as an example.
+3.1.2. EFFICIENT LEARNING FROM SMALL AMOUNTS OF
+DATA
+To demonstrate the behavior of the AWMonline method, we
+illustrate the cumulative success rate over the process of
+online evaluation, by evaluating the average success rate of
+the first k finished examples.
+As in Figure 4, the agent exhibits a fast learning curve in
+the beginning (between 0–40 examples), by acquiring the
+most essential workflows, which results in higher success
+rates. Afterward, agents learn more advanced workflows
+(Figure 1), while success rates gradually stabilize to the
+highest point in the early learning phase. This showcases
+AWM’s efficient learning process, which substantially im-
+proves performance with merely tens of examples.
+3.1.3. CROSS-TEMPLATE WORKFLOW GENERALIZATION
+Some tasks in WebArena have highly overlapping canonical
+trajectories, due to the benchmark construction process that
+instantiates multiple examples from a single underlying task
+template. AWM intuitively improves in-template success
+rate, that is, given one workflow induced from a successful
+example, it would be theoretically easier to solve all other
+examples generated from the same task template.
+4
+
+Agent Workflow Memory
+Table 1. Task success rate on WebArena using gpt-4, and score breakdown on five website splits.
+Method
+Total SR
+Shopping
+CMS
+Reddit
+GitLab
+Maps
+# Steps
+With human engineered workflows
+*SteP (Sodhi et al., 2023)
+33.0
+37.0
+24.0
+59.0
+32.0
+30.0
+-
+Autonomous agent only
+WebArena (Zhou et al., 2024)
+14.9
+14.0
+11.0
+6.0
+15.0
+16.0
+-
+AutoEval (Pan et al., 2024)
+20.2
+25.5
+18.1
+25.4
+28.6
+31.9
+46.7
+BrowserGym (Drouin et al., 2024)
+23.5
+-
+-
+-
+-
+-
+-
+BrowserGymax−tree
+15.0
+17.2
+14.8
+20.2
+19.0
+25.5
+7.9
+AWM (OURS)
+35.5
+30.8
+29.1
+50.9
+31.8
+43.3
+5.9
+To confirm that the benefits of AWM are not just from learn-
+ing workflows that help only within a template, and investi-
+gate whether AWM can obtain cross-template (≈cross-task)
+generalization, we extract a subset of WebArena examples
+sourcing from non-overlapping templates, by grouping ex-
+amples by their templates and randomly choosing one ex-
+ample from each template group. We run AWM on this
+cross-template subset and examine if it achieves similar
+performance gains.
+As shown in Table 2, AWM still achieves the highest per-
+formance, overall and on each website split. These results
+demonstrate that AWM induced workflows can effectively
+generalize across different tasks, i.e., examples instantiated
+from different task templates.
+Find a place by its name
+Get the zip code of a place
+Task Objective: Show me {location} on the map
+Action Trajectory:
+# To ﬁnd the {location}, I will search for 
+"{location}" on OpenStreetMap.                   
+Task Objective: Tell me the zip of code of {location}
+Action Trajectory:
+To ﬁnd the zip code of {location}, I will ﬁrst search for {location} on 
+OpenStreetMap. Once located, I will extract the zip code from the 
+map or the associated information
+# The search results have provided multiple 
+locations…. This location includes the zip code.
+ﬁll('145', {location})
+click('147')
+send_msg_to_user("The zip code is {zip-code}")
+ﬁll('145', {location})
+click('147')
+Adopt the ﬁrst few 
+steps from earlier, 
+easier workﬂows
+Add more steps to 
+build increasingly 
+complex workﬂows
+Figure 5. AWM builds increasingly complex workflows over time,
+by learning from past examples and earlier workflows.
+Building increasingly complex workflows
+To more in-
+tuitively demonstrate AWM’s cross-template generalization
+and ability to build increasingly complex workflows (as ex-
+emplified in Figure 1), we conduct a case study to illustrate
+the workflow mechanism behind it.
+As exemplified in Figure 5, the agent creates and learns the
+“Find a place by its name” workflow in the early stage of
+the online process by summarizing past examples. Later,
+when encountering an example that further asks to obtain
+the zip code of the location, AWM agent learns to adopt
+the first few steps to find locations by following the existing
+workflow, and then conducts further steps to obtain the zip
+code of the place found. Integrating these new steps upon
+the vanilla find location task, the agent successfully builds a
+more complex workflow, i.e., “get the zip code of a place”.
+We further examine whether example ordering affects this
+gradual induction process in §E.
+3.2. Mind2Web
+Mind2Web (Deng et al., 2023) features web navigation in
+cross-task, website, and domain settings, stressing the gen-
+erality of agents on versatile operations and environments.
+Each task in Mind2Web has a fixed number of steps; at
+each step, the agent needs to predict an action, which is
+evaluated by: (1) element accuracy: to check if the correct
+page element is selected, (2) action F1 to check if the action
+taken on the element is correct, and aggregating (1) and (2)
+yields (3) step success rate which checks that both element
+and action selection are correct at the current step. Lastly,
+after completing every step in the given task, the last metric
+(4) task-level success rate measures if all intermediate steps
+are successfully conducted for this task, i.e., all steps for
+this task score 1 under metric (3).
+Because Mind2Web provides a training set that covers part
+of the tested websites (the cross-task split), we explore both
+the offline setting that induces workflows from the training
+set and applies to test sets, and the online setting, where
+we stream workflow induction and inference on test queries
+(§2.3).
+Since we focus on LM-based agents that only take textual
+inputs, we compare AWM to two state-of-the-art methods,
+MindAct (Deng et al., 2023) and Synapse (Zheng et al.,
+2024). MindAct introduces webpage element filtering and
+multi-choice task format to ease observation processing, and
+Synapse changes the format to a trajectory style and aug-
+ments retrieved relevant examples. We integrate the element
+filtering adopted in both methods, and added workflows
+instead of retrieved examples in Synapse, to verify the supe-
+riority of reusable workflows over concrete examples. To
+fairly compare with all baseline methods, we run AWM
+with both gpt-3.5-turbo and gpt-4 models with tem-
+perature 0.0. We use the same model for neural workflow
+induction and agent action generation.
+3.2.1. MAIN RESULTS
+We first run with AWM offline using both GPT variants,
+and find that AWM consistently obtains the highest success
+rate in both step and task levels, leading to 4.0–8.9% rela-
+5
+
+Agent Workflow Memory
+Table 2. Task success rate on the cross-template subset of WebArena, as well as the result breakdown on each website split. We mark the
+number of examples for each website split under the name.
+Method
+Total SR
+Shopping
+CMS
+Reddit
+GitLab
+Maps
+(51)
+(45)
+(24)
+(45)
+(32)
+With human engineered workflows
+*SteP (Sodhi et al., 2023)
+32.1
+26.5
+29.3
+52.2
+27.3
+36.4
+Autonomous agent only
+AutoEval (Pan et al., 2024)
+23.2
+12.2
+17.1
+21.7
+31.8
+36.4
+BrowserGymax−tree
+20.5
+10.4
+17.8
+23.1
+27.3
+28.6
+AWM (OURS)
+33.2
+24.5
+29.3
+52.2
+31.8
+39.4
+Table 3. AWM offline results on Mind2Web cross-task dataset.
+Elem Acc and SR are short for element accuracy and success
+rate. We footnote the GPT variant used by each method, 3.5
+and 4 stands for gpt-3.5-turbo and gpt-4, respectively. We
+highlight the best result within the same model variant.
+Method
+Elem Acc
+Action F1
+Step SR
+SR
+MindAct3.5
+20.3
+56.6
+17.4
+0.8
+CogAgent3.5
+-
+-
+18.6
+-
+Synapse3.5
+34.0
+-
+30.6
+2.4
+AWM3.5
+39.0
+52.8
+34.6
+2.8
+MindAct4
+41.6
+60.6
+36.2
+2.0
+AWM4
+50.6
+57.3
+45.1
+4.8
+tive and 0.4–2.8 absolute points increases in step-wise and
+task-wise success rates than the baselines — Synapse with
+gpt-3.5-turbo and MindAct with gpt-4. Decompos-
+ing the step success rate by element and action selection
+and accuracy, we notice the increases mainly come from
+more accurate element selection, as indicated by the 5.0–9.0
+element accuracy increase in Table 3.
+Abstract sub-routines vs. concrete experiences
+More
+specifically, compared to the Synapse (Zheng et al., 2024)
+method that retrieves the most relevant training examples,
+AWM achieves a +5.0 element accuracy and leads to a +4.0
+increase in step success rate. While augmenting concrete,
+full examples may bias agents to select elements similar to
+those presented in the given examples, AWM introduces
+less bias on element selection via its abstract representation
+of example-specific contexts in workflows, and therefore
+enables higher step success rates.
+Furthermore, AWM integrates frequently-used sub-routines,
+which can be more flexibly and readily leveraged across test
+examples, compared to the full example trajectories used
+by Synapse, which are less likely to appear multiple times.
+In general, our results indicate that the abstract, reusable
+nature of workflows contributes to the superiority of the
+AWM method.
+Learn to diverge from workflow guidelines
+Despite
+more accurate element selection, AWM gets slightly lower
+action F1 scores than MindAct, possibly because the aug-
+mented workflows may guide the agent to take certain ac-
+tions aligning to the workflows, which are not always rel-
+evant to the particular environment state at hand. While
+following the workflows generally results in more success-
+ful task trajectories, agents still encounter challenges in
+identifying places to diverge from the workflow guidelines.
+3.2.2. ONLINE AWM ENABLES GENERALIZATION
+Beyond the offline induction setting, we further explore the
+AWM in the online setting, similar to the WebArena experi-
+ment setup in §3.1, where no additional training examples
+are needed besides test queries. This naturally facilitates
+cross-website and cross-domain generalization, which we
+examine on the two other splits provided by the Mind2Web
+dataset: cross-website and cross-domain tests.
+In addition to the MindAct baseline, we additionally set bars
+with our AWMoffline setup, by randomly selecting work-
+flows induced from the training set as memory augmenta-
+tions. Specifically, for cross-website examples, we select
+workflows from the same domain; for the cross-domain
+setting, we randomly select workflows from all domains.
+We conduct AWMonline by iteratively inducing, integrat-
+ing, and utilizing workflows over test inferences. We also
+explore AWMoffline+online in §C.
+As shown in Table 4, both AWMonline and AWMoffline
+surpass the MindAct baseline by a large margin, resulting
+in 7.4–8.9, 3.6–3.8, and 14.0–16.9 absolute point improve-
+ments in step success rates, in cross-task, cross-website, and
+cross-domain scenarios.
+In-domain, cross-task scenario
+When tested in-domain,
+AWMonline and AWMoffline perform comparably to each
+other. When inspecting the model behaviors in detail, we
+notice the pros and cons of each method. AWMonline in-
+duces workflows from model-predicted trajectories that are
+not always correct, thus can lead to incorrect workflows that
+degrade model performance. On the other hand, the training
+and test examples on some websites vary in task distribu-
+tions (e.g., training examples cover how to buy items on
+Amazon, test examples ask for job applications to Amazon
+careers.). AWMonline naturally resolves this train-test gap
+6
+
+Agent Workflow Memory
+Table 4. Success rate on Mind2Web cross-task, cross-website, and cross-domain generalization test, using gpt-4 model. EA is short for
+element accuracy and AF1 is short for action F1.
+Method
+Cross-Task
+Cross-Website
+Cross-Domain
+EA
+AF1
+Step SR
+SR
+EA
+AF1
+Step SR
+SR
+EA
+AF1
+Step SR
+SR
+MindAct*
+41.6
+60.6
+36.2
+2.0
+35.8
+51.1
+30.1
+2.0
+21.6
+52.8
+26.4
+2.0
+AWMoffline
+50.6
+57.3
+45.1
+4.8
+41.4
+46.2
+33.7
+2.3
+36.4
+41.6
+32.6
+0.7
+AWMonline
+50.0
+56.4
+43.6
+4.0
+42.1
+45.1
+33.9
+1.6
+40.9
+46.3
+35.5
+1.7
+because its operating process only involves test queries and
+environments, therefore yields workflows that are presum-
+ably more targeted toward the test distribution, which in
+turn, leads to higher success rates overall. Nonetheless, if
+distribution-matching, high-quality training examples are
+available, AWMoffline could bring more benefit by alleviat-
+ing the gap issue, as the slightly higher cross-tasks scores
+of AWMoffline in Table 4.
+Extending to unseen websites and domains
+When
+applied on unseen websites or domains, AWMonline
+demonstrates greater generalization abilities, compared to
+AWMoffline. The performance margin of AWMonline (over
+AWMoffline) widens as the domain gaps between train-
+ing and testing data widen from different websites (e.g.,
+apple to bestbuy) to different domains (e.g., macys in
+shopping domain to reddit in social media domain). Be-
+cause AWMonline does not require nor rely on informa-
+tion from the training data, it is not affected by any do-
+main gaps. Nonetheless, as demonstrated by the substantial
+improvements of AWMoffline over the MindAct baseline,
+AWMoffline still demonstrates that models can benefit from
+mechanistically similar workflows from the previously in-
+duced workflow repository.
+4. Exploring Optimal Workflow
+Representations
+In this section, we experiment with other possible alterna-
+tives to better represent the workflows. Specifically, we
+ablate workflows in sub-routine, abstract formats (§4.1),
+explore workflows in descriptive texts (§4.2), and lastly, be-
+yond the default workflows that describe environment state
+in NL, we compare strengthened observations with website
+HTML within workflow steps (§4.3).
+4.1. How much does the sub-routine, abstract format
+contribute?
+In this section, we compare our abstract, sub-routine-based
+induction method using LMs to a rule-based method without
+context and sub-routine abstraction.
+Specifically, our rule-based induction Irule first extracts the
+action sequence (e.g., CLICK →CLICK →TYPE) of each
+experience and deduplicates experiences by their action
+sequence. In each unique experience, we then remove the
+steps whose action cannot be executed on the environment.
+We take these unique, validated experiences as workflows.
+Find more detailed descriptions in §B.
+Table 5. AWM success rate on WebArena using gpt-4, with rule-
+and lm-based induction.
+Method
+Total SR
+# Steps
+AWMrule
+35.6
+6.3
+AWMlm
+35.5
+5.9
+WebArena Results
+As shown in Table 5, using rule- and
+LM-based workflow induction performs comparably, with a
+small 0.1 gap in success rate; the LM-based method appears
+more efficient and uses 0.4 fewer steps. Our manual analysis
+found workflows produced by the LM-based induction mod-
+ule Ilm are finer-grained, preventing agents from following
+unnecessary steps that sometimes appear in rule-induced
+workflows, hence making the task-solving process slightly
+more efficient.
+Table 6. AWM results with different workflow induction methods
+on Mind2Web cross-task dataset.
+Method
+Elem Acc
+Action F1
+Step SR
+SR
+MindAct4
+41.6
+60.6
+36.2
+2.0
+AWM4,rule
+49.5
+57.0
+43.4
+2.0
+AWM4,lm
+50.6
+57.3
+45.1
+4.8
+Mind2Web Results
+In Table 6, compared to AWMrule,
+AWMlm improves by a 2.8 margin. While augmenting
+concrete, full examples may bias agents to select elements
+similar to those presented in the given examples, AWM
+lm introduces less bias on element selection via its abstract
+representation of example-specific contexts in workflows.
+Further, AWM lm uses frequently-used sub-routines, which
+can be more flexibly and readily utilized across test exam-
+ples, compared to the full example trajectories induced by
+AWM rule, which are less likely to appear multiple times.
+In general, our results indicate that the abstract, reusable
+nature of workflows contributes to the efficacy of AWM lm
+method.
+4.2. Workflows in Descriptive Texts
+AWM represents workflow steps in a program format. In
+this section, we compare with a textual format for work-
+7
+
+Agent Workflow Memory
+flows, to understand whether text or code serves as a better
+format for agent memory. More concretely, we prompt
+gpt-3.5-turbo to verbalize the action trajectory in the
+workflows induced in earlier experiments. For example,
+from an action CLICK({submit-id}), its verbalized
+NL representation reads similar to “CLICK the submit but-
+ton”. We use the same textual observation and thoughts
+from code actions as observation and thoughts in these text
+actions.
+Table 7. Mind2Web cross-task results with AWM using code and
+text workflows.
+Method
+Elem Acc
+Action F1
+Step SR
+SR
+MindAct
+41.6
+60.6
+36.2
+2.0
+AWM
+50.6
+57.3
+45.1
+4.8
+AWMtext
+51.2
+57.4
+45.4
+3.6
+From the results in Table 7, AWMtext achieves slightly
+higher element selection accuracy and step success rate, by
+0.6 and 0.3 points, respectively, yet degrades 1.2 in task suc-
+cess rate. Overall, we do not find substantial performance
+variance between workflows represented in text and code
+formats, indicating that both forms can be effective. See §F
+for more studies on executable action workflows.
+4.3. Environment Abstraction in Workflows
+AWM describes intermediate webpage states using NL, yet
+showing concrete states may be helpful to better ground
+agents on the environment. Since a webpage’s full HTML
+can be overly long, we filter the webpage representation
+using the relevance predictor of Deng et al. (2023), and
+augment each workflow step with this shortened HTML
+that only has elements predicted as relevant.
+We run
+gpt-3.5-turbo with only descriptions, only HTML,
+and both types of content.
+Table 8. Mind2Web results using GPT-3.5-turbo with different en-
+vironment representations.
+Desc.
+HTML
+Elem Acc
+Act F1
+Step SR
+SR
+✓
+✗
+39.0
+52.8
+34.6
+2.8
+✗
+✓
+38.1
+54.0
+33.8
+2.8
+✓
+✓
+37.1
+51.3
+32.9
+2.0
+As shown in Table 8, NL description of states is more useful
+than HTML, as replacing NL with HTML leads to a slight
+0.8 drop in step success rate. Interestingly, using both NL
+and filtered HTML leads to worse results. We conjecture
+the reason to be two-fold. First, adding NL and HTML sub-
+stantially increases the context length, thus making it harder
+for models to handle things correctly. Second, the filtered
+HTML has a substantial number of irrelevant items (miss-
+ing all correct elements 47% of the time) thus potentially
+contradicting NL descriptions and impairing agent abilities.
+5. Related Work
+Web Agent Benchmarks
+The first modern and widely
+used web agent benchmark is Shi et al. (2017)’s MiniWob,
+which evaluates across various scenarios such as flight book-
+ing. (Liu et al., 2018) then created MiniWob++ with extra
+challenges. More recently, WebShop (Yao et al., 2022) fea-
+tures a simulated e-commerce website and crowd-sourced
+text instructions. WebArena (Zhou et al., 2024) integrates
+four more websites and enables realistic execution-based
+evaluations, and VisualWebArena (Koh et al., 2024) extends
+with tasks that necessitate visual inputs. Mind2Web (Deng
+et al., 2023) proposes versatile tasks and stresses agent gen-
+eralization across websites and domains. We use WebArena
+and Mind2Web to evaluate our method’s task success and
+generality.
+Enhancing Agents for Complex Tasks
+Many works im-
+prove agents by modifying their action space, such as con-
+straining its action search space (Liu et al., 2018), enabling
+LM self-feedback to refine predicted actions (Sun et al.,
+2023), or incorporating human-designed actions to certain
+tasks (Sodhi et al., 2023; Sarch et al., 2024). Other works
+explore ways to augment agent memory, such as adding
+example demonstrations in context (Haluptzok et al., 2023;
+Zheng et al., 2024; Fu et al., 2024). However, high-quality
+examples are not always available or easy to collect. Our
+AWM can flexibly operate even when auxiliary examples
+are non-existent and only test queries are available.
+Learning Common Procedures from Experiences
+Some works use full examples (Zheng et al., 2024) as con-
+text for an agent, yet they entangle with example-specific
+contexts and face challenges in extrapolating to other tasks
+or domains (Majumder et al., 2023). Many works propose to
+extract frequently reused sub-routines from experiences with
+rule-based (Ellis et al., 2023; Bowers et al., 2023; Grand
+et al., 2023) or LM-based methods (Cai et al., 2023; Wang
+et al., 2024c;a) methods, and use them as auxiliary skills
+to ease future task-solving (Oh et al., 2017; Liang et al.,
+2023; Yu et al., 2023; Mao et al., 2023). We explored both
+rule- and LM-based methods to induce reusable workflows,
+and use them flexibly as context guidance that are free of
+environment grounding issues.
+6. Conclusion
+We propose agent workflow memory that induces, augments,
+and uses workflows, offline from available examples or
+purely online at inference time. We evaluate AWM on
+WebArena and Mind2Web, and achieve 24.6% and 51.1%
+relative increases in task success rate. AWM also demon-
+strates its superior generalization abilities across tasks, web-
+sites, and domains. We hope AWM sheds insight on and
+boosts advances in dynamic memory building and agent
+adaptations on varied digital tasks.
+8
+
+Agent Workflow Memory
+Acknowledgments
+We thank Frank Xu, Jiayi Pan, Vijay Viswanathan, Chenglei
+Si, and Jason Wu for their helpful discussions during the
+early stage of this project. We would like to thank members
+of NeuLab and DFried Lab at Carnegie Mellon University
+for their valuable feedback and comments on the paper.
+Zora Zhiruo Wang is supported by the CMU Presidential
+Fellowship and Fujitsu Research.
+Impact Statement
+This paper presents work whose goal is to advance large
+language model-supported digital agents. While utilizing
+digital agents in practice can facilitate users in completing
+computer-using tasks, these agents may not perform per-
+fectly accurately, and ensuring safety and privacy through-
+out the usage is still an open problem in the field.
+References
+Bowers, M., Olausson, T. X., Wong, L., Grand, G., Tenen-
+baum, J. B., Ellis, K., and Solar-Lezama, A. Top-down
+synthesis for library learning.
+Proc. ACM Program.
+Lang., 7(POPL), jan 2023. doi: 10.1145/3571234. URL
+https://doi.org/10.1145/3571234.
+Cai, T., Wang, X., Ma, T., Chen, X., and Zhou, D.
+Large language models as tool makers. arXiv preprint
+arXiv:2305.17126, 2023. URL https://arxiv.org/pdf/2305.
+17126.
+Chi, M. T., Feltovich, P. J., and Glaser, R. Categorization
+and representation of physics problems by experts and
+novices. Cognitive science, 5(2):121–152, 1981.
+Chi, M. T., Glaser, R., and Farr, M. J. The nature of expertise.
+Psychology Press, 2014.
+Deng, X., Gu, Y., Zheng, B., Chen, S., Stevens, S., Wang,
+B., Sun, H., and Su, Y. Mind2web: Towards a gener-
+alist agent for the web. In Thirty-seventh Conference
+on Neural Information Processing Systems Datasets and
+Benchmarks Track, 2023. URL https://openreview.net/
+forum?id=kiYqbO3wqw.
+Drouin, A., Gasse, M., Caccia, M., Laradji, I. H., Del Verme,
+M., Marty, T., Boisvert, L., Thakkar, M., Cappart, Q.,
+Vazquez, D., et al. Workarena: How capable are web
+agents at solving common knowledge work tasks? arXiv
+preprint arXiv:2403.07718, 2024.
+Ellis, K., Wong, L., Nye, M., Sable-Meyer, M., Cary, L.,
+Anaya Pozo, L., Hewitt, L., Solar-Lezama, A., and Tenen-
+baum, J. B. Dreamcoder: growing generalizable, inter-
+pretable knowledge with wake–sleep bayesian program
+learning. Philosophical Transactions of the Royal Society
+A, 381(2251):20220050, 2023.
+Fu, Y., Kim, D.-K., Kim, J., Sohn, S., Logeswaran, L.,
+Bae, K., and Lee, H. Autoguide: Automated generation
+and selection of state-aware guidelines for large language
+model agents. arXiv preprint arXiv:2403.08978, 2024.
+Grand, G., Wong, L., Bowers, M., Olausson, T. X., Liu,
+M., Tenenbaum, J. B., and Andreas, J. Lilo: Learning
+interpretable libraries by compressing and documenting
+code. arXiv preprint arXiv:2310.19791, 2023.
+Haluptzok, P., Bowers, M., and Kalai, A. T. Language
+models can teach themselves to program better. In The
+Eleventh International Conference on Learning Repre-
+sentations, 2023. URL https://openreview.net/forum?id=
+SaRj2ka1XZ3.
+Koh, J. Y., Lo, R., Jang, L., Duvvur, V., Lim, M. C., Huang,
+P.-Y., Neubig, G., Zhou, S., Salakhutdinov, R., and Fried,
+D. Visualwebarena: Evaluating multimodal agents on
+realistic visual web tasks. In ICLR 2024 Workshop on
+Large Language Model (LLM) Agents, 2024. URL https:
+//openreview.net/forum?id=RPKxrKTJbj.
+Liang, J., Huang, W., Xia, F., Xu, P., Hausman, K., Ichter, B.,
+Florence, P., and Zeng, A. Code as policies: Language
+model programs for embodied control. In 2023 IEEE
+International Conference on Robotics and Automation
+(ICRA), pp. 9493–9500. IEEE, 2023.
+Liu, E. Z., Guu, K., Pasupat, P., and Liang, P. Reinforcement
+learning on web interfaces using workflow-guided explo-
+ration. In International Conference on Learning Repre-
+sentations, 2018. URL https://openreview.net/forum?id=
+ryTp3f-0-.
+Majumder, B. P., Mishra, B. D., Jansen, P., Tafjord, O.,
+Tandon, N., Zhang, L., Callison-Burch, C., and Clark,
+P.
+Clin: A continually learning language agent for
+rapid task adaptation and generalization. arXiv preprint
+arXiv:2310.10134, 2023.
+Mao, J., Lozano-P´erez, T., Tenenbaum, J. B., and Kael-
+bling, L. P. Learning reusable manipulation strategies. In
+Conference on Robot Learning, pp. 1467–1483. PMLR,
+2023.
+Murty, S., Manning, C., Shaw, P., Joshi, M., and Lee, K.
+Bagel: Bootstrapping agents by guiding exploration with
+language. arXiv preprint arXiv:2403.08140, 2024.
+Oh, J., Singh, S., Lee, H., and Kohli, P. Zero-shot task gen-
+eralization with multi-task deep reinforcement learning.
+In International Conference on Machine Learning, pp.
+2661–2670. PMLR, 2017.
+9
+
+Agent Workflow Memory
+Pan, J., Zhang, Y., Tomlin, N., Zhou, Y., Levine, S., and
+Suhr, A. Autonomous evaluation and refinement of digital
+agents. arXiv preprint arXiv:2404.06474, 2024.
+Rawles, C., Li, A., Rodriguez, D., Riva, O., and Lillicrap,
+T. P. Androidinthewild: A large-scale dataset for android
+device control. In Thirty-seventh Conference on Neu-
+ral Information Processing Systems Datasets and Bench-
+marks Track, 2023. URL https://openreview.net/forum?
+id=j4b3l5kOil.
+Rawles, C., Clinckemaillie, S., Chang, Y., Waltz, J., Lau,
+G., Fair, M., Li, A., Bishop, W., Li, W., Campbell-
+Ajala, F., et al. Androidworld: A dynamic benchmark-
+ing environment for autonomous agents. arXiv preprint
+arXiv:2405.14573, 2024.
+Sarch, G., Jang, L., Tarr, M. J., Cohen, W. W., Marino, K.,
+and Fragkiadaki, K. Ical: Continual learning of multi-
+modal agents by transforming trajectories into actionable
+insights. arXiv preprint arXiv:2406.14596, 2024.
+Shi, T., Karpathy, A., Fan, L., Hernandez, J., and Liang, P.
+World of bits: An open-domain platform for web-based
+agents. In Precup, D. and Teh, Y. W. (eds.), Proceed-
+ings of the 34th International Conference on Machine
+Learning, volume 70 of Proceedings of Machine Learn-
+ing Research, pp. 3135–3144. PMLR, 06–11 Aug 2017.
+URL https://proceedings.mlr.press/v70/shi17a.html.
+Sodhi, P., Branavan, S., and McDonald, R. Heap: Hierar-
+chical policies for web actions using llms. arXiv preprint
+arXiv:2310.03720, 2023.
+Sun, H., Zhuang, Y., Kong, L., Dai, B., and Zhang, C.
+Adaplanner: Adaptive planning from feedback with lan-
+guage models. In Thirty-seventh Conference on Neu-
+ral Information Processing Systems, 2023. URL https:
+//openreview.net/forum?id=rnKgbKmelt.
+Wang, G., Xie, Y., Jiang, Y., Mandlekar, A., Xiao, C.,
+Zhu, Y., Fan, L., and Anandkumar, A. Voyager: An
+open-ended embodied agent with large language mod-
+els. Transactions on Machine Learning Research, 2024a.
+ISSN 2835-8856. URL https://openreview.net/forum?id=
+ehfRiF0R3a.
+Wang, Z., Cheng, Z., Zhu, H., Fried, D., and Neubig, G.
+What are tools anyway? a survey from the language
+model perspective. In First Conference on Language
+Modeling, 2024b. URL https://openreview.net/forum?id=
+Xh1B90iBSR.
+Wang, Z., Neubig, G., and Fried, D. TroVE: Inducing veri-
+fiable and efficient toolboxes for solving programmatic
+tasks. In Forty-first International Conference on Machine
+Learning, 2024c. URL https://openreview.net/forum?id=
+DCNCwaMJjI.
+Yao, S., Chen, H., Yang, J., and Narasimhan, K.
+Webshop:
+Towards scalable real-world web inter-
+action with grounded language agents.
+In Koyejo,
+S., Mohamed, S., Agarwal, A., Belgrave, D., Cho,
+K., and Oh, A. (eds.), Advances in Neural Infor-
+mation Processing Systems, volume 35, pp. 20744–
+20757. Curran Associates, Inc., 2022.
+URL https:
+//proceedings.neurips.cc/paper files/paper/2022/file/
+82ad13ec01f9fe44c01cb91814fd7b8c-Paper-Conference.
+pdf.
+Yoran, O., Amouyal, S. J., Malaviya, C., Bogin, B., Press,
+O., and Berant, J.
+Assistantbench: Can web agents
+solve realistic and time-consuming tasks? arXiv preprint
+arXiv:2407.15711, 2024.
+Yu, W., Gileadi, N., Fu, C., Kirmani, S., Lee, K.-H., Are-
+nas, M. G., Chiang, H.-T. L., Erez, T., Hasenclever, L.,
+Humplik, J., et al. Language to rewards for robotic skill
+synthesis. arXiv preprint arXiv:2306.08647, 2023.
+Zheng, L., Wang, R., Wang, X., and An, B.
+Synapse:
+Trajectory-as-exemplar prompting with memory for com-
+puter control.
+In The Twelfth International Confer-
+ence on Learning Representations, 2024. URL https:
+//openreview.net/forum?id=Pc8AU1aF5e.
+Zhou, S., Xu, F. F., Zhu, H., Zhou, X., Lo, R., Sridhar, A.,
+Cheng, X., Ou, T., Bisk, Y., Fried, D., Alon, U., and
+Neubig, G. Webarena: A realistic web environment for
+building autonomous agents. In The Twelfth International
+Conference on Learning Representations, 2024. URL
+https://openreview.net/forum?id=oKn9c6ytLx.
+10
+
+Agent Workflow Memory
+A. LM-Based Workflow Induction
+As introduced in §2.3, one realization of our workflow induction module is to prompt LMs to generate abstract, sub-routine
+workflows from the given examples, i.e., experience. In this section, we provide the detailed model prompt, exemplar
+workflows induced by models, and quality examination on these workflows.
+A.1. Model Prompt
+We provide the exact prompt inputted to the model for WebArena and Mind2Web experiments below. Experiments on both
+datasets use the same prompt.
+Given a list of web navigation tasks, your task is to extract the common workflows.
+Each given task contains a natural language instruction, and a series of actions to solve the task. You need to find the
+repetitive subset of actions across multiple tasks, and extract each of them out as a workflow.
+Each workflow should be a commonly reused sub-routine of the tasks. Do not generate similar or overlapping workflows.
+Each workflow should have at least two steps. Represent the non-fixed elements (input text, button strings) with descriptive
+variable names as shown in the example.
+A.2. Example Workflows
+We present several exemplar workflows induced on WebArena and Mind2Web, to give a more concrete impression of
+workflows.
+WebArena Workflows
+We show one example workflow on each website involved in WebArena.
+## shopping: Browse Products in a Specific Category
+To browse products in a specific category, I need to navigate to the relevant main category. I will start by hovering over
+the main category menu item to reveal the subcategories.
+hover(’main category id’)
+To browse products in the specific subcategory, I need to click on the subcategory link.
+click(’subcategory id’)
+## shopping admin: Edit and Save Changes
+This workflow is used to edit specific fields and save changes.
+To edit a specific field, I need to locate the field and update its value.
+clear(’field id’)
+fill(’field id’, ’new value’)
+Next, I need to save the changes by clicking the ”Save” button.
+click(’save button id’)
+## reddit: Navigate to a forum section and select a specific forum
+To navigate to a specific forum, I need to click on the ”Forums” section.
+click(’42’)
+Now, I need to click on the specific forum link based on the forum name provided.
+click(’<forum link id>’)
+## gitlab: Navigation to Repository and Contributors Section
+This workflow involves searching for a repository and navigating to its contributors to find detailed contribution data.
+First, search for the specific repository to gather information.
+fill(’130’, ’{RepositoryName}’)
+press(’130’, ’Enter’)
+Navigate to the “Contributors” section to view contribution details.
+click(’311’)
+# “Contributors” link
+Obtain and report the required contributor details.
+send msg to user(’{ContributorDetails}’)
+11
+
+Agent Workflow Memory
+## map: Calculate Travel Time and Distance
+To calculate travel time and distance between two locations, I will use the directions feature. I will fill in the respective
+fields and select the mode of transportation.
+fill(’158’, ’FROM LOCATION’)
+fill(’163’, ’TO LOCATION’)
+select option(’166’, ’MODE OF TRANSPORTATION’)
+click(’171’)
+I will use these details to provide the user with accurate travel time and distance information.
+send msg to user(’The distance between FROM LOCATION and TO LOCATION is DISTANCE
+and the estimated travel time is TIME.’)
+Mind2Web Workflows
+We present one example workflow in each data domain in Mind2Web.
+# travel: enter flight locations
+Given that you are on the flight booking page, this workflow enters the departure and destination city/airport for your
+flight.
+[link] From Departure Airport or City Your Origin −> CLICK
+[textbox] Origin City or Airport −> TYPE: {your-origin-city}
+[link] {best-popup-option} −> CLICK
+[link] To Destination Airport or City Your Destination −> CLICK
+[textbox] Destination City or Airport −> TYPE: {your-destination-city}
+[link] {best-popup-option} −> CLICK
+# shopping: search and sort
+Given that you are on the Amazon search results page, this workflow searches for a product and sorts the results.
+[textbox] Search Amazon −> TYPE: {search-term}
+[button] Go −> CLICK
+[span] Sort by: −> CLICK
+[option] {sort-option} −> CLICK
+# entertainment: search and select
+Given that you are on the IMDb homepage, this workflow searches for a term and selects the best match.
+[textbox] Search IMDb −> TYPE: {search-term}
+[button] Submit Search −> CLICK
+[button] {best-match} −> CLICK
+A.3. Workflow Quality Analysis
+To provide intermediate information beyond the end-to-end task success, we propose several metrics to verify the quality
+of the model-induced workflows. (1) Number of workflows: The number of workflows augmented to the memory, fewer
+workflows is better, whereas agents rely on fewer workflows to achieve satisfactory performance. (2) Coverage: How many
+steps in the action trajectory are covered by the workflows, higher coverage presumably signals the general applicability of
+the concerned workflow. (3) Function overlap: How much functionality overlap exists between workflows, we measure this
+by counting the number of overlapping sub-trajectories (≤2 steps) between each workflow pair for the same website. Less
+overlap indicates more maximized workflow management. (4) Utility rate: How often are workflows used by test examples.
+We evaluate the workflows on WebArena test examples and Mind2Web cross-task test examples. We do not evaluate
+coverage on WebArena since it requires canonical trajectories, yet which are not available for WebArena. For Mind2Web,
+we do not evaluate on cross-website and cross-domain test examples since workflows induced from training examples do not
+have domain overlapping with these test examples, thus less applicable to them.
+As shown in Table 9, neural-based induction produces 7.3–7.4 workflows per example, which is efficient and do not add too
+much content to the memory. On WebArena, the induced workflows are used by 0.94 of the test examples, indicating its wide
+applicability among varied tasks. Further, only 0.08 of the steps between workflows overlap, demonstrating the efficiency of
+workflows in solving respective tasks. Workflows on Mind2Web, although used similarly frequently as indicated by the high
+12
+
+Agent Workflow Memory
+Table 9. Quality evaluation of model-induced workflows on Mind2Web dataset.
+Metric
+# Workflows
+Coverage
+Function Overlap
+Utility Rate
+WebArena
+7.4
+-
+0.08
+0.94
+Mind2Web
+7.3
+0.40
+0.20
+0.91
+0.91 utility rate, have slightly more functional overlap, and only achieve a 0.40 coverage over test examples. However, as
+the training examples used to induce workflows have substantial task distribution variances with the cross-task test examples,
+this relatively low coverage is reasonable.
+B. Rule-Based Workflow Induction
+Beyond LM-based workflow induction, we also explored a rule-based workflow induction method. Our rule-based workflow
+induction module consists of two steps: (i) experience deduplication, and (2) invalid action filtering.
+For deduplication, we extract the action sequence of the experience, e.g., extracting CLICK →CLICK →TYPE from
+the trajectory CLICK(’12’) →CLICK(’30’) →TYPE(’44’, "cat"). We group experiences by their action
+sequence and randomly select n (n = 1 by default) experiences from each group. Specifically on WebArena, where the task
+template for each experience is available. We conduct another round of deduplication by grouping experiences by their task
+template, and randomly selecting n (n = 1 by default) experiences from each group. This process yields diverse experiences
+from the given set of experiences.
+Next, for each unique experience, we remove the invalid steps in its action trajectory. Invalid actions means actions that
+cannot be successfully executed on the environment, because the input arguments do not meet the requirement of the action
+function. Specifically, we have one rule of determining invalid actions for CLICK and TYPE, that requires the first argument
+to be a string-formatted integer (which refers to the id of an element in the environment). We remove CLICK and TYPE
+steps if they do not meet this requirement. For example, an experience with trajectory CLICK(12) →CLICK(’12’)
+→CLICK(’30’) →TYPE(44, "cat") →TYPE(’44’, "cat") will yield CLICK(’12’) →CLICK(’30’)
+→TYPE(’44’, "cat"). We conduct this invalid action filtering for each unique experience, and take the resulting
+experiences as rule-based workflows.
+C. Integrating AWM Offline and Online
+We compared AWMoffline and AWMonline in §3.2, that adopts workflows induced separately from training or on-the-fly
+during testing, respectively. In this section, we explore an integration of both sets of workflows, AWMoff +on, that injects
+relevant training workflows to warm start task-solving, but also aggregates increasingly more online-induced workflows to
+better adapt to test distributions.
+Table 10. Success rate on Mind2Web cross-task, cross-website, and cross-domain generalization test, using gpt-4 model. EA is short for
+element accuracy and AF1 is short for action F1.
+Method
+Cross-Task
+Cross-Website
+Cross-Domain
+EA
+AF1
+Step SR
+SR
+EA
+AF1
+Step SR
+SR
+EA
+AF1
+Step SR
+SR
+MindAct*
+41.6
+60.6
+36.2
+2.0
+35.8
+51.1
+30.1
+2.0
+21.6
+52.8
+18.6
+1.0
+AWMoffline
+50.6
+57.3
+45.1
+4.8
+41.4
+46.2
+33.7
+2.3
+36.4
+41.6
+32.6
+0.7
+AWMonline
+50.0
+56.4
+43.6
+4.0
+42.1
+45.1
+33.9
+1.6
+40.9
+46.3
+35.5
+1.7
+AWMoff +on
+50.0
+57.0
+44.5
+1.6
+41.8
+45.5
+33.3
+1.1
+39.3
+44.3
+34.1
+1.5
+From Table 10, AWMoff +on scores between AWMoffline and AWMonline across three test splits. Rather than an additive
+effect, workflows induced offline and online are not fully compatible with each other, particularly, the offline workflows
+seem to impair the generative quality and utility efficacy of online workflows, therefore resulting in medium results overall.
+D. Efficiency Discussion
+In addition to task success rate, the efficiency and scalability of agents are crucial too. In addition to reporting the number of
+steps in §3, we provide a more detailed analysis of the computation cost for each of the modules involved in AWM.
+13
+
+Agent Workflow Memory
+Besides the action generation step, our AWM approach adds two other steps — trajectory evaluation and workflow induction.
+We calculate the average computation of all three steps by the number of input, output, total tokens per step, the average
+number of times that the step occurs per task, and the total number of tokens used on average for a task. As shown in
+Table 11, the trajectory evaluation step and workflow induction step only take 4.0% and 6.8% of the compute of the original
+action generation step. Compared to the baseline method (using action generation step only), our AWM approach only adds
+10.8% computation overhead, but brings a 51.5% accuracy increase in WebArena tasks, demonstrating the cost-effectiveness
+of our AWM approach.
+Table 11. Computation cost breakdown for action generation, trajectory evaluation, and workflow induction modules in AWM.
+Step
+# Input Tokens
+# Output Tokens
+# Per Step Tokens
+# Occurance
+# Total Tokens
+Action generation
+5,663
+52.0
+5,715
+5.9
+33,718.5
+Trajectory evaluation
+306.8
+82.8
+389.6
+5.9
+2298.6
+Workflow induction
+306.8
+328.7
+635.5
+2.1
+1344.6
+E. AWM Sensitivity to Example Ordering
+The process of AWM gradually learning increasingly complex workflows may raise the hypothesis that, streaming the
+examples in an easy-to-hard order may facilitate this gradual learning process and optimize AWM performance. Therefore,
+we test the effect of example ordering in AWM experiments. We conduct this analysis on the Mind2Web dataset (cross-task
+split); because WebArena examples need to be kept in the original order released to maintain the validity of the browser
+environment (Zhou et al., 2024), we could not change the orders arbitrarily to examine this effect. We run the AWM
+online approach to focus on test example ordering without being affected by other training examples during the offline
+process. Specifically, we compare the (1) original ordering, (2) random shuffling as a comparison baseline, (3) easy-to-hard
+ordering, and (4) hard-to-easy ordering. For (3) and (4), we measure the examples’ difficulty by the number of steps in the
+ground-truth trajectory, i.e., the more steps, the harder the example. The results are shown in Table 12.
+Table 12. Success rate on Mind2Web (cross-task) with AWM online in different example ordering.
+Method
+Element Acc.
+Action F1
+Step SR
+SR
+MindAct*
+41.6
+60.6
+36.2
+2.8
+Original
+50.6
+57.3
+45.1
+4.8
+Random shuffle
+49.4
+57.9
+45.9
+4.0
+Easy-to-hard
+49.8
+57.8
+45.7
+4.0
+Hard-to-easy
+48.5
+59.0
+45.6
+4.2
+First, AWM in all example orderings still substantially outperforms the MindAct baseline. Moreover, the ordering of
+examples does not significantly affect the performance of our AWM approach, where all four example ordering achieves
+similar step success rates. Coupled with a careful analysis of the derived workflows, we found that our design of the
+“sub-task level” workflow contributes to AWM ’s robustness to example ordering —- regardless of the complexity of the task,
+our method can induce usable workflow. Nonetheless, because each website in the Mind2Web dataset only has less than 20
+examples, AWM’s robustness to example ordering in relatively small numbers of examples (as shown by the experiments
+above) may not fully extrapolate larger datasets.
+F. Exploring Workflow Utilization in Context and in Action
+Besides integrating workflows as agent memory, we also explore workflows in expanding the agent action space, denoted as
+AWMAS. We leverage the programmatic nature of workflows and wrap each workflow into a high-level function, similar to
+a shortcut tool the agent can call to perform a pre-determined series of actions (Wang et al., 2024b). Formally, an agent is
+initially equipped with default, primitive actions P (e.g., click, type), and AWMAS adds the induced workflow actions
+W (e.g., find place, get place zipcode) to its action space.
+The agent can call a primitive or workflow action at each step. When a primitive action is called, the agent immediately
+takes that action. When the agent calls a workflow action, it will trigger the sequence of pre-determined steps in the
+workflow. For example, calling the login(username, password) workflow action results in sequentially executing
+14
+
+Agent Workflow Memory
+click(box1-id) →type(box1-id, username) →click(box2-id) →type(box2-id, password)
+→click(submit-id). The workflow action is completed when all intermediate primitive actions are finished.
+Table 13. Mind2Web results with AWMAS variant that alters the
+action space besides memory augmentation. All methods use gpt-4.
+Method
+Elem Acc
+Action F1
+Step SR
+SR
+MindAct
+41.6
+60.6
+36.2
+2.0
+AWM
+50.6
+57.3
+45.1
+4.8
+AWMAS
+51.8
+56.7
+46.4
+3.6
+In Table 13, expanding the agent action space with work-
+flows (AWMAS) slightly improves the step success rate
+by 1.3 points, and gets the same overall success rate,
+3.2, of the base memory-augmented AWM. We analyzed
+agent predictions and found they call workflow actions in
+merely 18.5% of the tasks, suggesting a resistance of cur-
+rent agents to use newly-added actions. Overall, expand-
+ing actions with workflows seems to reinforce workflows
+in memory, and brings small extra gains as auxiliary actions.
+However, workflow actions do not always lead to task success. A representative example is shown in Figure 6. When
+booking flights, users often input a city name such as “New York,” yet the system often pops up some nearby airports to
+support next-step search. While one can induce a book flight workflow that enters all required data via a pre-determined
+action sequence, the action to choose pop-up airports is executed without seeing the intermediate states with available
+pop-up options, and is not flexible enough to do so. More advanced techniques such as granting real-time state access
+or dynamic execution loops can be promising to solve this issue, and we encourage future work to leverage the AWM
+framework to explore these.
+click(120) # id of textbox under ‘To*’
+type(120, “New York”) # enter location
+1
+select(‘New York, NY, US (JFK)’) 
+2
+Depend on the 
+pop up options
+Action
+Environment
+Figure 6. An example of dynamic environment changes that challenge workflow action utilization.
+15

@@ -1,0 +1,119 @@
+1
+Introduction
+Machine learning research has long been captivated by the
+potential of autonomous agents and their capabilities. In re-
+cent times, incorporating large language models into these
+agents (Wang et al. 2023b; Xi et al. 2023) has unveiled
+a broad spectrum of applications, even extending beyond
+academia (Yang et al. 2023a; Nakajima 2023; Significant-
+Gravitas 2023). One of the significant advantages of LLMs
+lies in their world knowledge, allowing them to be inherently
+versatile across various scenarios (Zhao et al. 2023b).
+On the one hand, previous works investigated finetun-
+ing LLMs with a large number of environment interactions
+(Yao et al. 2023c) or with a large amount of human-labeled
+datasets (Nakano et al. 2021; Shaw et al. 2023). This class
+of methods incurs high computational costs and needs ac-
+cess to the LLM’s parametric weights. Furthermore, fine-
+tuning an LLM restricts its functionalities and can hurt its
+generalization abilities (Du et al. 2022). On the other hand,
+prompting methods can augment an LLM with better se-
+quential decision-making planning abilities with only a few
+in-context examples (Hao et al. 2023; Lin et al. 2023b; Sun
+et al. 2023). However, since current LLMs are bounded by
+context window size (Tworkowski et al. 2023), these agents
+have no recollections of what they have seen, and therefore
+no learning can be done outside of a few demonstrations. So,
+how can we strike a balance between these paradigms?
+We present the Experiential Learning (ExpeL) agent as a
+solution. Our agent autonomously gathers experiences from
+a collection of training tasks through trial and error. From
+these experiences, it derives natural language insights and
+employs its own successful experiences as in-context exam-
+ples during test time. Our agent’s learning process is analo-
+gous to a student studying for an exam and then taking it on
+a single attempt, reflecting many real-world situations. Un-
+like self-improvement methods like Reflexion (Shinn et al.
+2023), our approach emphasizes the importance of retaining
+experiences across multiple tasks to enhance agent perfor-
+mance. Moreover, ExpeL learns without parameter updates,
+making it compatible with powerful closed-source models
+like GPT-4 or Claude. Lastly, the experience-gathering step
+does not require a large amount of data or human labels.
+We evaluated ExpeL on three vastly different domains and
+consistently outperformed strong baselines. Additionally,
+we showcased a transfer learning scenario where our agent
+that accumulated knowledge from source tasks showed pos-
+itive forward transfer to target tasks. Finally, we highlighted
+some unexpected emerged abilities the ExpeL agent gained.
+In summary, our key contributions are as follows: (1) we
+introduced ExpeL, a novel LLM agent that autonomously
+learns from experience without gradient updates; (2) We
+evaluated ExpeL on a diverse set of tasks to showcase its
+learning abilities and improvement on top of existing plan-
+ning methods; (3) we showed a novel setting of transfer
+learning for our LLM agent and demonstrated forward trans-
+ferability from source tasks to target tasks. Lastly, we be-
+lieve that as planning algorithms and foundational models
+continue to improve, ExpeL’s paradigm stands to gain sig-
+nificant benefits from their enhanced performances.
+2
+Related Work
+We discuss the most relevant related works in this section.
+See Appendix A for detailed discussions on related works.
+Prompt-based Learning: Prompt-based learning refines
+label prediction tasks by modifying the input context, facili-
+tating swift adaptation to new tasks with minimal data (Liu
+et al. 2023a). This approach capitalizes on LLMs for an-
+swers without parameter tuning as they can be augmented
+using in-context learning (Brown et al. 2020). LAMA
+(Petroni et al. 2019) and GPT-3 (Brown et al. 2020) are
+early works that promoted this formulation. Efforts to reduce
+the intricacies of prompt design include automatic reason-
+ing chains for NLP (Kojima et al. 2022; Zhang et al. 2023).
+Similarly, the ExpeL agent also autonomously learns from
+experiences using extracted insights and self-generated in-
+context trajectories by altering the execution prompt.
+Retrieval Augmented Generation (RAG): Retrieval al-
+lows LLMs to access databases, mitigating hallucinations
+(Li et al. 2022; Wang, Yang, and Wei 2023; Rubin, Herzig,
+and Berant 2022; Liu et al. 2022). Retrieval has also been
+used to enhance the capabilities of decision-making agents
+(Humphreys et al. 2022; Zhao et al. 2023a). In contrast
+to these works, we focus on retrieving the ExpeL agent’s
+self-generated experiences, thus reducing the dependency on
+gold examples and leveraging domain-specific corpus.
+Planning for LLM Agents: Application of LLM agents
+in fields like robotics, natural sciences, game-playing, and
+workflows has surged, with emphasis on their world knowl-
+edge in fewshot settings (Ha, Florence, and Song 2023;
+Mu et al. 2023; Bran et al. 2023; Boiko, MacKnight, and
+Gomes 2023; Yang et al. 2023b; Lin et al. 2023a; Nakano
+et al. 2021; Wang et al. 2023c; Liu et al. 2023b). Moreover,
+LLMs have demonstrated promising zero/few-shot planning
+and reasoning capabilities in various configurations (Sumers
+et al. 2023), including embodied environments and reason-
+ing tasks (Huang et al. 2022; Yao et al. 2023a; Wei et al.
+2022b; Yao et al. 2023b; Gong et al. 2023).
+Self-improvement and Memory for LLM Agents: Agents
+like Reflexion showcase feedback-based improvement, yet
+often lack cross-task memory (Shinn et al. 2023). Other
+agents exhibit potential in persistent memory within multi-
+agent contexts (Park et al. 2023; Maas et al. 2023). Our
+ExpeL agent combines these approaches, focusing on task-
+solving while benefiting from self-generated in-context ex-
+amples and abstracted insights from memory.
+3
+Preliminaries
+Complex Interactive Tasks
+We work with complex inter-
+active tasks where at each time step i ∈{0, . . . , H}, the
+agent receives an observation o ∈O, and from its observa-
+tion history Ht decides to perform action a ∈A. The ob-
+jective of the agent is to achieve some goal g ∈G. We only
+deal with deterministic environments in this work.
+Large Language Models
+A large language model is a
+statistical model of the natural language, typically a neu-
+ral network. In our setting, we use an autoregressive lan-
+guage model (OpenAI 2023; Brown et al. 2020; Touvron

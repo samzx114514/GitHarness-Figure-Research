@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720"><defs>
+<marker id="n" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0 0 L8 4 L0 8Z" fill="#23364C"/></marker>
+<marker id="o" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0 0 L8 4 L0 8Z" fill="#CE6C32"/></marker>
+<marker id="g" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0 0 L8 4 L0 8Z" fill="#388365"/></marker>
+<marker id="x" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0 0 L8 4 L0 8Z" fill="#778391"/></marker>
+<marker id="r" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0 0 L8 4 L0 8Z" fill="#84689D"/></marker>
+</defs><rect width="1200" height="720" fill="white"/>
+<text x="30" y="35" font-family="Arial,Helvetica,sans-serif" font-size="25" fill="#23364C" font-weight="700" text-anchor="start">D  Work transformation at the center</text>
+<text x="30" y="63" font-family="Arial,Helvetica,sans-serif" font-size="16" fill="#778391" font-weight="400" text-anchor="start">A small history supplies W4; the main visual event is the candidate state change.</text>
+<text x="31" y="114" font-family="Arial,Helvetica,sans-serif" font-size="21" fill="#23364C" font-weight="700" text-anchor="start">Historical graph</text>
+<path d="M93 151 V184" fill="none" stroke="#23364C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#n)"/>
+<path d="M93 216 V249" fill="none" stroke="#23364C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#n)"/>
+<path d="M135 265 H196 V176 H222" fill="none" stroke="#23364C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#n)"/>
+<path d="M306 160 V127 H331" fill="none" stroke="#23364C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#n)"/>
+<path d="M415 111 H448" fill="none" stroke="#23364C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#n)"/>
+<path d="M93 281 V345" fill="none" stroke="#23364C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#n)"/>
+<rect x="51" y="119" width="42" height="32" rx="0" fill="#E8F1FA" stroke="none" stroke-width="1.5"/>
+<rect x="93" y="119" width="42" height="32" rx="0" fill="#E1F1E9" stroke="none" stroke-width="1.5"/>
+<rect x="51" y="119" width="84" height="32" rx="4" fill="none" stroke="#23364C" stroke-width="1.5"/>
+<text x="72" y="141" font-family="Arial,Helvetica,sans-serif" font-size="17" fill="#23364C" font-weight="400" text-anchor="middle">Q0</text>
+<text x="114" y="141" font-family="Arial,Helvetica,sans-serif" font-size="17" fill="#23364C" font-weight="400" text-anchor="middle">W0</text>
+<text x="43" y="141" font-family="Arial,Helvetica,sans-serif" font-size="17" fill="#23364C" font-weight="700" text-anchor="end">v0</text>
+<rect x="51" y="184" width="42" height="32" rx="0" fill="#E8F1FA" stroke="none" stroke-width="1.5"/>
+<rect x="93" y="184" width="42" height="32" rx="0" fill="#E1F1E9" stroke="none" stroke-width="1.5"/>
+<rect x="51" y="184" width="84" height="32" rx="4" fill="none" stroke="#23364C" stroke-width="1.5"/>
+<text x="72" y="206" font-family="Arial,Helvetica,sans-serif" font-size="17" fill="#23364C" font-weight="400" text-anchor="middle">Q1</text>
+<text x="114" y="206" font-family="Arial,Helvetica,sans-serif" font-size="17" fill="#23364C" font-weight="400" text-anchor="middle">W1</text>
+<text x="43" y="206" font-family="Arial,Helvetica,sans-serif" font-size="17" fill="#23364C" font-weight="700" text-anchor="end">v1</text>
+<rect x="51" y="249" width="42" height="32" rx="0" fill="#E8F1FA" stroke="none" stroke-width="1.5"/>
+<rect x="93" y="249" width="42" height="32" rx="0" fill="#E1F1E9" stroke="none" stroke-width="1.5"/>
+<rect x="51" y="249" width="84" height="32" rx="4" fill="none" stroke="#23364C" stroke-width="1.5"/>
+<text x="72" y="271" font-family="Arial,Helvetica,sans-serif" font-size="17" fill="#23364C" font-weight="400" text-anchor="middle">Q2</text>
+<text x="114" y="271" font-family="Arial,Helvetica,sans-serif" font-size="17" fill="#23364C" font-weight="400" text-anchor="middle">W2</text>
+<text x="43" y="271" font-family="Arial,Helvetica,sans-serif" font-size="17" fill="#23364C" font-weight="700" text-anchor="end">v2</text>
+<rect x="222" y="144" width="42" height="32" rx="0" fill="#E8F1FA" stroke="none" stroke-width="1.5"/>
+<rect x="264" y="144" width="42" height="32" rx="0" fill="#E1F1E9" stroke="none" stroke-width="1.5"/>
+<rect x="222" y="144" width="84" height="32" rx="4" fill="none" stroke="#23364C" stroke-width="1.5"/>
+<text x="243" y="166" font-family="Arial,Helvetica,sans-serif" font-size="17" fill="#23364C" font-weight="400" text-anchor="middle">Q3</text>
+<text x="285" y="166" font-family="Arial,Helvetica,sans-serif" font-size="17" fill="#23364C" font-weight="400" text-anchor="middle">W3</text>
+<text x="264" y="197" font-family="Arial,Helvetica,sans-serif" font-size="17" fill="#23364C" font-weight="700" text-anchor="middle">v3</text>
+<rect x="332" y="95" width="42" height="32" rx="0" fill="#E8F1FA" stroke="none" stroke-width="1.5"/>
+<rect x="374" y="95" width="42" height="32" rx="0" fill="#E1F1E9" stroke="none" stroke-width="1.5"/>
+<rect x="332" y="95" width="84" height="32" rx="4" fill="none" stroke="#23364C" stroke-width="1.5"/>
+<text x="353" y="117" font-family="Arial,Helvetica,sans-serif" font-size="17" fill="#23364C" font-weight="400" text-anchor="middle">Q5</text>
+<text x="395" y="117" font-family="Arial,Helvetica,sans-serif" font-size="17" fill="#23364C" font-weight="400" text-anchor="middle">W5</text>
+<text x="374" y="148" font-family="Arial,Helvetica,sans-serif" font-size="17" fill="#23364C" font-weight="700" text-anchor="middle">v5</text>
+<rect x="448" y="95" width="42" height="32" rx="0" fill="#E8F1FA" stroke="none" stroke-width="1.5"/>
+<rect x="490" y="95" width="42" height="32" rx="0" fill="#E1F1E9" stroke="none" stroke-width="1.5"/>
+<rect x="448" y="95" width="84" height="32" rx="4" fill="none" stroke="#23364C" stroke-width="1.5"/>
+<text x="469" y="117" font-family="Arial,Helvetica,sans-serif" font-size="17" fill="#23364C" font-weight="400" text-anchor="middle">Q6</text>
+<text x="511" y="117" font-family="Arial,Helvetica,sans-serif" font-size="17" fill="#23364C" font-weight="400" text-anchor="middle">W6</text>
+<text x="490" y="148" font-family="Arial,Helvetica,sans-serif" font-size="17" fill="#23364C" font-weight="700" text-anchor="middle">v6</text>
+<rect x="51" y="346" width="42" height="32" rx="0" fill="#E8F1FA" stroke="none" stroke-width="1.5"/>
+<rect x="93" y="346" width="42" height="32" rx="0" fill="#E1F1E9" stroke="none" stroke-width="1.5"/>
+<rect x="51" y="346" width="84" height="32" rx="4" fill="none" stroke="#CE6C32" stroke-width="1.5"/>
+<text x="72" y="368" font-family="Arial,Helvetica,sans-serif" font-size="17" fill="#23364C" font-weight="400" text-anchor="middle">Q4</text>
+<text x="114" y="368" font-family="Arial,Helvetica,sans-serif" font-size="17" fill="#23364C" font-weight="400" text-anchor="middle">W4</text>
+<text x="43" y="368" font-family="Arial,Helvetica,sans-serif" font-size="17" fill="#CE6C32" font-weight="700" text-anchor="end">v4</text>
+<text x="490" y="85" font-family="Arial,Helvetica,sans-serif" font-size="16" fill="#23364C" font-weight="400" text-anchor="start">HEAD</text>
+<text x="32" y="426" font-family="Arial,Helvetica,sans-serif" font-size="18" fill="#CE6C32" font-weight="400" text-anchor="start">W4 immutable</text>
+<text x="591" y="110" font-family="Arial,Helvetica,sans-serif" font-size="20" fill="#23364C" font-weight="400" text-anchor="start">qₜ: + metrics / − legacy API</text>
+<rect x="667" y="134" width="145" height="54" rx="5" fill="#F4F0F8" stroke="#84689D" stroke-width="1.5"/>
+<text x="739" y="167" font-family="Arial,Helvetica,sans-serif" font-size="22" fill="#23364C" font-weight="700" text-anchor="middle">Git Agent</text>
+<path d="M740 113 V132" fill="none" stroke="#CE6C32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#o)"/>
+<path d="M667 157 H577 V361 H141" fill="none" stroke="#CE6C32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#o)"/>
+<text x="329" y="350" font-family="Arial,Helvetica,sans-serif" font-size="18" fill="#CE6C32" font-weight="400" text-anchor="start">select bₜ = v4</text>
+<text x="617" y="223" font-family="Arial,Helvetica,sans-serif" font-size="22" fill="#CE6C32" font-weight="400" text-anchor="start">COMMIT (Qₜ, v4, hₜ)</text>
+<path d="M740 188 V201" fill="none" stroke="#CE6C32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#o)"/>
+<text x="666" y="262" font-family="Arial,Helvetica,sans-serif" font-size="19" fill="#CE6C32" font-weight="400" text-anchor="start">Router · Reuse &amp; Patch</text>
+<path d="M740 229 V244" fill="none" stroke="#CE6C32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#o)"/>
+<rect x="315" y="387" width="650" height="217" rx="5" fill="#FAFCFB" stroke="#A6C2B5" stroke-width="1.5" stroke-dasharray="6 5"/>
+<text x="335" y="416" font-family="Arial,Helvetica,sans-serif" font-size="21" fill="#23364C" font-weight="700" text-anchor="start">Isolated candidate</text>
+<path d="M135 363 H238 V469 H332" fill="none" stroke="#CE6C32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#o)"/>
+<text x="241" y="453" font-family="Arial,Helvetica,sans-serif" font-size="17" fill="#CE6C32" font-weight="400" text-anchor="start">fork</text>
+<text x="340" y="454" font-family="Arial,Helvetica,sans-serif" font-size="25" fill="#23364C" font-weight="400" text-anchor="start">Wₜ⁰</text>
+<text x="790" y="454" font-family="Arial,Helvetica,sans-serif" font-size="25" fill="#23364C" font-weight="400" text-anchor="start">W̃ₜ under Qₜ</text>
+<text x="340" y="484" font-family="Arial,Helvetica,sans-serif" font-size="19" fill="#23364C" font-weight="400" text-anchor="start">Core Logic</text>
+<text x="790" y="484" font-family="Arial,Helvetica,sans-serif" font-size="19" fill="#388365" font-weight="400" text-anchor="start">Core Logic</text>
+<text x="340" y="515" font-family="Arial,Helvetica,sans-serif" font-size="19" fill="#23364C" font-weight="400" text-anchor="start">Evaluation</text>
+<text x="790" y="515" font-family="Arial,Helvetica,sans-serif" font-size="19" fill="#CE6C32" font-weight="400" text-anchor="start">Evaluation′</text>
+<text x="340" y="546" font-family="Arial,Helvetica,sans-serif" font-size="19" fill="#23364C" font-weight="400" text-anchor="start">Legacy API</text>
+<text x="790" y="546" font-family="Arial,Helvetica,sans-serif" font-size="19" fill="#778391" font-weight="400" text-anchor="start">— excluded</text>
+<text x="340" y="577" font-family="Arial,Helvetica,sans-serif" font-size="19" fill="#23364C" font-weight="400" text-anchor="start">Utilities</text>
+<text x="790" y="577" font-family="Arial,Helvetica,sans-serif" font-size="19" fill="#388365" font-weight="400" text-anchor="start">Utilities</text>
+<rect x="529" y="459" width="214" height="72" rx="5" fill="#F0F5F2" stroke="#23364C" stroke-width="1.5"/>
+<text x="636" y="486" font-family="Arial,Helvetica,sans-serif" font-size="19" fill="#23364C" font-weight="400" text-anchor="middle">Task-Native</text>
+<text x="636" y="516" font-family="Arial,Helvetica,sans-serif" font-size="20" fill="#23364C" font-weight="700" text-anchor="middle">Update Agent</text>
+<path d="M484 495 H524" fill="none" stroke="#23364C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#n)"/>
+<path d="M743 495 H779" fill="none" stroke="#23364C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#n)"/>
+<path d="M739 275 V370 H636 V455" fill="none" stroke="#CE6C32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#o)"/>
+<text x="752" y="321" font-family="Arial,Helvetica,sans-serif" font-size="18" fill="#23364C" font-weight="400" text-anchor="start">Qₜ, hₜ</text>
+<path d="M965 496 H1026" fill="none" stroke="#388365" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#g)"/>
+<rect x="1040" y="479" width="42" height="32" rx="0" fill="#E8F1FA" stroke="none" stroke-width="1.5"/>
+<rect x="1082" y="479" width="42" height="32" rx="0" fill="#E1F1E9" stroke="none" stroke-width="1.5"/>
+<rect x="1040" y="479" width="84" height="32" rx="4" fill="none" stroke="#388365" stroke-width="1.5"/>
+<text x="1061" y="501" font-family="Arial,Helvetica,sans-serif" font-size="17" fill="#23364C" font-weight="400" text-anchor="middle">Q7</text>
+<text x="1103" y="501" font-family="Arial,Helvetica,sans-serif" font-size="17" fill="#23364C" font-weight="400" text-anchor="middle">W7</text>
+<text x="1082" y="532" font-family="Arial,Helvetica,sans-serif" font-size="17" fill="#388365" font-weight="700" text-anchor="middle">v7 · New HEAD</text>
+<text x="1005" y="462" font-family="Arial,Helvetica,sans-serif" font-size="17" fill="#388365" font-weight="400" text-anchor="start">commit</text>
+<text x="549" y="633" font-family="Arial,Helvetica,sans-serif" font-size="17" fill="#778391" font-weight="400" text-anchor="start">Failure → discard candidate only</text>
+<text x="32" y="497" font-family="Arial,Helvetica,sans-serif" font-size="17" fill="#778391" font-weight="400" text-anchor="start">Exact match: ∅</text>
+<text x="32" y="526" font-family="Arial,Helvetica,sans-serif" font-size="17" fill="#778391" font-weight="400" text-anchor="start">REUSE bypass</text>
+<text x="32" y="573" font-family="Arial,Helvetica,sans-serif" font-size="17" fill="#778391" font-weight="400" text-anchor="start">Fresh: ∅ → Wₜ⁰</text>
+<text x="970" y="122" font-family="Arial,Helvetica,sans-serif" font-size="18" fill="#84689D" font-weight="400" text-anchor="start">Outcome + Query</text>
+<text x="970" y="154" font-family="Arial,Helvetica,sans-serif" font-size="18" fill="#84689D" font-weight="400" text-anchor="start">rewards</text>
+<text x="970" y="194" font-family="Arial,Helvetica,sans-serif" font-size="18" fill="#84689D" font-weight="400" text-anchor="start">Harness RL / GRPO</text>
+<path d="M1072 208 V247 H899 V161 H816" fill="none" stroke="#84689D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="5 5" marker-end="url(#r)"/>
+<text x="30" y="687" font-family="Arial,Helvetica,sans-serif" font-size="14" fill="#778391" font-weight="700" text-anchor="start">COMPOSITION STUDY ONLY</text>
+<text x="300" y="687" font-family="Arial,Helvetica,sans-serif" font-size="14" fill="#778391" font-weight="400" text-anchor="start">All historical nodes: Vᵢ = (Qᵢ, Wᵢ)  ·  Solid edges: ancestry / execution; orange: active choice</text>
+<text x="30" y="709" font-family="Arial,Helvetica,sans-serif" font-size="14" fill="#778391" font-weight="400" text-anchor="start">Details omitted for layout comparison; no new algorithmic components are proposed.</text>
+</svg>

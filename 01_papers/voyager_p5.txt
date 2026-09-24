@@ -1,0 +1,41 @@
+I cannot make stick because I need:  2 more planks
+I cannot make stone_shovel because I need:  2 more stick
+throw new Error(`No item named ${name}`);
+No item named acacia_axe
+at line 18:await craftItem(bot, "acacia_axe", 1);
+Environment Feedback
+Execution Error
+GPT-4
+GPT-4
+Figure 5: Left: Environment feedback. GPT-4 realizes it needs 2 more planks before crafting sticks.
+Right: Execution error. GPT-4 realizes it should craft a wooden axe instead of an acacia axe since
+there is no acacia axe in Minecraft. We only display the partial prompt for brevity. The full prompt
+structure for code generation is in Appendix, Sec. A.4.
+(5) Chain-of-thought prompting [46] to do reasoning before code generation.
+We iteratively refine the program through a novel iterative prompting mechanism (Sec. 2.3), in-
+corporate it into the skill library as a new skill, and index it by the embedding of its description
+(Fig. 4, top). For skill retrieval, we query the skill library with the embedding of self-generated task
+plans and environment feedback (Fig. 4, bottom). By continuously expanding and refining the skill
+library, VOYAGER can learn, adapt, and excel in a wide spectrum of tasks, consistently pushing the
+boundaries of its capabilities in the open world.
+2.3
+Iterative Prompting Mechanism
+We introduce an iterative prompting mechanism for self-improvement through three types of feedback:
+(1) Environment feedback, which illustrates the intermediate progress of program execution
+(Fig. 5, left). For example, “I cannot make an iron chestplate because I need:
+7 more iron ingots” highlights the cause of failure in crafting an iron chestplate. We use
+bot.chat() inside control primitive APIs to generate environment feedback and prompt
+GPT-4 to use this function as well during code generation;
+(2) Execution errors from the program interpreter that reveal any invalid operations or syntax
+errors in programs, which are valuable for bug fixing (Fig. 5, right);
+(3) Self-verification for checking task success. Instead of manually coding success checkers
+for each new task proposed by the automatic curriculum, we instantiate another GPT-4
+agent for self-verification. By providing VOYAGER’s current state and the task to GPT-4,
+we ask it to act as a critic [47–49] and inform us whether the program achieves the task.
+In addition, if the task fails, it provides a critique by suggesting how to complete the task
+(Fig. 6). Hence, our self-verification is more comprehensive than self-reflection [30] by both
+checking success and reflecting on mistakes.
+During each round of code generation, we execute the generated program to obtain environment
+feedback and execution errors from the code interpreter, which are incorporated into GPT-4’s prompt
+for the next round of code refinement. This iterative process repeats until self-verification validates
+5

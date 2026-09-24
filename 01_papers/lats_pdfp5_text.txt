@@ -1,0 +1,74 @@
+Language Agent Tree Search Unifies Reasoning, Acting, and Planning in Language Models
+Figure 2. Overview of the six operations in LATS. A node is selected, expanded, evaluated, then simulated until a terminal node is reached,
+and then the resulting value is backpropagated. If the trajectory fails, a reflection is generated and used as additional context for future
+trials. These operations are performed in succession until the budget is reached or the task is successful.
+depicted in Fig. 2, LATS consists of a series of operations
+– selection, expansion, evaluation, simulation, backpropa-
+gation, and reflection – performed in succession until the
+task is successfully completed or a computational limit is
+reached after sampling k trajectories. The full pseudocode
+of LATS can be found in Sec. A in the Appendix.
+Selection. In the first operation, the algorithm identifies
+a segment of the current tree most suitable for subsequent
+expansion. Starting from the root node, denoted as the initial
+state s0, a child node is selected at each tree level until a leaf
+node is reached. To balance exploration and exploitation,
+we use the UCT algorithm as shown in Eq. 1.
+Expansion. After selecting a node, the second operation
+expands the tree by sampling n actions from pθ, as described
+in the prior section. The environment receives each action
+and returns corresponding feedback as an observation. This
+results in n new child nodes added to the tree. This tree is
+stored in an external long-term memory structure.
+Evaluation. The third operation assigns a scalar value to
+each new child node for selection and backpropagation.
+This value effectively quantifies the agent’s progress in task
+completion, serving as a heuristic to steer the search algo-
+rithm towards the most promising regions of the tree. As
+LATS does not involve training, we propose a novel value
+function for this setting based on two components: (1) a
+self-generated LM score and (2) a self-consistency score.
+Inspired by ToT, we repurpose pθ into a value function by
+prompting it to reason about a given state. To obtain a scalar
+value, we instruct pθ to end its reasoning trace with a score
+indicating the correctness of the trajectory. Our key distinc-
+tion from ToT is that we obtain this value after obtaining
+the environmental feedback, improving value assignment.
+This also enables scaling to more challenging environments,
+as it is difficult for LMs to improve their responses with-
+out external feedback (Huang et al., 2024). Additionally,
+to further improve value assignment, we introduce an ad-
+ditional heuristic based on self-consistency (Wang et al.,
+2022), in which actions sampled multiple times at the same
+state tend to be more accurate. This results in the overall
+value function:
+V (s) = λ ∗LM(s) + (1 −λ) ∗SC(s),
+(2)
+where λ is a hyperparameter. Notably, our method offers
+enhanced flexibility over programmed heuristics (Campbell
+et al., 2002) and greater efficiency than learned heuristics
+(Silver et al., 2017).
+Simulation. The fourth operation expands the currently se-
+lected node until a terminal state is reached. At each depth
+level, we sample and evaluate nodes with the same opera-
+tions but prioritize nodes of the highest value. Reaching a
+terminal state provides objective feedback on the correct-
+ness of a trajectory. If the task is completed successfully,
+then LATS terminates the search. If the solution is partially
+successful or unsuccessful, then we perform two additional
+operations as described below. The success of a trajectory is
+determined by the design of the specific environment, such
+as finalizing a purchase in web navigation environments.
+Backpropagation. This operation updates the values of the
+tree based on the outcome of a trajectory. For each node
+s0, s1, . . . , sl in the trajectory from root (initial state s0)
+of the searching tree to leaf (terminal state sl), its value is
+updated to reflect the outcome of the simulation by N(si) =
+N(si−1)+1 and V (si) = V (si−1)N(si−1)+r
+N(si)
+, where r is the
+reward. These updated values are used in the UCT formula
+(Eq. 1) to guide the selection of the next node.
+Reflection. In addition to the environmental feedback, we
+leverage self-reflection to further refine the decision-making
+5

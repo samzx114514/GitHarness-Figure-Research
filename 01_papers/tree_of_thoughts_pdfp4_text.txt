@@ -1,0 +1,76 @@
+learned (e.g. AlphaGo [29]). We propose a third alternative, by using the LM to deliberately reason
+about states. When applicable, such a deliberate heuristic can be more flexible than programmed
+rules, and more sample-efficient than learned models. Similar to the thought generator, we consider
+two strategies to evaluate states either independently or together:
+(a) Value each state independently: V (pθ, S)(s) ∼pvalue
+θ
+(v|s) ∀s ∈S, where a value
+prompt reasons about the state s to generate a scalar value v (e.g. 1-10) or a classifica-
+tion (e.g. sure/likely/impossible) that could be heuristically turned into a value. The basis
+of such evaluative reasoning can vary across problems and thought steps. In this work, we
+explore evaluation via few lookahead simulations (e.g. quickly confirm that 5, 5, 14 can
+reach 24 via 5 + 5 + 14, or “hot l” can mean “inn” via filling “e” in “ ”) plus commonsense
+(e.g. 1 2 3 are too small to reach 24, or no word can start with “tzxc”). While the former
+might promote “good” states, the latter could help eliminate “bad” states. Such valuations
+do not need to be perfect, and only need to be approximately helpful for decision making.
+(b) Vote across states: V (pθ, S)(s) = 1[s = s∗], where a “good” state s∗∼pvote
+θ
+(s∗|S) is
+voted out based on deliberately comparing different states in S in a vote prompt. When
+problem success is harder to directly value (e.g. passage coherency), it is natural to to instead
+compare different partial solutions and vote for the most promising one. This is similar
+in spirit to a “step-wise” self-consistency strategy, i.e. cast “which state to explore” as a
+multi-choice QA, and use LM samples to vote for it.
+For both strategies, we could prompt the LM multiple times to aggregate the value or vote results to
+trade time/resource/cost for more faithful/robust heuristics.
+Algorithm 1 ToT-BFS(x, pθ, G, k, V, T, b)
+Require: Input x, LM pθ, thought generator G()
+& size limit k, states evaluator V (), step limit T,
+breadth limit b.
+S0 ←{x}
+for t = 1, · · · , T do
+S′
+t ←{[s, z] | s ∈St−1, zt ∈G(pθ, s, k)}
+Vt ←V (pθ, S′
+t)
+St ←arg maxS⊂S′
+t,|S|=b
+P
+s∈S Vt(s)
+end for
+return G(pθ, arg maxs∈ST VT (s), 1)
+Algorithm 2 ToT-DFS(s, t, pθ, G, k, V, T, vth)
+Require: Current state s, step t, LM pθ, thought
+generator G() and size limit k, states evaluator
+V (), step limit T, threshold vth
+if t > T then record output G(pθ, s, 1)
+end if
+for s′ ∈G(pθ, s, k) do
+▷sorted candidates
+if V (pθ, {s′})(s) > vthres then ▷pruning
+DFS(s′, t + 1)
+end if
+end for
+4. Search algorithm. Finally, within the ToT framework, one can plug and play different search
+algorithms depending on the tree structure. We explore two relatively simple search algorithms and
+leave more advanced ones (e.g. A* [11], MCTS [2]) for future work:
+(a) Breadth-first search (BFS) (Algorithm 1) maintains a set of the b most promising states
+per step. This is used for Game of 24 and Creative Writing where the tree depth is limit
+(T ≤3), and initial thought steps can be evaluated and pruned to a small set (b ≤5).
+(b) Depth-first search (DFS) (Algorithm 2) explores the most promising state first, until the
+final output is reached (t > T), or the state evaluator deems it impossible to solve the
+problem from the current s (V (pθ, {s})(s) ≤vth for a value threshold vth). In the latter
+case, the subtree from s is pruned to trade exploration for exploitation. In both cases, DFS
+backtracks to the parent state of s to continue exploration.
+Conceptually, ToT has several benefits as a method for general problem-solving with LMs: (1) Gener-
+ality. IO, CoT, CoT-SC, and self-refinement can be seen as special cases of ToT (i.e. trees of limited
+depth and breadth; Figure 1). (2) Modularity. The base LM, as well as the thought decomposition,
+generation, evaluation, and search procedures can all be varied independently. (3) Adaptability.
+Different problem properties, LM capabilities, and resource constraints can be accommodated. (4)
+Convenience. No extra training is needed, just a pre-trained LM is sufficient. The next section will
+show how these conceptual benefits translate to strong empirical performance in different problems.
+4
+Experiments
+We propose three tasks that are hard even when sampling from the state-of-the-art language model,
+GPT-4 [23], using standard IO prompting or chain-of-thought (CoT) prompting. We show how
+4

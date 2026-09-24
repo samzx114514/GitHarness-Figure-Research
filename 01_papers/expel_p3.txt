@@ -1,0 +1,61 @@
+Figure 1: ExpeL Agent Overview. Left: ExpeL operates in three stages: (1) Collection of success and failure experiences into
+a pool. (2) Extraction/abstraction of cross-task knowledge from these experiences. (3) Application of the gained insights and
+recall of past successes in evaluation tasks. Right: (A) Illustrates the experience gathering process via Reflexion (Shinn et al.
+2023), enabling task reattempt after self-reflection on failures. (B) Illustrates the insight extraction step. When presented with
+success/failure pairs or a list of L successes, the agent dynamically modifies an existing list of insights ˆι using operations ADD,
+UPVOTE, DOWNVOTE, and EDIT. This process has an emphasis on extracting prevalent failure patterns or best practices.
+et al. 2023b,a; Chowdhery et al. 2023), which given an or-
+dered list of existing tokens x = {x1, x2, ..., xl−1}, outputs
+the probability of the next token p(xl | x<l). An instruction-
+following LLM (Thoppilan et al. 2022; Chung et al. 2022;
+Wei et al. 2022a) is typically finetuned on various NLP tasks
+that are formatted into instruction, input, response tuples
+(Taori et al. 2023). Instruction-tuned models are better at
+following natural language instructions which alleviates the
+need for heavy prompt engineering (Wei et al. 2022a).
+ReAct and Reflexion
+ReAct (Yao et al. 2023b) and Re-
+flexion (Shinn et al. 2023) are promising frameworks en-
+abling the aforementioned proficiency of LLMs in reason-
+ing and self-improvement. ReAct explicitly intertwines ob-
+servations, actions, and thoughts, providing a foundation for
+robust planning and reasoning capabilities. Building upon
+it, Reflexion introduces an additional reflective step before
+reattempting the subsequent trial of the same task, enhanc-
+ing the model’s adaptive learning process.
+4
+ExpeL: An Experiential Learning Agent
+Recent advancements in generative LLMs suggest an in-
+triguing approach. Rather than altering the LLM param-
+eters, adjusting the prompts may be more beneficial: this
+strategy ensures that the LLM’s inherent common sense
+knowledge remains intact, allowing for superior generaliza-
+tion (Liu et al. 2023a). Furthermore, some of the most po-
+tent language models are proprietary (OpenAI 2023; An-
+thropic 2023). Thus, focusing on prompt-based methods
+seems promising as a way to harness the strengths of these
+advanced LLMs. Additionally, previous works on learning
+in LLM agents have primarily been trained on extensive
+human-labeled datasets (Lin et al. 2023a; Shaw et al. 2023)
+or improved via iterative retries (Shinn et al. 2023) on a sin-
+gle task. A relatively less explored area is facilitating agents
+to learn autonomously from their own experiences, similar
+to a student gaining insights from practicing for an exam.
+The student tackles practice problems multiple times to de-
+rive insights. At the exam, the student rely solely on these
+insights and draw memories of similar problems to answer
+the questions with one attempt. With this in mind, we wish to
+design an LLM agent that autonomously gathers experiences
+and extracts insights, then uses these cross-task insights and
+memories of similar tasks to aid its decision-making.
+We aim to enhance a planning LLM agent, such as Re-
+Act, with learning abilities that allow it to improve through
+inter-task experiences without any parameter updates. In-
+spired by the cognitive abilities inherent in human learning,
+as well as the benefits observed in self-learning autonomous
+agents and the progress made in prompt-based methods, we
+developed the Experiential Learning (ExpeL) agent. During
+the training stage, the agent interacts with the environment,
+gathering experiences via trial and error. These experiences
+are stored in an experience pool (Lin 1992). From this pool,
+the agent later extracts insights, similar to off-policy learn-

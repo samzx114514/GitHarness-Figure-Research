@@ -1,0 +1,130 @@
+Algorithm 1: ExpeL - Experience Gathering
+Initialize:
+Policy LLMReAct
+Self-reflection model LLMreflect
+Collection of tasks Ttrain
+Fewshot examples Fmanual
+Experience pool B ←Fmanual
+Number of training tasks N
+Maximum retry number Z
+Maximum step number H
+Current task index n ←1
+while task n ≤N do
+tn ←Ttrain[n]
+Reflection νn,0 ←“”
+for trial z = 0 to Z do
+o0 ←env.reset(tn)
+Initialize trajectory τn,z ←o0
+for timestep i = 0 to H do
+ai ←LLMReAct(ai | τn,z, Fmanual, νn,z)
+oi+1, ri+1, done ←env.step(ai)
+τn,z ←τn,z ∪{(oi, ai, oi+1, ri+1)}
+if done then
+break
+end if
+end for
+B ←B ∪τn,z
+if done or z = Z then
+n ←n + 1
+break
+else
+νn,z+1 ←concat(νn,z + LLMreflect(τn,z))
+end if
+end for
+end while
+return B
+Algorithm 2: ExpeL - Insight Extraction
+Initialize:
+Experience pool B (from Alg. 1)
+Insight extraction model LLMinsights
+Set of insights ˆι ←∅
+Divide the successes in B into L-sized chunks:
+Csuccess = {{τ success
+1
+, τ success
+2
+, ...τ success
+L
+},
+{τ success
+L+1 , τ success
+L+2 , ...τ success
+2L
+}, ...}
+Construct fail/success tuples of the same tasks in B:
+Ccompare = {(τ success
+1
+, τ fail
+1,0), (τ success
+1
+, τ fail
+1,1), ...,
+(τ success
+2
+, τ fail
+2,0), ...}
+for each ccompare in Ccompare do
+ˆι ←LLMinsights(ccompare,ˆι)
+end for
+for each csuccess in Csuccess do
+ˆι ←LLMinsights(csuccess,ˆι)
+end for
+return ˆι
+Algorithm 3: ExpeL - Evaluation
+Initialize:
+ExpeL agent LLMExpeL
+Text Embedder E
+Experience pool B (from Alg. 1)
+Set of insights ˆι (from Alg. 2)
+Collection of evaluation tasks Tevaluation
+Number of evaluation tasks M
+Number of fewshots k
+Number of successes S ←0
+for task m = 1 to M do
+tm ←Tevaluation[m]
+o0 ←env.reset(tm)
+Initialize trajectory τm ←o0
+Fsimilar tasks ←Faiss(tm, B, E, k)
+for timestep i = 1 to H do
+ai ←LLMExpeL(ai | τm, Fsimilar tasks,ˆι)
+oi+1, ri+1, done ←env.step(ai)
+τm ←τm ∪{(oi, ai, oi+1, ri+1)}
+if done then
+break
+end if
+end for
+if ri+1 = 1 then
+S ←S + 1
+end if
+end for
+return
+S
+M
+to a target domain is illustrated in Fig. 4.
+4.5
+ExpeL’s Strengths
+In this section, we outline the key strengths of our frame-
+work. First and foremost, ExpeL offers inherent inter-
+pretability, as both the extracted experiences and successful
+trajectories are presented in natural language. This design
+allows users to easily inspect, modify, or remove potentially
+harmful trajectories/insights — a challenge in finetuned
+models. Moreover, users can seamlessly add expert insights
+or trajectories to an ExpeL agent. Additionally, our learning
+approach is highly accessible; it demands less data, reduces
+computational resources, and is straightforward to imple-
+ment. Furthermore, self-improvement methods like Reflex-
+ion (Shinn et al. 2023) facilitate intra-task improvements,
+but ExpeL enables inter-task learning. ExpeL does not rely
+on retries during deployment, which certain domains re-
+quire. On the flexibility front, the ExpeL agent boasts a
+significant level of versatility. It is not restricted to spe-
+cific language models and complements existing strategies
+aimed at enhancing LLM agent planning capabilities. More-
+over, when applied in conjunction with them, ExpeL might
+even improve the capabilities of finetuned agents. Another
+strength lies in continuous improvement. Our method stands
+to benefit from the ongoing enhancements in foundational
+models. As an illustration, our experiments show that using
+gpt-4 to extract insights outperforms gpt-3.5-turbo
+(refer to Sec. 5.6). Lastly, we introduced a method for trans-

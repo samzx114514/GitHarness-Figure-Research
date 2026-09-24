@@ -1,0 +1,1279 @@
+{
+  "passed": true,
+  "paper_count": 12,
+  "figure_count": 18,
+  "checks": [
+    {
+      "passed": true,
+      "message": "ace: PDF exists"
+    },
+    {
+      "passed": true,
+      "message": "ace: PDF header"
+    },
+    {
+      "passed": true,
+      "message": "ace: source SHA256"
+    },
+    {
+      "passed": true,
+      "message": "ace Fig.4: PDF page in range"
+    },
+    {
+      "passed": true,
+      "message": "ace: figure number"
+    },
+    {
+      "passed": true,
+      "message": "ace Fig.4: crop bounds"
+    },
+    {
+      "passed": true,
+      "message": "ace Fig.4: crop screenshot"
+    },
+    {
+      "passed": true,
+      "message": "ace Fig.4: preview screenshot"
+    },
+    {
+      "passed": true,
+      "message": "ace Fig.4: whole page screenshot"
+    },
+    {
+      "passed": true,
+      "message": "ace Fig.4: caption marker"
+    },
+    {
+      "passed": true,
+      "message": "ace: A-H analysis exists"
+    },
+    {
+      "passed": true,
+      "message": "ace: A-H sections"
+    },
+    {
+      "passed": true,
+      "message": "ace: source URLs"
+    },
+    {
+      "passed": true,
+      "message": "agent_lightning: PDF exists"
+    },
+    {
+      "passed": true,
+      "message": "agent_lightning: PDF header"
+    },
+    {
+      "passed": true,
+      "message": "agent_lightning: source SHA256"
+    },
+    {
+      "passed": true,
+      "message": "agent_lightning Fig.1: PDF page in range"
+    },
+    {
+      "passed": true,
+      "message": "agent_lightning: figure number"
+    },
+    {
+      "passed": true,
+      "message": "agent_lightning Fig.1: crop bounds"
+    },
+    {
+      "passed": true,
+      "message": "agent_lightning Fig.1: crop screenshot"
+    },
+    {
+      "passed": true,
+      "message": "agent_lightning Fig.1: preview screenshot"
+    },
+    {
+      "passed": true,
+      "message": "agent_lightning Fig.1: whole page screenshot"
+    },
+    {
+      "passed": true,
+      "message": "agent_lightning Fig.1: caption marker"
+    },
+    {
+      "passed": true,
+      "message": "agent_lightning Fig.2: PDF page in range"
+    },
+    {
+      "passed": true,
+      "message": "agent_lightning: figure number"
+    },
+    {
+      "passed": true,
+      "message": "agent_lightning Fig.2: crop bounds"
+    },
+    {
+      "passed": true,
+      "message": "agent_lightning Fig.2: crop screenshot"
+    },
+    {
+      "passed": true,
+      "message": "agent_lightning Fig.2: preview screenshot"
+    },
+    {
+      "passed": true,
+      "message": "agent_lightning Fig.2: whole page screenshot"
+    },
+    {
+      "passed": true,
+      "message": "agent_lightning Fig.2: caption marker"
+    },
+    {
+      "passed": true,
+      "message": "agent_lightning Fig.3: PDF page in range"
+    },
+    {
+      "passed": true,
+      "message": "agent_lightning: figure number"
+    },
+    {
+      "passed": true,
+      "message": "agent_lightning Fig.3: crop bounds"
+    },
+    {
+      "passed": true,
+      "message": "agent_lightning Fig.3: crop screenshot"
+    },
+    {
+      "passed": true,
+      "message": "agent_lightning Fig.3: preview screenshot"
+    },
+    {
+      "passed": true,
+      "message": "agent_lightning Fig.3: whole page screenshot"
+    },
+    {
+      "passed": true,
+      "message": "agent_lightning Fig.3: caption marker"
+    },
+    {
+      "passed": true,
+      "message": "agent_lightning Fig.4: PDF page in range"
+    },
+    {
+      "passed": true,
+      "message": "agent_lightning: figure number"
+    },
+    {
+      "passed": true,
+      "message": "agent_lightning Fig.4: crop bounds"
+    },
+    {
+      "passed": true,
+      "message": "agent_lightning Fig.4: crop screenshot"
+    },
+    {
+      "passed": true,
+      "message": "agent_lightning Fig.4: preview screenshot"
+    },
+    {
+      "passed": true,
+      "message": "agent_lightning Fig.4: whole page screenshot"
+    },
+    {
+      "passed": true,
+      "message": "agent_lightning Fig.4: caption marker"
+    },
+    {
+      "passed": true,
+      "message": "agent_lightning: A-H analysis exists"
+    },
+    {
+      "passed": true,
+      "message": "agent_lightning: A-H sections"
+    },
+    {
+      "passed": true,
+      "message": "agent_lightning: source URLs"
+    },
+    {
+      "passed": true,
+      "message": "agenticrag_r1: PDF exists"
+    },
+    {
+      "passed": true,
+      "message": "agenticrag_r1: PDF header"
+    },
+    {
+      "passed": true,
+      "message": "agenticrag_r1: source SHA256"
+    },
+    {
+      "passed": true,
+      "message": "agenticrag_r1 Fig.2: PDF page in range"
+    },
+    {
+      "passed": true,
+      "message": "agenticrag_r1: figure number"
+    },
+    {
+      "passed": true,
+      "message": "agenticrag_r1 Fig.2: crop bounds"
+    },
+    {
+      "passed": true,
+      "message": "agenticrag_r1 Fig.2: crop screenshot"
+    },
+    {
+      "passed": true,
+      "message": "agenticrag_r1 Fig.2: preview screenshot"
+    },
+    {
+      "passed": true,
+      "message": "agenticrag_r1 Fig.2: whole page screenshot"
+    },
+    {
+      "passed": true,
+      "message": "agenticrag_r1 Fig.2: caption marker"
+    },
+    {
+      "passed": true,
+      "message": "agenticrag_r1: A-H analysis exists"
+    },
+    {
+      "passed": true,
+      "message": "agenticrag_r1: A-H sections"
+    },
+    {
+      "passed": true,
+      "message": "agenticrag_r1: source URLs"
+    },
+    {
+      "passed": true,
+      "message": "amem: PDF exists"
+    },
+    {
+      "passed": true,
+      "message": "amem: PDF header"
+    },
+    {
+      "passed": true,
+      "message": "amem: source SHA256"
+    },
+    {
+      "passed": true,
+      "message": "amem Fig.2: PDF page in range"
+    },
+    {
+      "passed": true,
+      "message": "amem: figure number"
+    },
+    {
+      "passed": true,
+      "message": "amem Fig.2: crop bounds"
+    },
+    {
+      "passed": true,
+      "message": "amem Fig.2: crop screenshot"
+    },
+    {
+      "passed": true,
+      "message": "amem Fig.2: preview screenshot"
+    },
+    {
+      "passed": true,
+      "message": "amem Fig.2: whole page screenshot"
+    },
+    {
+      "passed": true,
+      "message": "amem Fig.2: caption marker"
+    },
+    {
+      "passed": true,
+      "message": "amem: A-H analysis exists"
+    },
+    {
+      "passed": true,
+      "message": "amem: A-H sections"
+    },
+    {
+      "passed": true,
+      "message": "amem: source URLs"
+    },
+    {
+      "passed": true,
+      "message": "awm: PDF exists"
+    },
+    {
+      "passed": true,
+      "message": "awm: PDF header"
+    },
+    {
+      "passed": true,
+      "message": "awm: source SHA256"
+    },
+    {
+      "passed": true,
+      "message": "awm Fig.2: PDF page in range"
+    },
+    {
+      "passed": true,
+      "message": "awm: figure number"
+    },
+    {
+      "passed": true,
+      "message": "awm Fig.2: crop bounds"
+    },
+    {
+      "passed": true,
+      "message": "awm Fig.2: crop screenshot"
+    },
+    {
+      "passed": true,
+      "message": "awm Fig.2: preview screenshot"
+    },
+    {
+      "passed": true,
+      "message": "awm Fig.2: whole page screenshot"
+    },
+    {
+      "passed": true,
+      "message": "awm Fig.2: caption marker"
+    },
+    {
+      "passed": true,
+      "message": "awm Fig.3: PDF page in range"
+    },
+    {
+      "passed": true,
+      "message": "awm: figure number"
+    },
+    {
+      "passed": true,
+      "message": "awm Fig.3: crop bounds"
+    },
+    {
+      "passed": true,
+      "message": "awm Fig.3: crop screenshot"
+    },
+    {
+      "passed": true,
+      "message": "awm Fig.3: preview screenshot"
+    },
+    {
+      "passed": true,
+      "message": "awm Fig.3: whole page screenshot"
+    },
+    {
+      "passed": true,
+      "message": "awm Fig.3: caption marker"
+    },
+    {
+      "passed": true,
+      "message": "awm: A-H analysis exists"
+    },
+    {
+      "passed": true,
+      "message": "awm: A-H sections"
+    },
+    {
+      "passed": true,
+      "message": "awm: source URLs"
+    },
+    {
+      "passed": true,
+      "message": "ds_agent: PDF exists"
+    },
+    {
+      "passed": true,
+      "message": "ds_agent: PDF header"
+    },
+    {
+      "passed": true,
+      "message": "ds_agent: source SHA256"
+    },
+    {
+      "passed": true,
+      "message": "ds_agent Fig.3: PDF page in range"
+    },
+    {
+      "passed": true,
+      "message": "ds_agent: figure number"
+    },
+    {
+      "passed": true,
+      "message": "ds_agent Fig.3: crop bounds"
+    },
+    {
+      "passed": true,
+      "message": "ds_agent Fig.3: crop screenshot"
+    },
+    {
+      "passed": true,
+      "message": "ds_agent Fig.3: preview screenshot"
+    },
+    {
+      "passed": true,
+      "message": "ds_agent Fig.3: whole page screenshot"
+    },
+    {
+      "passed": true,
+      "message": "ds_agent Fig.3: caption marker"
+    },
+    {
+      "passed": true,
+      "message": "ds_agent: A-H analysis exists"
+    },
+    {
+      "passed": true,
+      "message": "ds_agent: A-H sections"
+    },
+    {
+      "passed": true,
+      "message": "ds_agent: source URLs"
+    },
+    {
+      "passed": true,
+      "message": "expel: PDF exists"
+    },
+    {
+      "passed": true,
+      "message": "expel: PDF header"
+    },
+    {
+      "passed": true,
+      "message": "expel: source SHA256"
+    },
+    {
+      "passed": true,
+      "message": "expel Fig.1: PDF page in range"
+    },
+    {
+      "passed": true,
+      "message": "expel: figure number"
+    },
+    {
+      "passed": true,
+      "message": "expel Fig.1: crop bounds"
+    },
+    {
+      "passed": true,
+      "message": "expel Fig.1: crop screenshot"
+    },
+    {
+      "passed": true,
+      "message": "expel Fig.1: preview screenshot"
+    },
+    {
+      "passed": true,
+      "message": "expel Fig.1: whole page screenshot"
+    },
+    {
+      "passed": true,
+      "message": "expel Fig.1: caption marker"
+    },
+    {
+      "passed": true,
+      "message": "expel: A-H analysis exists"
+    },
+    {
+      "passed": true,
+      "message": "expel: A-H sections"
+    },
+    {
+      "passed": true,
+      "message": "expel: source URLs"
+    },
+    {
+      "passed": true,
+      "message": "lats: PDF exists"
+    },
+    {
+      "passed": true,
+      "message": "lats: PDF header"
+    },
+    {
+      "passed": true,
+      "message": "lats: source SHA256"
+    },
+    {
+      "passed": true,
+      "message": "lats Fig.1: PDF page in range"
+    },
+    {
+      "passed": true,
+      "message": "lats: figure number"
+    },
+    {
+      "passed": true,
+      "message": "lats Fig.1: crop bounds"
+    },
+    {
+      "passed": true,
+      "message": "lats Fig.1: crop screenshot"
+    },
+    {
+      "passed": true,
+      "message": "lats Fig.1: preview screenshot"
+    },
+    {
+      "passed": true,
+      "message": "lats Fig.1: whole page screenshot"
+    },
+    {
+      "passed": true,
+      "message": "lats Fig.1: caption marker"
+    },
+    {
+      "passed": true,
+      "message": "lats Fig.2: PDF page in range"
+    },
+    {
+      "passed": true,
+      "message": "lats: figure number"
+    },
+    {
+      "passed": true,
+      "message": "lats Fig.2: crop bounds"
+    },
+    {
+      "passed": true,
+      "message": "lats Fig.2: crop screenshot"
+    },
+    {
+      "passed": true,
+      "message": "lats Fig.2: preview screenshot"
+    },
+    {
+      "passed": true,
+      "message": "lats Fig.2: whole page screenshot"
+    },
+    {
+      "passed": true,
+      "message": "lats Fig.2: caption marker"
+    },
+    {
+      "passed": true,
+      "message": "lats: A-H analysis exists"
+    },
+    {
+      "passed": true,
+      "message": "lats: A-H sections"
+    },
+    {
+      "passed": true,
+      "message": "lats: source URLs"
+    },
+    {
+      "passed": true,
+      "message": "loongreflect: PDF exists"
+    },
+    {
+      "passed": true,
+      "message": "loongreflect: PDF header"
+    },
+    {
+      "passed": true,
+      "message": "loongreflect: source SHA256"
+    },
+    {
+      "passed": true,
+      "message": "loongreflect Fig.2: PDF page in range"
+    },
+    {
+      "passed": true,
+      "message": "loongreflect: figure number"
+    },
+    {
+      "passed": true,
+      "message": "loongreflect Fig.2: crop bounds"
+    },
+    {
+      "passed": true,
+      "message": "loongreflect Fig.2: crop screenshot"
+    },
+    {
+      "passed": true,
+      "message": "loongreflect Fig.2: preview screenshot"
+    },
+    {
+      "passed": true,
+      "message": "loongreflect Fig.2: whole page screenshot"
+    },
+    {
+      "passed": true,
+      "message": "loongreflect Fig.2: caption marker"
+    },
+    {
+      "passed": true,
+      "message": "loongreflect: A-H analysis exists"
+    },
+    {
+      "passed": true,
+      "message": "loongreflect: A-H sections"
+    },
+    {
+      "passed": true,
+      "message": "loongreflect: source URLs"
+    },
+    {
+      "passed": true,
+      "message": "reflexion: PDF exists"
+    },
+    {
+      "passed": true,
+      "message": "reflexion: PDF header"
+    },
+    {
+      "passed": true,
+      "message": "reflexion: source SHA256"
+    },
+    {
+      "passed": true,
+      "message": "reflexion Fig.2: PDF page in range"
+    },
+    {
+      "passed": true,
+      "message": "reflexion: figure number"
+    },
+    {
+      "passed": true,
+      "message": "reflexion Fig.2: crop bounds"
+    },
+    {
+      "passed": true,
+      "message": "reflexion Fig.2: crop screenshot"
+    },
+    {
+      "passed": true,
+      "message": "reflexion Fig.2: preview screenshot"
+    },
+    {
+      "passed": true,
+      "message": "reflexion Fig.2: whole page screenshot"
+    },
+    {
+      "passed": true,
+      "message": "reflexion Fig.2: caption marker"
+    },
+    {
+      "passed": true,
+      "message": "reflexion: A-H analysis exists"
+    },
+    {
+      "passed": true,
+      "message": "reflexion: A-H sections"
+    },
+    {
+      "passed": true,
+      "message": "reflexion: source URLs"
+    },
+    {
+      "passed": true,
+      "message": "tree_of_thoughts: PDF exists"
+    },
+    {
+      "passed": true,
+      "message": "tree_of_thoughts: PDF header"
+    },
+    {
+      "passed": true,
+      "message": "tree_of_thoughts: source SHA256"
+    },
+    {
+      "passed": true,
+      "message": "tree_of_thoughts Fig.1: PDF page in range"
+    },
+    {
+      "passed": true,
+      "message": "tree_of_thoughts: figure number"
+    },
+    {
+      "passed": true,
+      "message": "tree_of_thoughts Fig.1: crop bounds"
+    },
+    {
+      "passed": true,
+      "message": "tree_of_thoughts Fig.1: crop screenshot"
+    },
+    {
+      "passed": true,
+      "message": "tree_of_thoughts Fig.1: preview screenshot"
+    },
+    {
+      "passed": true,
+      "message": "tree_of_thoughts Fig.1: whole page screenshot"
+    },
+    {
+      "passed": true,
+      "message": "tree_of_thoughts Fig.1: caption marker"
+    },
+    {
+      "passed": true,
+      "message": "tree_of_thoughts Fig.2: PDF page in range"
+    },
+    {
+      "passed": true,
+      "message": "tree_of_thoughts: figure number"
+    },
+    {
+      "passed": true,
+      "message": "tree_of_thoughts Fig.2: crop bounds"
+    },
+    {
+      "passed": true,
+      "message": "tree_of_thoughts Fig.2: crop screenshot"
+    },
+    {
+      "passed": true,
+      "message": "tree_of_thoughts Fig.2: preview screenshot"
+    },
+    {
+      "passed": true,
+      "message": "tree_of_thoughts Fig.2: whole page screenshot"
+    },
+    {
+      "passed": true,
+      "message": "tree_of_thoughts Fig.2: caption marker"
+    },
+    {
+      "passed": true,
+      "message": "tree_of_thoughts: A-H analysis exists"
+    },
+    {
+      "passed": true,
+      "message": "tree_of_thoughts: A-H sections"
+    },
+    {
+      "passed": true,
+      "message": "tree_of_thoughts: source URLs"
+    },
+    {
+      "passed": true,
+      "message": "voyager: PDF exists"
+    },
+    {
+      "passed": true,
+      "message": "voyager: PDF header"
+    },
+    {
+      "passed": true,
+      "message": "voyager: source SHA256"
+    },
+    {
+      "passed": true,
+      "message": "voyager Fig.2: PDF page in range"
+    },
+    {
+      "passed": true,
+      "message": "voyager: figure number"
+    },
+    {
+      "passed": true,
+      "message": "voyager Fig.2: crop bounds"
+    },
+    {
+      "passed": true,
+      "message": "voyager Fig.2: crop screenshot"
+    },
+    {
+      "passed": true,
+      "message": "voyager Fig.2: preview screenshot"
+    },
+    {
+      "passed": true,
+      "message": "voyager Fig.2: whole page screenshot"
+    },
+    {
+      "passed": true,
+      "message": "voyager Fig.2: caption marker"
+    },
+    {
+      "passed": true,
+      "message": "voyager: A-H analysis exists"
+    },
+    {
+      "passed": true,
+      "message": "voyager: A-H sections"
+    },
+    {
+      "passed": true,
+      "message": "voyager: source URLs"
+    },
+    {
+      "passed": true,
+      "message": "A_graph_scaffold: SVG/PNG"
+    },
+    {
+      "passed": true,
+      "message": "A_graph_scaffold: valid SVG"
+    },
+    {
+      "passed": true,
+      "message": "B_paired_lanes: SVG/PNG"
+    },
+    {
+      "passed": true,
+      "message": "B_paired_lanes: valid SVG"
+    },
+    {
+      "passed": true,
+      "message": "C_shared_policy: SVG/PNG"
+    },
+    {
+      "passed": true,
+      "message": "C_shared_policy: valid SVG"
+    },
+    {
+      "passed": true,
+      "message": "D_central_transformation: SVG/PNG"
+    },
+    {
+      "passed": true,
+      "message": "D_central_transformation: valid SVG"
+    },
+    {
+      "passed": true,
+      "message": "12 papers"
+    },
+    {
+      "passed": true,
+      "message": "at least 12 numbered figures"
+    },
+    {
+      "passed": true,
+      "message": "comparison.md: link 03_analysis/lats.md"
+    },
+    {
+      "passed": true,
+      "message": "comparison.md: link 03_analysis/tree_of_thoughts.md"
+    },
+    {
+      "passed": true,
+      "message": "comparison.md: link 03_analysis/amem.md"
+    },
+    {
+      "passed": true,
+      "message": "comparison.md: link 03_analysis/awm.md"
+    },
+    {
+      "passed": true,
+      "message": "comparison.md: link 03_analysis/ace.md"
+    },
+    {
+      "passed": true,
+      "message": "comparison.md: link 03_analysis/expel.md"
+    },
+    {
+      "passed": true,
+      "message": "comparison.md: link 03_analysis/reflexion.md"
+    },
+    {
+      "passed": true,
+      "message": "comparison.md: link 03_analysis/voyager.md"
+    },
+    {
+      "passed": true,
+      "message": "comparison.md: link 03_analysis/ds_agent.md"
+    },
+    {
+      "passed": true,
+      "message": "comparison.md: link 03_analysis/agent_lightning.md"
+    },
+    {
+      "passed": true,
+      "message": "comparison.md: link 03_analysis/loongreflect.md"
+    },
+    {
+      "passed": true,
+      "message": "comparison.md: link 03_analysis/agenticrag_r1.md"
+    },
+    {
+      "passed": true,
+      "message": "comparison.md: link 01_papers/"
+    },
+    {
+      "passed": true,
+      "message": "git_harness_design_directions.md: link 04_composition_studies/A_graph_scaffold.png"
+    },
+    {
+      "passed": true,
+      "message": "git_harness_design_directions.md: link 04_composition_studies/A_graph_scaffold.svg"
+    },
+    {
+      "passed": true,
+      "message": "git_harness_design_directions.md: link 03_analysis/tree_of_thoughts.md"
+    },
+    {
+      "passed": true,
+      "message": "git_harness_design_directions.md: link 03_analysis/expel.md"
+    },
+    {
+      "passed": true,
+      "message": "git_harness_design_directions.md: link 03_analysis/lats.md"
+    },
+    {
+      "passed": true,
+      "message": "git_harness_design_directions.md: link 04_composition_studies/B_paired_lanes.png"
+    },
+    {
+      "passed": true,
+      "message": "git_harness_design_directions.md: link 04_composition_studies/B_paired_lanes.svg"
+    },
+    {
+      "passed": true,
+      "message": "git_harness_design_directions.md: link 03_analysis/agent_lightning.md"
+    },
+    {
+      "passed": true,
+      "message": "git_harness_design_directions.md: link 03_analysis/amem.md"
+    },
+    {
+      "passed": true,
+      "message": "git_harness_design_directions.md: link 03_analysis/lats.md"
+    },
+    {
+      "passed": true,
+      "message": "git_harness_design_directions.md: link 04_composition_studies/C_shared_policy.png"
+    },
+    {
+      "passed": true,
+      "message": "git_harness_design_directions.md: link 04_composition_studies/C_shared_policy.svg"
+    },
+    {
+      "passed": true,
+      "message": "git_harness_design_directions.md: link 03_analysis/ace.md"
+    },
+    {
+      "passed": true,
+      "message": "git_harness_design_directions.md: link 03_analysis/awm.md"
+    },
+    {
+      "passed": true,
+      "message": "git_harness_design_directions.md: link 03_analysis/reflexion.md"
+    },
+    {
+      "passed": true,
+      "message": "git_harness_design_directions.md: link 03_analysis/loongreflect.md"
+    },
+    {
+      "passed": true,
+      "message": "git_harness_design_directions.md: link 04_composition_studies/D_central_transformation.png"
+    },
+    {
+      "passed": true,
+      "message": "git_harness_design_directions.md: link 04_composition_studies/D_central_transformation.svg"
+    },
+    {
+      "passed": true,
+      "message": "git_harness_design_directions.md: link 03_analysis/voyager.md"
+    },
+    {
+      "passed": true,
+      "message": "git_harness_design_directions.md: link 03_analysis/agent_lightning.md"
+    },
+    {
+      "passed": true,
+      "message": "git_harness_design_directions.md: link 03_analysis/agenticrag_r1.md"
+    },
+    {
+      "passed": true,
+      "message": "git_harness_design_directions.md: link 03_analysis/ds_agent.md"
+    },
+    {
+      "passed": true,
+      "message": "README.md: link survey.md"
+    },
+    {
+      "passed": true,
+      "message": "README.md: link comparison.md"
+    },
+    {
+      "passed": true,
+      "message": "README.md: link gallery.html"
+    },
+    {
+      "passed": true,
+      "message": "README.md: link git_harness_design_directions.md"
+    },
+    {
+      "passed": true,
+      "message": "README.md: link 04_composition_studies/A_graph_scaffold.svg"
+    },
+    {
+      "passed": true,
+      "message": "README.md: link 04_composition_studies/B_paired_lanes.svg"
+    },
+    {
+      "passed": true,
+      "message": "README.md: link 04_composition_studies/C_shared_policy.svg"
+    },
+    {
+      "passed": true,
+      "message": "README.md: link 04_composition_studies/D_central_transformation.svg"
+    },
+    {
+      "passed": true,
+      "message": "README.md: link 03_analysis/00_skills_and_scope.md"
+    },
+    {
+      "passed": true,
+      "message": "survey.md: link git_harness_design_directions.md"
+    },
+    {
+      "passed": true,
+      "message": "survey.md: link git_harness_design_directions.md"
+    },
+    {
+      "passed": true,
+      "message": "survey.md: link 03_analysis/00_skills_and_scope.md"
+    },
+    {
+      "passed": true,
+      "message": "survey.md: link 03_analysis/lats.md"
+    },
+    {
+      "passed": true,
+      "message": "survey.md: link 03_analysis/tree_of_thoughts.md"
+    },
+    {
+      "passed": true,
+      "message": "survey.md: link 03_analysis/amem.md"
+    },
+    {
+      "passed": true,
+      "message": "survey.md: link 03_analysis/awm.md"
+    },
+    {
+      "passed": true,
+      "message": "survey.md: link 03_analysis/ace.md"
+    },
+    {
+      "passed": true,
+      "message": "survey.md: link 03_analysis/expel.md"
+    },
+    {
+      "passed": true,
+      "message": "survey.md: link 03_analysis/reflexion.md"
+    },
+    {
+      "passed": true,
+      "message": "survey.md: link 03_analysis/voyager.md"
+    },
+    {
+      "passed": true,
+      "message": "survey.md: link 03_analysis/ds_agent.md"
+    },
+    {
+      "passed": true,
+      "message": "survey.md: link 03_analysis/agent_lightning.md"
+    },
+    {
+      "passed": true,
+      "message": "survey.md: link 03_analysis/loongreflect.md"
+    },
+    {
+      "passed": true,
+      "message": "survey.md: link 03_analysis/agenticrag_r1.md"
+    },
+    {
+      "passed": true,
+      "message": "survey.md: link git_harness_design_directions.md"
+    },
+    {
+      "passed": true,
+      "message": "03_analysis\\ace.md: link ../02_figures/ace_fig4_pdfp5.png"
+    },
+    {
+      "passed": true,
+      "message": "03_analysis\\ace.md: link ../02_figures/ace_pdfp5_full.png"
+    },
+    {
+      "passed": true,
+      "message": "03_analysis\\ace.md: link ../02_figures/ace_fig4_pdfp5_180mm.png"
+    },
+    {
+      "passed": true,
+      "message": "03_analysis\\agenticrag_r1.md: link ../01_papers/agenticrag_r1.pdf"
+    },
+    {
+      "passed": true,
+      "message": "03_analysis\\agenticrag_r1.md: link ../02_figures/agenticrag_r1_fig2_pdfp4.png"
+    },
+    {
+      "passed": true,
+      "message": "03_analysis\\agent_lightning.md: link ../01_papers/agent_lightning.pdf"
+    },
+    {
+      "passed": true,
+      "message": "03_analysis\\agent_lightning.md: link ../02_figures/agent_lightning_fig2_pdfp6.png"
+    },
+    {
+      "passed": true,
+      "message": "03_analysis\\amem.md: link ../02_figures/amem_fig2_pdfp4.png"
+    },
+    {
+      "passed": true,
+      "message": "03_analysis\\amem.md: link ../02_figures/amem_pdfp4_full.png"
+    },
+    {
+      "passed": true,
+      "message": "03_analysis\\amem.md: link ../02_figures/amem_fig2_pdfp4_180mm.png"
+    },
+    {
+      "passed": true,
+      "message": "03_analysis\\awm.md: link ../02_figures/awm_fig2_pdfp3.png"
+    },
+    {
+      "passed": true,
+      "message": "03_analysis\\awm.md: link ../02_figures/awm_fig3_pdfp3.png"
+    },
+    {
+      "passed": true,
+      "message": "03_analysis\\awm.md: link ../02_figures/awm_pdfp3_full.png"
+    },
+    {
+      "passed": true,
+      "message": "03_analysis\\awm.md: link ../02_figures/awm_fig2_pdfp3_180mm.png"
+    },
+    {
+      "passed": true,
+      "message": "03_analysis\\awm.md: link ../02_figures/awm_fig3_pdfp3_180mm.png"
+    },
+    {
+      "passed": true,
+      "message": "03_analysis\\ds_agent.md: link ../01_papers/ds_agent.pdf"
+    },
+    {
+      "passed": true,
+      "message": "03_analysis\\ds_agent.md: link ../02_figures/ds_agent_fig3_pdfp4.png"
+    },
+    {
+      "passed": true,
+      "message": "03_analysis\\expel.md: link ../02_figures/expel_fig1_pdfp3.png"
+    },
+    {
+      "passed": true,
+      "message": "03_analysis\\expel.md: link ../02_figures/expel_fig1_180mm96dpi.png"
+    },
+    {
+      "passed": true,
+      "message": "03_analysis\\expel.md: link ../02_figures/expel_pdfp3_full.png"
+    },
+    {
+      "passed": true,
+      "message": "03_analysis\\expel.md: link ../01_papers/expel_source.json"
+    },
+    {
+      "passed": true,
+      "message": "03_analysis\\expel.md: link ../01_papers/expel.pdf"
+    },
+    {
+      "passed": true,
+      "message": "03_analysis\\lats.md: link ../01_papers/lats.pdf"
+    },
+    {
+      "passed": true,
+      "message": "03_analysis\\lats.md: link ../02_figures/lats_fig2_pdfp5.png"
+    },
+    {
+      "passed": true,
+      "message": "03_analysis\\lats.md: link ../02_figures/lats_pdfp5_page.png"
+    },
+    {
+      "passed": true,
+      "message": "03_analysis\\lats.md: link ../02_figures/lats_fig1_pdfp1.png"
+    },
+    {
+      "passed": true,
+      "message": "03_analysis\\lats.md: link ../02_figures/lats_fig2_180mm_150dpi.png"
+    },
+    {
+      "passed": true,
+      "message": "03_analysis\\lats.md: link ../02_figures/lats_fig2_180mm_96dpi.png"
+    },
+    {
+      "passed": true,
+      "message": "03_analysis\\loongreflect.md: link ../01_papers/loongreflect.pdf"
+    },
+    {
+      "passed": true,
+      "message": "03_analysis\\loongreflect.md: link ../02_figures/loongreflect_fig2_pdfp4.png"
+    },
+    {
+      "passed": true,
+      "message": "03_analysis\\loongreflect.md: link ../02_figures/loongreflect_pdfp4_page.png"
+    },
+    {
+      "passed": true,
+      "message": "03_analysis\\loongreflect.md: link ../02_figures/loongreflect_fig2_180mm_150dpi.png"
+    },
+    {
+      "passed": true,
+      "message": "03_analysis\\loongreflect.md: link ../02_figures/loongreflect_fig2_180mm_96dpi.png"
+    },
+    {
+      "passed": true,
+      "message": "03_analysis\\reflexion.md: link ../02_figures/reflexion_fig2_pdfp4.png"
+    },
+    {
+      "passed": true,
+      "message": "03_analysis\\reflexion.md: link ../02_figures/reflexion_fig2_180mm96dpi.png"
+    },
+    {
+      "passed": true,
+      "message": "03_analysis\\reflexion.md: link ../02_figures/reflexion_pdfp4_full.png"
+    },
+    {
+      "passed": true,
+      "message": "03_analysis\\reflexion.md: link ../01_papers/reflexion_source.json"
+    },
+    {
+      "passed": true,
+      "message": "03_analysis\\reflexion.md: link ../01_papers/reflexion.pdf"
+    },
+    {
+      "passed": true,
+      "message": "03_analysis\\tree_of_thoughts.md: link ../01_papers/tree_of_thoughts.pdf"
+    },
+    {
+      "passed": true,
+      "message": "03_analysis\\tree_of_thoughts.md: link ../02_figures/tree_of_thoughts_fig1_pdfp2.png"
+    },
+    {
+      "passed": true,
+      "message": "03_analysis\\tree_of_thoughts.md: link ../02_figures/tree_of_thoughts_fig2_pdfp5.png"
+    },
+    {
+      "passed": true,
+      "message": "03_analysis\\tree_of_thoughts.md: link ../02_figures/tree_of_thoughts_pdfp2_page.png"
+    },
+    {
+      "passed": true,
+      "message": "03_analysis\\tree_of_thoughts.md: link ../02_figures/tree_of_thoughts_pdfp5_page.png"
+    },
+    {
+      "passed": true,
+      "message": "03_analysis\\tree_of_thoughts.md: link ../02_figures/tree_of_thoughts_fig2_180mm_150dpi.png"
+    },
+    {
+      "passed": true,
+      "message": "03_analysis\\tree_of_thoughts.md: link ../02_figures/tree_of_thoughts_fig2_180mm_96dpi.png"
+    },
+    {
+      "passed": true,
+      "message": "03_analysis\\voyager.md: link ../02_figures/voyager_fig2_pdfp2.png"
+    },
+    {
+      "passed": true,
+      "message": "03_analysis\\voyager.md: link ../02_figures/voyager_fig2_180mm96dpi.png"
+    },
+    {
+      "passed": true,
+      "message": "03_analysis\\voyager.md: link ../02_figures/voyager_pdfp2_full.png"
+    },
+    {
+      "passed": true,
+      "message": "03_analysis\\voyager.md: link ../01_papers/voyager_source.json"
+    },
+    {
+      "passed": true,
+      "message": "03_analysis\\voyager.md: link ../01_papers/voyager.pdf"
+    }
+  ]
+}

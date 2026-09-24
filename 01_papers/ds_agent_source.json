@@ -1,0 +1,29 @@
+{
+  "slug": "ds_agent",
+  "title": "DS-Agent: Automated Data Science by Empowering Large Language Models with Case-Based Reasoning",
+  "venue": "ICML 2024",
+  "venue_source": "https://proceedings.mlr.press/v235/guo24b.html",
+  "source_url": "https://proceedings.mlr.press/v235/guo24b.html",
+  "pdf_url": "https://raw.githubusercontent.com/mlresearch/v235/main/assets/guo24b/guo24b.pdf",
+  "pdf_file": "01_papers/ds_agent.pdf",
+  "retrieved": "2026-09-23",
+  "sha256": "6fd64ed02e8c54e01035505cc7b4c75d97a1fede5137d5183b5e6566f9c2a3a0",
+  "figures": [
+    {
+      "figure": 3,
+      "pdf_page_1based": 4,
+      "crop_pdf_points": [
+        53,
+        65,
+        544,
+        251
+      ],
+      "image": "02_figures/ds_agent_fig3_pdfp4.png",
+      "render_scale": 4,
+      "status": "Verified: rendered and visually inspected; caption/method checked"
+    }
+  ],
+  "technical_relevance": 4,
+  "visual_transfer": 3,
+  "analysis": "03_analysis/ds_agent.md"
+}

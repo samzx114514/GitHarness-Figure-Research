@@ -1,0 +1,38 @@
+{
+  "slug": "ace",
+  "title": "Agentic Context Engineering: Evolving Contexts for Self-Improving Language Models",
+  "venue": "ICLR 2026",
+  "venue_source": "https://iclr.cc/virtual/2026/poster/10008343",
+  "pdf_url": "https://arxiv.org/pdf/2510.04618",
+  "figure": 4,
+  "technical_score": 4,
+  "visual_score": 5,
+  "method_sections": [
+    "3 Agentic Context Engineering",
+    "3.1 Incremental Delta Updates",
+    "3.2 Grow-and-Refine"
+  ],
+  "text_pages": [
+    4,
+    5
+  ],
+  "source_url": "https://iclr.cc/virtual/2026/poster/10008343",
+  "pdf_page_1based": 5,
+  "printed_page": 5,
+  "crop_pdf_points": [
+    108,
+    80,
+    505,
+    206
+  ],
+  "crop_coordinate_system": "PDF points; top-left origin; [x0,y0,x1,y1]",
+  "verification_status": "Verified: PDF rendered and visually inspected, caption and nearby methods read",
+  "pdf_path": "01_papers/ace.pdf",
+  "screenshot": "02_figures/ace_fig4_pdfp5.png",
+  "full_page_screenshot": "02_figures/ace_pdfp5_full.png",
+  "paper_scale_screenshot": "02_figures/ace_fig4_pdfp5_180mm.png",
+  "paper_scale_check": "680 px width, approximately 180 mm at 96 dpi; visually inspected, not a physical print proof",
+  "accessed": "2026-09-23",
+  "sha256": "51050ced82df75c143b151262d5af8763916968ca50374bd8ff778f40552b0ad",
+  "pdf_pages": 32
+}

@@ -1,0 +1,35 @@
+Figure 2: Insight Extraction Prompt Template. The
+prompt template ExpeL agents used for insight extraction.
+The same template is used both for success/fail pairs (A, in
+yellow) and L-sized successes (B, in green).
+pseudo-code for this step can be found in Alg. 3. We believe
+as the list of extracted insights grows, retrieval could be a
+feasible solution to manage the context window size.
+Figure 3: Task Inference Prompt Template. We illustrate
+ExpeL’s prompt template during evaluation. The areas with
+a white background are identical to the base ReAct agent’s
+inputs. We differ by (purple areas) having additional ex-
+tracted insights from past experience, and dynamically re-
+trieved successful in-context examples from past experiences
+based on task similarity.
+4.4
+Transfer Learning
+After demonstrating how learning by using experiences
+from a training set can benefit an LLM agent in solving an
+unseen task in the same task distribution, we investigate an-
+other interesting setting where knowledge accumulated from
+a source task distribution could be useful for a target task
+distribution with minimal target task examples for the Ex-
+peL agent. Like most transfer learning settings, we assume
+that the source and target tasks exhibit common knowledge.
+Therefore, experiences accumulated from source tasks can
+benefit the agent in solving a new set of target tasks.
+Similar to pretraining on source task and finetuning on tar-
+get task in transfer learning literature (Zhuang et al. 2020),
+we propose to use the extracted insights ˆι from the source
+task and fewshot examples from the target task to “finetune”
+the insights so that they are more applicable in the target
+task. We hypothesize that using target task fewshot examples
+can better ground the insights into the target task and miti-
+gate hallucinations. An example prompt template to “fine-
+tune” extracted insights from a source domain to tailor them

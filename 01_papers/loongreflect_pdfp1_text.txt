@@ -1,0 +1,113 @@
+LoongReflect: Boosting Long-Horizon Reflection in Search Agents via Global
+Perspective Distillation
+Zhixin Zhang∗1,2,3, Xinke Jiang∗1,2,3, Zhibang Yang∗1,2, Weixuan Xu1,2,3,
+Guohong Qiu1,2,3, Xu Chu†1,3,4, Junfeng Zhao†1,3, Yasha Wang†2,5
+1School of Computer Science, Peking University, Beijing, China
+2National Engineering Research Center for Software Engineering, Peking University, Beijing, China
+3Key Laboratory of High Confidence Software Technologies, Ministry of Education, Beijing, China
+4Center on Frontiers of Computing Studies, Peking University, Beijing, China
+5Peking University Information Technology Institute (Tianjin Binhai), Tianjin, China
+{zhixinzhang25,xinkejiang,yangzb}@stu.pku.edu.cn,
+{chu_xu, zhaojf, wangyasha}@pku.edu.cn
+Abstract
+Large language model agents increasingly rely on long-
+horizon reasoning to solve complex tasks involving plan-
+ning, tool use, and memory. A critical capability in such set-
+tings is reflection: assessing trajectory progress, identifying
+missing evidence and unreliable intermediate states, and de-
+ciding whether to continue, revise, or abandon the current
+branch. Learning effective reflection, however, is challeng-
+ing because reflection is performed locally within the current
+branch, whereas its utility can only be determined by its con-
+tribution to the final trajectory outcome. This local–global
+mismatch makes outcome-based reinforcement learning pro-
+vide only local, sparse and delayed supervision for reflec-
+tive decisions. To solve these, we propose LoongReflect,
+a training framework that formulates reflection as a memory-
+control policy. The agent operates over a reversible trajec-
+tory tree using explicit <reflect> and <backtrack> ac-
+tions. Reflection consolidates verified facts, missing evidence,
+and branch-specific risks into working memory, while back-
+tracking removes an unreliable branch from the active con-
+text and preserves a concise corrective lesson. To learn this
+policy, LoongReflect combines two complementary signals
+through a look-ahead, extragradient-style coordination mech-
+anism. A fast channel distills globally informed reflective be-
+havior from a privileged teacher, with supervision restricted
+to reflection and backtracking tokens. A slow channel op-
+timizes complete trajectories using outcome-based GRPO,
+aligning local control decisions with final task success. Ex-
+periments on multi-hop retrieval-augmented generation and
+mathematical reasoning benchmarks demonstrate consistent
+improvements over outcome-only reinforcement learning and
+self-distillation baselines.
+1
+Introduction
+Large language models (LLMs) have emerged as the core
+policy components of agents that reason, retrieve informa-
+tion, and maintain intermediate memory (Yao et al. 2022;
+Schick et al. 2023; Asai et al. 2024; Jiang et al. 2025b).
+As these systems are increasingly deployed on open-ended,
+∗These authors contributed equally.
+†Corresponding authors.
+Long-Horizon Execution
+Plan
+Act
+Observe
+Reflect
+Error
+accumulation
+State
+contamination
+Making
+progress?
+Enough
+evidence?
+Revise or 
+backtrack?
+Why Existing Reflection Fails
+…
+Reflection is necessary to 
+monitor and control the trajectory
+Answer
+Learning-Signal Dilemma
+S0
+S1
+…
+ST
+∅
+∅
+∅
+Outcome Reward Only
+Sparse, delayed credit
+Rtask
+Direct Reflection Reward
+=
+Reward hacking
+Local-Global Perspective Gap
+What Reflection Sees
+•
+Branch-local context
+•
+Limited global view
+What Determines Value
+Local reflection can’t access its 
+contribution to the full trajectory
+Figure 1: Reflective decisions are made from branch-local
+context, whereas their value is determined by their contribu-
+tion to the final trajectory outcome. This local–global mis-
+match leaves outcome-based learning with local, sparse and
+delayed supervision.
+multi-step tasks, long-horizon reasoning becomes critical. In
+such settings, an agent must do more than generate the next
+action: it must also continually assess whether its current tra-
+jectory is making progress, whether the available evidence
+is sufficient, and whether an earlier branch should be revised
+or abandoned, which is referred to as reflection.
+Reflection is not merely additional reasoning text; it is a
+control process over the trajectory itself. An effective reflec-
+tion step should consolidate verified facts, identify missing
+evidence, diagnose branch-specific risks, and decide whether
+the current branch should be continued, revised, or aban-
+doned (Jiang et al. 2025a,b; Zhang et al. 2026). This capa-
+arXiv:2608.11967v1  [cs.LG]  12 Aug 2026

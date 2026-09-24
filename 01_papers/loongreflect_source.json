@@ -1,0 +1,30 @@
+{
+  "title": "LoongReflect: Boosting Long-Horizon Reflection in Search Agents via Global Perspective Distillation",
+  "venue": "arXiv preprint 2026; no conference venue verified",
+  "venue_verification_source": "https://arxiv.org/abs/2608.11967",
+  "source_url": "https://arxiv.org/abs/2608.11967",
+  "pdf_url": "https://arxiv.org/pdf/2608.11967",
+  "verified_date": "2026-09-23",
+  "verification_status": "Verified: downloaded original PDF; rendered and visually inspected; caption and nearby method read",
+  "figures": [
+    {
+      "figure": 2,
+      "pdf_page_1based": 4,
+      "crop_pdf_points": [
+        76,
+        49,
+        537,
+        306
+      ],
+      "screenshot": "02_figures/loongreflect_fig2_pdfp4.png",
+      "original_page": "02_figures/loongreflect_pdfp4_page.png",
+      "paper_scale_preview": "02_figures/loongreflect_fig2_180mm_150dpi.png",
+      "paper_scale_preview_96dpi": "02_figures/loongreflect_fig2_180mm_96dpi.png"
+    }
+  ],
+  "technical_relevance": 5,
+  "visual_value": 4,
+  "score_scale": "1 low to 5 high; subjective design assessment",
+  "identity_note": "Possible match for user-mentioned LongReflect; user reference image not provided in current task, so identity with their figure is unverified.",
+  "paper_scale_check": "Both 180mm at 150dpi and approximately 180mm at 96dpi (680px wide) rendered and visually inspected; no physical print check."
+}

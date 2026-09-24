@@ -1,0 +1,4011 @@
+
+=== PDF PAGE 1 ===
+AGENTICRAG-R1: Agentic Reinforcement Learning with Stack Memory
+for Multi-Step Reasoning, Retrieval and Memorizing
+Xinke Jiang1,2,3,*, Yue Fang1,2,3,*, Zhibang Yang1,2,3,*, Jiaran Gao1,2,3,*, Zhixin Zhang1,2,3,*, Tao Feng1,
+Rihong Qiu1,2,3, Wentao Zhang1, Hongxin Ding1,2, Ruizhe Zhang1,2,3, Yongxin Xu1,3,
+Yuheng Huang4, Xu Chu2,3,5,†, Junfeng Zhao2,3,†, Yasha Wang1,6,†
+1National Engineering Research Center of Software Engineering, Peking University, Beijing, China
+2School of Computer Science, Peking University, Beijing, China
+3Key Laboratory of High Confidence Software Technologies, Ministry of Education, Beijing, China
+4GRG Banking Equipment Co., Ltd., Guangzhou, China
+5Center on Frontiers of Computing Studies, Peking University, Beijing, China
+6Peking University Information Technology Institute (Tianjin Binhai), Tianjin, China
+*Equal contribution
+†Corresponding authors
+{xinkejiang, yangzb}@stu.pku.edu.cn; {chu_xu, zhaojf, wangyasha}@pku.edu.cn
+Abstract
+Retrieval-Augmented Generation (RAG) im-
+proves the factuality of large language models
+(LLMs), yet existing RAG systems often
+struggle with complex, multi-step reasoning
+that requires adaptive retrieval and continuous
+revision of intermediate contexts.
+Recent
+reinforcement learning (RL)-based agentic
+RAG methods partially alleviate this issue,
+but typically rely on coarse-grained action
+spaces and trajectory-level rewards, resulting
+in weak reward assignment and a bias toward
+short-horizon, stereotyped reasoning template.
+To address, we propose AGENTICRAG-R1, a
+RL framework that deeply integrates reasoning,
+retrieval, and memory via a memory stack
+and fine-grained action space,
+supported
+by hierarchical action-aware rewards and
+an
+information-aware
+trajectory
+rejection
+strategy to enable effective long-horizon
+learning. Experiments across a diverse set of
+multi-hop, open-domain, and agentic reasoning
+benchmarks,
+spanning multiple backbone
+model sizes, demonstrate that AGENTICRAG-
+R1 consistently outperforms strong baselines.
+Moreover,
+AGENTICRAG-R1 learns more
+robust,
+interpretable,
+and memory-aware
+reasoning behaviors, highlighting the effect of
+fine-grained action modeling and information-
+aware optimization for long-horizon reasoning.
+Our code is anonymous available at https:
+//github.com/jiangxinke/Harness-RL/
+tree/AgenticRAG-R1-Whitebox.
+1
+Introduction
+Large Language Models (LLMs) have achieved
+impressive performance across a broad range of
+natural language processing tasks (Kaplan et al.,
+2020; Yang et al., 2024b; Guo et al., 2025; Vu
+Figure 1: Conventional Agentic vs AGENTICRAG-
+R1 for multi-step reasoning and retrieval. Conventional
+methods adopt coarse-grained, append-only memory
+and shallow retrieval, leading to error accumulation and
+short-horizon. AGENTICRAG-R1 employs fine-grained,
+reversible memory actions and information-aware roll-
+out selection, for robust long-horizon reasoning.
+et al., 2024; Chang et al., 2024). However, de-
+spite their strengths, LLMs still remain prone to
+factual errors (Ji et al., 2023a; Cao et al., 2020; Ji
+et al., 2023b; Jiang et al., 2024b), outdated knowl-
+edge (He et al., 2022) and limited domain-specific
+expertise (Kandpal et al., 2023), making Retrieval-
+Augmented Generation (RAG) (Edge et al., 2024;
+Asai et al., 2024; Yang et al., 2024c) a promising
+solution by enabling access to external knowledge
+for improved accuracy and adaptability.
+In contrast, many real-world decision-making
+tasks are inherently complicated (Gao et al., 2025),
+requiring models to decompose problems into mul-
+tiple interdependent steps rather than relying on
+one-off reasoning or single-step retrieval (Shao
+et al., 2023; Press et al., 2022).
+Such settings
+arXiv:2608.29622v1  [cs.MA]  30 Aug 2026
+
+
+=== PDF PAGE 2 ===
+demand not only access to external knowledge,
+but also the ability to dynamically decide when
+and what to retrieve as the reasoning process un-
+folds (Lee et al., 2024; Jeong et al., 2024). Cru-
+cially, retrieved information could be continuously
+integrated into the model’s evolving internal state,
+influencing subsequent reasoning and decision
+making. This tight coupling between reasoning
+and retrieval makes their deep integration a critical
+yet underexplored challenge.
+Early attempts to integrate reasoning and re-
+trieval primarily relied on manually crafted prompt-
+ing strategies (Press et al., 2022; Shao et al.,
+2023; Trivedi et al., 2023; Jiang et al., 2024a;
+Li et al., 2025), and were later extended through
+Supervised Fine-Tuning (SFT) to better coordi-
+nate their interaction (Wang et al., 2025b). While
+effective in specific settings, these approaches de-
+pend heavily on heuristic design and often over-
+fit to fixed reasoning patterns, without intrinsi-
+cally improving the model’s ability to jointly rea-
+son and retrieve (Chu et al., 2025a). More recently,
+Reinforcement Learning (RL) has emerged as a
+promising paradigm for enhancing complex rea-
+soning, as demonstrated by OpenAI O1 (OpenAI,
+2025) and DeepSeek-R1 (Guo et al., 2025). Moti-
+vated by this success, several studies have begun
+to apply RL to retrieval-augmented settings, train-
+ing models to invoke external retrieval tools during
+reasoning (Jin et al., 2025; Dong et al., 2025a,b;
+Zhou et al., 2025; Liu et al., 2026). As illustrated
+in Figure 1, most existing RL-based RAG rely on
+coarse-grained action modeling, treating retrieval
+as a single or shallow action, which limits fine-
+grained control over complex tasks and biases pol-
+icy learning toward short-horizon, easily repro-
+ducible reasoning templates than long-horizon
+retrieval and reasoning, posing two challenges:
+❶Challenge 1.
+How to expose fine-grained,
+memory-aware action-making and reward al-
+location in multi-step reasoning and retrieval.
+Deep integration of reasoning and retrieval requires
+LLMs not only to acquire external information,
+but also to continuously manage and revise in-
+termediate content memory under noisy and un-
+certain conditions. In multi-step reasoning, both
+external retrieval and internal inference inevitably
+introduce noise: retrieved documents may be irrel-
+evant or misleading (Yao et al., 2022b; Shinn et al.,
+2023; Liu et al., 2023), while intermediate reason-
+ing steps may contain logical errors or overconfi-
+dent assumptions (Jiang et al., 2024a; Xiong et al.,
+2024; Hao et al., 2023). If such noisy intermediate
+conclusions are written into context memory with-
+out the ability to be inspected, revised, or discarded,
+they tend to propagate and amplify over steps, ef-
+fectively corrupting the agent’s internal decision
+state (Ning et al., 2025; Hoscilowicz et al., 2024;
+Lai et al., 2024). However, most existing RL-based
+agentic methods adopt a highly coarse-grained
+action formulation, collapsing the entire reason-
+ing and retrieval processes into a single latent and
+memory-appending <think> and <search> action
+template (Dong et al., 2025a,b; Zhou et al., 2025),
+which are then stored as irreversible content. This
+limitation is further exacerbated by reward design,
+where outcome rewards are evaluated only on final
+correctness, overlooking the contributions of in-
+termediate actions throughout the trajectory (Shao
+et al., 2024; Jin et al., 2025). Without fine-grained,
+memory-aware action and reward signals, RL suf-
+fers from weak reward assignment and is biased
+toward shallow, template-like strategies.
+❷Challenge 2.
+How to expose reinforce-
+ment learning to sufficiently diverse and high-
+information reasoning and retrieval rollouts.
+Even with fine-grained action spaces and memory-
+aware reward mechanisms, RL may still fail to
+learn robust long-horizon reasoning if the training
+distribution is dominated by low information tra-
+jectories. Most multi-hop and retrieval-augmented
+tasks are simple—requiring only a single retrieval
+step or shallow reasoning—so these short-horizon
+trajectories often yield higher immediate rewards
+than more complex, long-horizon ones (Gao et al.,
+2025; Zhou et al., 2025). As a result, RL tends to
+overfit to low-information, trivially rewarding tra-
+jectories, rarely exercising actions such as revising,
+summarizing, or planning, and under-optimizing
+the long-horizon combinations of cognitive ac-
+tions (Wang et al., 2025c).
+To address the above challenges, we propose
+AGENTICRAG-R1, a reinforcement learning frame-
+work that achieves deep integration of reasoning,
+retrieval and memorizing through fine-grained ac-
+tion modeling and action-aligned reward mecha-
+nisms. ❶For C1, we design a structured multi-
+action space together with a stack-based memory
+which represents the agent’s internal state across
+multi-step reasoning. The memory stack allows
+intermediate actions to be selectively pushed, re-
+vised, or popped, enabling the agent to inspect
+and correct noisy information accumulated dur-
+ing reasoning and retrieval.
+Specifically, our
+
+
+=== PDF PAGE 3 ===
+framework supports distinct cognitive actions such
+as <think>, <search>, and <plan>, as well as
+memory-oriented actions such as <summary> and
+<backtrack>, which operate over the memory
+stack to refine or retract intermediate actions. This
+action design is further complemented by an action-
+aware reward attribution mechanism that assigns
+process rewards to each actions, providing fine-
+grained reward supervision. ❷For C2, we intro-
+duce a dynamic training trajectories rejection strat-
+egy that rejects low-information trajectories and pri-
+oritizes high-reward rollouts while up-weighting in-
+puts whose rollouts exhibit meaningful dispersion.
+Inspired by rejection sampling (Liu et al.; Xiong
+et al., 2025), we define a cross-batch, information-
+awareness metric (Upper Confidence Bound-
+like) (Russo and Roy, 2014; Russo and Van Roy,
+2013) that evaluates each trajectory based on both
+its rollout reward and the sample variance. This
+approach ensures trajectories eliciting diverse rea-
+soning behaviors and requiring multi-step, long-
+horizon decision-making receive higher priority
+during training. In summary, our main contribu-
+tions are as follows:
+• We first formalize the agentic reinforcement
+learning process within a search-and-memory en-
+vironment, and introduce a fine-grained, memory-
+aware action space together with action-aware
+process-level rewards. This design enables ex-
+plicit supervision of heterogeneous cognitive ac-
+tions and effectively mitigates error accumulation
+in the agent’s memory (C1).
+• We introduce a dynamic, information-aware
+trajectories rejection strategy that filters low-
+information trajectories and prioritizes challeng-
+ing, long-horizon samples with high behavioral
+variance, ensuring RL effectively explores and
+optimizes complex, multi-step reasoning strate-
+gies (C2).
+• We evaluate AGENTICRAG-R1 on multiple multi-
+hop and RAG benchmarks, demonstrating im-
+proved reasoning performance, generalization,
+and applicability to complex downstream tasks,
+i.e., report generation.
+2
+AGENTICRAG-R1
+In this section, we present AGENTICRAG-R1, as
+illustrated in Figure 2, which consists of two key
+components: ❶action-centric training paradigm
+that supports multi-turn, multi-action rollouts with
+reasoning, retrieval, and memory operations, and
+incorporates hierarchical, action-aware reward
+modeling for fine-grained, token-level reward as-
+signment; ❷Information-Gain-Aware dynamic
+rollout selection strategy, improves long-horizon
+exploration and data efficiency during training.
+More details of Notation Table, Full Algorithm,
+Prompt, Proofs, are in Appendix C, B, G, K.
+2.1
+Action Modeling with Hierarchical
+Rewards
+Memory-aware Multi-Action Modeling.
+To
+overcome C1, we introduce a structured multi-
+action mechanism integrated with the last-in-first-
+out (LIFO) memory stack that supports push and
+pop operations. Each stack element corresponds to
+a discrete and semantically meaningful reasoning
+unit, serving as the basic execution primitive of the
+agent. The memory stack enables step-wise action
+decomposition of reasoning trajectories, supports
+dynamic rollback through stack manipulation, and
+maintains a reversible and interpretable record of
+the agent’s internal decision process:
+• <Plan> (push): Generate and store a sub-goal,
+task decomposition, or high-level strategy for
+long-horizon reasoning.
+• <Think> (push): Record internal reasoning, such
+as logical deduction or decision-making, to sup-
+port subsequent inference.
+• <Search> (push): Formulate a query with struc-
+tured parameters and invoke the retrieval module.
+This action explicitly determines what and how
+external knowledge is accessed by external tools.
+• <Backtrack> (pop, then push): Remove one or
+more top elements upon detecting inconsistencies
+or errors to restore a prior valid reasoning state
+for alternative exploration.
+• <Summary> (pop, then push): Compress recent
+memory entries into a concise representation and
+push the summary back onto the stack, for con-
+text management and information preservation.
+• <Conclusion> (push): Indicate that the current
+state represents a candidate final answer, conclud-
+ing the reasoning sequence.
+Hierarchical
+Reward
+Modeling
+To
+better
+model interaction outcomes arising from multi-turn
+reasoning and multi-action execution—particularly
+those involving external retrieval engines and
+the memory stack—we introduce a hierarchical
+reward modeling framework. Specifically, we de-
+compose the overall reward signal into two parts:
+
+
+=== PDF PAGE 4 ===
+��
+�2
+�1
+...
+Query
+Reference Model
+Rejection
+Policy
+Optimization
+ Composed Action Set
+Agentic Reinforcement Learning Pipeline
+Information-aware Trajectory Rejection
+Observation
+Search
+Rollout Module
+Search 
+Tools
+Memory 
+Stack
+ 
+Pop
+Push
+Actor Model
+Action 
+Push-in
+LLM
+Action
+Pop-base Attention
+ Mask Mechanism
+Casual Attention Mask
+Search
+It seems not 
+related to user 
+query.
+pop
+ 
+M
+Backtrack
+pop
+ 
+M
+Summary
+ 
+M
+Summary
+Search
+push
+Observation
+ 
+M
+Draw 
+conclusion!
+Conclusion
+Plan
+push
+ 
+M
+Search 「HCG」
+Summary results
+Think 
+Conclusion
+Thought 
+push
+ 
+M
+According to the 
+retrieved 
+information, the 
+symptoms may be 
+the recurrence of...
+Reward
+Samples
+� 
+ 1  
+���  �2 
+� 
+ 2 
+� 
+ � 
+Based on the above 
+reasoning and 
+research, 
+I draw a conclusion.
+Operation 
+Flow
+�1
+sorted by reward & variance
+Top p
+�2
+...
+��
+... ...
+ 
+Push
+      
+Reward Model
+�����,�
+ � 
+= ����,�
+ � 
+ 
+Action 
+Pop-out
+pop
+4
+Logits 
+Obtain
+Learnable
+M
+Memory
+Take Actions
+����,�
+ � 
+����,�
+ � 
+Advantage
+ 
+ 
+ 
+ 
+...
+...
+...
+...
+...
+ 
+ 
+� 
+ 1,1 
+� 
+ 1,� 
+� 
+ 1,� 
+...
+...
+� 
+ 2,� 
+� 
+ 2,3 � 
+ �,� 
+� 
+ 1,� 
+� 
+ 2,� � 
+ 2,3 
+� 
+ �,� 
+ 
+ 
+ 
+...
+...
+...
+...
+...
+�2
+ 
+ 
+ 
+� 
+ 2,1 
+� 
+ 2,� 
+� 
+ 2,� 
+ 
+...
+...
+...
+ 
+ 
+��
+...
+...
+� 
+ �,1 
+� 
+ �,� 
+� 
+ �,� 
+ 
+ 
+ 
+...
+Calculate variance and mean
+too naive，
+no/one search
+too hard，
+but I can try 
+too hard，
+I have no idea
+①
+②
+ Query
+Sum. 3
+Act. 2
+Act. 1
+ Query
+Sum. 2
+Plan 1
+Act. 1
+Act. 2
+pop
+M
+push
+M
+Summary
+Backtrack
+pop Act. 2
+push Sum. 3
+push
+Push new Act.3
+Sum.3
+Act. 1
+Act. 4
+Act. 2
+Act. 1
+Act. 2
+Sum.3
+Act. 4
+Act. 1
+Act. 1
+Act. 1
+Act. 1
+Act. 2
+Act. 2
+Act. 2
+Sum.3
+Sum.3
+Act. 4
+...
+Sum. 3
+Act. 4
+...
+...
+Act. 2
+Mask
+Mask after 
+POP
+Figure 2: Overall Framework of AGENTICRAG-R1.
+a outcome reward and a process reward. The out-
+come reward reflects the quality of the final out-
+come and is uniformly distributed across valid gen-
+eration tokens, while the process reward provides
+fine-grained supervision and is assigned to tokens
+for corresponding actions.
+Formally, for a rollout indexed by k, let y(k) =
+ x(k)
+1 , . . . , x(k)
+|y(k)|
+
+denote the generated token se-
+quence of the k-th trajectory. We define per-token
+reward as:
+r(k)
+i
+=
+ 1−I(k)
+mask,i
+
+r(k)
+out +I(k)
+act,i r(k)
+proc,i, i ∈[1, |y(k)|],
+(1)
+where I(k)
+mask,i indicates whether token x(k)
+i
+is
+masked from policy optimization (e.g., retrieved
+observations) to avoid those false gradient updates,
+and I(k)
+act,i indicates whether the token corresponds
+to this action invocation. This hierarchical reward
+formulation allows outcome-level supervision to be
+shared across the entire reasoning trajectory, while
+process-level rewards are selectively applied to ac-
+tion tokens, providing fine-grained control over
+decisions:
+• Outcome Reward r(k)
+out : evaluates the quality of
+the final answer produced by the trajectory. We
+extract the predicted answer from <conclusion>
+a(k)
+conclusion from y(k) and compare it with the
+ground-truth agold via Exact Match (EM) for dis-
+crete answers and F1 score for graded answers:
+r(k)
+out = Acc
+
+a(k)
+conclusion, agold
+
+∈[0, 1].
+(2)
+• Process Rewards r(k)
+proc,i: Beyond the final out-
+come, we introduce action-conditioned process
+rewards to supervise intermediate decisions dur-
+ing reasoning. These rewards are applied only at
+action tokens and encourage syntactically valid
+actions, effective external retrieval, and robust
+memory manipulation. Specifically, the process
+reward is defined as:
+r(k)
+proc,i = r(k)
+fmt,i + r(k)
+rag,i + r(k)
+mem,i,
+(3)
+which contains the three types:
+– ❶Action Format Reward (r(k)
+fmt,i), enforces
+syntactic correctness at action level.
+Let
+Isyntax(ai) be an indicator that equals 1 if
+action ai is properly formatted with valid
+<ACTION>...</ACTION> tags, and 0 otherwise.
+rfmt
+t
+is defined as
+r(k)
+fmt,i = αtype(ai), if Isyntax(ai) = 1,
+(4)
+where αtype(ai) = 1.0 for CONCLUSION actions
+and 0.5 for other valid action types, otherwise
+0.
+– ❷Search-based Reward (r(k)
+rag,i). To encour-
+age effective external retrieval, we assign a
+reward based on semantic relevance of re-
+trieved content.
+Upon a <Search> action,
+a large-parameterized general reward model
+(GRM) (Wang et al., 2025a) evaluates the
+alignment between the issued query, the re-
+trieved evidence, and the current task context,
+producing a relevance score:
+r(k)
+rag,i = GRM(qs
+i , oi, q) ∈[0, 1],
+(5)
+where qs
+i denotes the search query, oi the re-
+trieved observation, and q the original user
+input.
+
+
+=== PDF PAGE 5 ===
+– ❸Memory-aware Reward (r(k)
+mem,i) super-
+vises useful memory operations rather than
+their mere occurrence. For memory-related
+actions (Backtrack, Summary), we also em-
+ploy the GRM to assess whether the operation
+is reasonable and beneficial given the current
+reasoning context and memory state. Specifi-
+cally, we define:
+r(k)
+mem,i = GRM(ai, Mi, q) ∈[0, 1],
+(6)
+where Mi denotes the current memory stack.
+We use separate fixed prompts for retrieval and
+memory evaluation, as detailed in Appendix G.
+Reward Budget and Proportional Normaliza-
+tion. To prevent reward hacking via excessive ac-
+tion invocation, we impose a per-trajectory budget
+on process rewards. Let r(k)
+proc = P
+i r(k)
+proc,i denote
+the accumulated process reward. Process reward is
+normalized as:
+˜r(k)
+proc,i =
+
+
+
+
+
+r(k)
+proc,i,
+R(k)
+proc ≤Bproc,
+Bproc
+R(k)
+proc
+r(k)
+proc,i,
+R(k)
+proc > Bproc,
+(7)
+where Bproc is a fixed reward budget. This ensures
+that when the total process reward exceeds the bud-
+get, all process rewards are proportionally scaled
+to share the same budget, thereby discouraging ex-
+cessive or redundant action invocation.
+2.2
+Information-Aware Trajectories Rejection
+Despite fine-grained, action-level reward, C2 still
+remains: how to distinguish informative trajecto-
+ries from noisy or redundant ones when multiple
+stochastic rollouts are generated per input. In prac-
+tice, rollouts sampled from the same prompt can
+exhibit substantially different reasoning paths and
+reward outcomes, while rollouts across different
+inputs vary widely in their overall learning utility.
+Naively treating all rollouts equally during opti-
+mization can dilute gradient signals and bias train-
+ing toward short-sighted, low-effort, or stereo-
+typed templated behaviors. To address, we pro-
+pose an Information-Aware Trajectories Rejection
+mechanism that explicitly accounts for both input-
+level uncertainty and rollout-level quality. Unlike
+prior approaches that perform selection indepen-
+dently per input, our method operates globally
+over a mini-batch of rollouts, enabling competi-
+tion across both inputs and trajectories.
+Batch-level Rollout Ensemble.
+At each train-
+ing step, we sample a mini-batch of inputs B =
+{q(1), . . . , q(B)}.
+For each input q(b), the pol-
+icy πθ generates K stochastic rollouts y(b) =
+{y(b,1), . . . , y(b,K)}, where y(b,i) ∼πθ(· | q(b)).
+All rollouts in the mini-batch form a unified rollout
+set YB = SB
+b=1 y(b) with cardinality |YB| = B×K.
+Each rollout y(b,i) is assigned with a scalar reward
+r(b,i). For each input q(b), we compute the empiri-
+cal reward mean and variance across its rollouts to
+estimate expected performance:
+µ(b) = 1
+K
+K
+X
+i=1
+r(b,i), (σ(b))2 = 1
+K
+K
+X
+i=1
+
+r(b,i) −µ(b)2
+,
+Here, the variance (σ(b))2 provides a lightweight
+measure of input-level informativeness, reflecting
+the variability of learning signals across reasoning
+and retrieval trajectories for a given input.
+Information-Aware Rejection.
+Given the batch-
+level rollout set YB = {y(b,i)}B,K
+b=1,i=1, we assign
+each rollout an information-aware score that jointly
+accounts for input-level diversity and rollout-level
+quality. Concretely, for i-th rollout of input x(b),
+we define it as Upper Confidence Bound (UCB) fol-
+lowing (Russo and Roy, 2014; Russo and Van Roy,
+2013):
+˜r(b,i) = (σ(b))2 · r(b,i) + µ(b),
+(8)
+where r(b,i) denotes the aggregated scalar reward of
+the rollout, and µ(b) and (σ(b))2 are the mean and
+variance of rollout rewards under the same input
+x(b). This scoring function captures two comple-
+mentary signals. The variance term (σ(b))2 reflects
+how much the learning signal varies across differ-
+ent reasoning and retrieval trajectories induced by
+the same input, and thus emphasizes inputs that ad-
+mit diverse, non-trivial solution paths. The rollout-
+level reward r(b,i) distinguishes higher-quality tra-
+jectories within the same input context. By mul-
+tiplicatively coupling these terms, the score selec-
+tively amplifies high-reward rollouts when mean-
+ingful diversity exists, while suppressing uninfor-
+mative or degenerate trajectories. Additive mean
+term µ(b) serves as a stabilizing baseline to prevent
+overly rejection.
+Rollout rejection is then performed globally over
+the batch-level rollout set. Specifically, we rank
+all rollouts y(b,i) ∈YB according to ˜r(b,i) and re-
+tain only the top fraction p ∈(0, 1]. Rollouts not
+
+
+=== PDF PAGE 6 ===
+selected are discarded and do not participate in pol-
+icy optimization. By performing rejection over the
+joint batch × rollout space, this mechanism priori-
+tizes trajectories that are both locally high-quality
+and globally informative, encouraging exploration
+of diverse reasoning strategies while improving
+long-horizon reasoning.
+3
+Experiments
+We conduct extensive experiments to evaluate
+AGENTICRAG-R1 and address the following key
+research questions:
+• RQ1: Does AGENTICRAG-R1 consistently out-
+perform strong baselines on in-domain and out-
+of-domain QA?
+• RQ2: How do memory-aware actions and trajec-
+tory rejection jointly affect overall model perfor-
+mance?
+• RQ3:
+What is the impact of retrieval- and
+memory-based rewards on the quality of learning
+and reasoning?
+• RQ4: How sensitive is AGENTICRAG-R1 to the
+chosen rejection threshold in trajectory filtering?
+• RQ5: How does AGENTICRAG-R1 effectively
+handle long-horizon reasoning with larger step
+budgets?
+3.1
+Experimental Setup
+❶Training Data.
+We train our models and
+baselines on a curated multi-hop question answer-
+ing dataset constructed from the training splits
+of HotpotQA (Yang et al., 2018) and 2WikiMul-
+tiHopQA (Ho et al., 2020).
+To focus on gen-
+uinely non-trivial reasoning scenarios, we filter
+out instances that require no external retrieval or
+can be solved with only a single, trivial retrieval
+step. Detailed dataset construction procedures and
+statistics are provided in Appendix D. ❷Evalua-
+tion Benchmarks. We evaluate our method on
+ten benchmarks spanning three settings: multi-
+hop QA (HotpotQA, 2Wiki, MusiQue (Trivedi
+et al., 2022), Bamboogle (Press et al., 2022)),
+open-domain QA (Natural Questions (Kwiatkowski
+et al., 2019), TriviaQA (Joshi et al., 2017)), and
+agentic benchmarks (FRAMES (Krishna et al.,
+2025)).Additional benchmark details are reported
+in Appendix D. ❸Backbone Models. We adopt
+Qwen2.5 (Yang et al., 2024a) as the backbone lan-
+guage model across all experiments, with param-
+eter scales of 1.5B, 3B, and 7B. ❹RAG Tools.
+We employ a Wikipedia-based search tool built
+on a dump dated November 1, 2023. ❺Base-
+lines. We compare our approach against a broad
+range of baselines spanning No-RAG, Naive RAG,
+Agentic RAG, and RL-based Agentic paradigms.
+These include Base, CoT (Wei et al., 2022a), FS-
+RAG (Trivedi et al., 2023), FL-RAG (Khandel-
+wal et al., 2020), ReAct (Yao et al., 2022b), IR-
+CoT (Trivedi et al., 2023), TC-RAG (Jiang et al.,
+2024a), ReSearch (Chen et al., 2025), Search-
+R1 (Jin et al., 2025), AEPO (Dong et al., 2025a),
+ARPO (Dong et al., 2025b), and Mem1 (Zhou et al.,
+2025). Baseline descriptions are provided in Ap-
+pendix E. ❻Evaluation Metrics. We report the F1
+score (Yacouby and Axman, 2020) as the primary
+evaluation metric for all question-answering bench-
+marks (Appendix F). ❼Additional Experiments.
+More experiments are listed in Appendix I.
+3.2
+Main Result Analysis
+To address RQ1, we evaluate AGENTICRAG-R1 on
+two types of tasks using three backbones (Table 1)
+and analyze its training behaviors and learning dy-
+namics (Figure 3). Based on these analyses, we
+highlight the following main observations:
+❶Strong Performance Compared with Base-
+lines. Across in-domain and out-of-domain multi-
+hop QA benchmarks (Table 1), AGENTICRAG-
+R1 achieves the best or near-best performance
+across backbone model sizes. On the in-domain
+datasets, AGENTICRAG-R1 consistently surpasses
+the strongest baselines, with, for example, abso-
+lute gains of +3.02% on 2Wiki and +6.76% on
+HotpotQA using the 3B backbone.
+On out-of-
+domain benchmarks, AGENTICRAG-R1 exhibits
+strong generalization, e.g., achieving an absolute
+improvement of about +7.2% on TriviaQA with
+the 1.5B backbone and +7.1% on Bamboogle with
+the 7B backbone over the strongest Agentic RAG
+baselines. Notably, these gains hold across back-
+bone scales, demonstrating the effectiveness and
+robustness of our reinforcement learning-based op-
+timization in this setting.
+❷Learning Dynamics of Cognitive Actions
+and Information-Aware Rejection. We exam-
+ine the evolution of cognitive actions during train-
+ing and the associated learning dynamics, corrobo-
+rating trends using reward trajectories from Fig-
+ure 5.
+Using the Qwen2.5-3B model as a pri-
+mary example, <think> actions steadily increase,
+reflecting a growing reliance on internal reason-
+ing.
+Actions related to intermediate reasoning,
+namely <summary> and <backtrack>, fluctuate
+
+
+=== PDF PAGE 7 ===
+Method
+In-Domain
+Out-of-Domain
+Paradigm
+Approach 2Wiki
+HotpotQA
+Bamboogle
+FRAMES
+MusiQue
+NQ
+TriviaQA
+Avg
+Qwen2.5-1.5B
+No RAG
+Base
+21.95
+20.20
+5.87
+9.51
+8.26
+11.31
+32.81
+15.70
+COT
+16.75
+17.90
+19.74
+8.43
+7.22
+9.82
+25.17
+15.00
+Naive RAG
+FS-RAG
+21.37
+26.55
+15.31
+11.40
+9.50
+17.74
+44.73
+20.94
+FL-RAG
+26.08
+28.14
+14.84
+12.58
+10.30
+21.94
+48.59
+23.21
+Agentic RAG
+ReACT
+12.43
+23.48
+12.54
+8.63
+7.99
+21.06
+33.91
+17.15
+IRCOT
+21.79
+26.68
+17.49
+9.32
+8.73
+22.93
+44.19
+21.59
+TCRAG
+25.23
+22.29
+11.63
+10.27
+7.90
+14.21
+34.05
+17.94
+RL-based
+ReSearch
+25.55
+30.45
+22.16
+9.21
+9.54
+29.07
+44.65
+24.38
+Search-R1 26.51
+20.66
+13.80
+9.65
+8.36
+11.93
+25.76
+16.67
+AEPO
+17.34
+14.75
+11.58
+8.98
+7.11
+9.55
+23.02
+13.19
+ARPO
+20.02
+15.48
+12.38
+9.11
+6.16
+9.19
+23.96
+13.76
+Mem1
+14.43
+14.34
+12.03
+8.18
+6.08
+18.41
+22.06
+13.65
+Ours
+29.53 (+3.02) 30.88 (+0.43) 20.00 (-2.16)
+13.46 (+0.88) 16.48 (+6.18) 31.35 (+2.28) 51.83 (+3.24) 27.65 (+3.27)
+Qwen2.5-3B
+No RAG
+Base
+23.98
+24.08
+9.45
+8.01
+9.70
+14.27
+38.84
+18.33
+COT
+18.90
+23.82
+20.80
+7.16
+10.47
+16.53
+39.62
+19.61
+Naive RAG
+FS-RAG
+15.47
+25.85
+10.48
+10.42
+7.64
+19.84
+45.38
+19.30
+FL-RAG
+16.80
+26.78
+11.05
+9.19
+7.29
+21.93
+48.50
+20.22
+Agentic RAG
+ReACT
+25.09
+34.37
+24.86
+10.53
+13.92
+27.19
+46.04
+26.00
+IRCOT
+15.89
+24.50
+25.27
+6.79
+12.43
+27.86
+49.19
+23.13
+TCRAG
+28.47
+21.94
+17.59
+7.69
+8.99
+20.74
+50.46
+22.27
+RL-based
+ReSearch
+27.23
+33.96
+15.09
+10.00
+9.47
+34.61
+53.93
+26.33
+Search-R1 29.90
+37.24
+29.90
+10.76
+13.53
+34.73
+55.08
+30.16
+AEPO
+23.01
+28.71
+22.09
+12.26
+11.70
+26.76
+47.78
+24.62
+ARPO
+29.55
+36.48
+27.32
+13.49
+13.38
+33.29
+53.66
+29.60
+Mem1
+18.06
+20.15
+5.19
+4.99
+4.47
+19.18
+33.09
+15.02
+Ours
+32.92 (+3.02) 44.00 (+6.76) 31.48 (+1.58) 16.23 (+2.74) 16.48 (+2.56) 37.15 (+2.42) 56.62 (+1.54) 33.55 (+3.39)
+Qwen2.5-7B
+No RAG
+Base
+25.41
+26.63
+17.86
+12.52
+12.15
+19.72
+49.08
+23.34
+COT
+23.55
+29.10
+37.56
+17.60
+14.35
+22.47
+49.33
+27.71
+Naive RAG
+FS-RAG
+17.71
+29.21
+16.86
+12.52
+10.74
+16.82
+35.02
+19.84
+FL-RAG
+19.78
+34.42
+24.10
+12.10
+12.46
+19.72
+42.66
+23.61
+Agentic RAG
+ReACT
+27.51
+42.81
+27.63
+15.29
+19.34
+30.01
+54.55
+31.02
+IRCOT
+36.45
+26.29
+21.90
+6.78
+8.39
+19.63
+49.43
+24.12
+TCRAG
+29.70
+40.83
+25.13
+16.46
+17.56
+29.01
+54.78
+30.50
+RL-based
+ReSearch
+30.03
+30.39
+30.42
+15.61
+12.58
+23.69
+48.25
+27.28
+Search-R1 35.03
+38.89
+42.04
+18.01
+19.08
+29.59
+55.91
+26.94
+AEPO
+19.88
+13.85
+13.24
+7.24
+5.85
+9.93
+17.53
+12.50
+ARPO
+30.71
+25.20
+32.94
+12.18
+12.71
+17.80
+40.16
+24.53
+Mem1
+25.29
+29.98
+36.50
+14.15
+14.13
+26.38
+51.04
+28.21
+Ours
+38.34 (+1.89) 45.15 (+2.34) 49.21 (+7.17) 19.44 (+1.43) 22.01 (+2.67) 23.60 (-6.41)
+58.45 (+2.54) 36.60 (+5.58)
+Table 1: Performance comparison (%) on multi-hop, retrieval-augmented benchmarks, including 2Wiki, HotpotQA,
+Bamboogle, FRAMES, MusiQue, NQ, and TriviaQA. Bold indicates the best, and underline indicates the second.
+but overall increase; these behaviors help man-
+age memory and remove noise from previous con-
+texts. In contrast, <search> remains relatively
+stable with minor increases. <conclusion> ac-
+tions rise consistently, reducing cases where the
+model fails to produce a final answer. For the
+smaller Qwen2.5-1.5B model, similar trends are
+observed for <think>, <summary>, <backtrack>,
+and <plan>.
+However, <search> frequency is
+lower, likely due to limited context capacity: per-
+forming excessive retrievals can disrupt reasoning,
+so the model reduces search while still success-
+fully completing reasoning episodes, as reflected
+by increased <conclusion>.
+Additional training statistics track overall model
+behavior throughout training (Figure 5). Over 0–
+300 training steps, rewards steadily increase while
+action entropy shows a general downward trend,
+suggesting convergence toward more consistent
+policies. Response length and number of reason-
+ing turns initially rise and then decline, indicating
+that the model discovers more efficient reasoning
+and retrieval strategies over time, ultimately pro-
+ducing answers faster and more accurately. Collec-
+tively, these analyses reveal how AGENTICRAG-
+R1 adapts its cognitive actions and information-
+aware rejection throughout training, balancing ex-
+ploration and exploitation to optimize multi-hop
+reasoning.
+3.3
+Component Analysis
+We analyze the effects of key model components,
+process-level rewards, and rejection thresholds on
+performance across both in-domain and out-of-
+domain tasks.
+
+
+=== PDF PAGE 8 ===
+Method
+In-Domain
+Out-of-Domain
+Paradigm
+Approach
+2Wiki
+HotpotQA
+Bamboogle
+FRAMES
+MusiQue
+NQ
+TriviaQA
+Avg
+Full Model
+AGENTICRAG-R1
+32.92
+44.00
+31.48
+16.23
+16.48
+37.15
+56.62
+33.55
+Component
+Ablation
+w/o MemAction
+27.54
+28.77
+24.60
+9.83
+13.86
+35.10
+51.91
+27.37
+w/o Reject
+26.86
+28.33
+27.69
+12.98
+12.68
+23.67
+45.80
+25.43
+w/o MemAct&Reject
+24.56
+28.61
+25.49
+11.61
+12.54
+22.07
+44.83
+24.24
+Reward
+Ablation
+w/o rrag
+23.70
+34.71
+19.68
+7.70
+11.45
+29.07
+52.39
+25.53
+w/o rmem
+27.49
+33.78
+17.14
+7.41
+7.63
+22.00
+55.29
+24.39
+w/o rrag&rmem
+22.98
+26.42
+15.74
+5.33
+6.07
+18.62
+44.40
+19.94
+Table 2: Ablation analysis of component and reward designs in AGENTICRAG-R1 on Qwen2.5-3B.
+0
+25
+50
+75
+100
+125
+150
+175
+200
+Step
+0
+1
+2
+3
+4
+5
+6
+7
+Average Count per Sample
+Qwen 2.5 1.5B
+<think>
+<search>
+<conclusion>
+<summary>
+<backtrack>
+<plan>
+0
+25
+50
+75
+100
+125
+150
+175
+200
+Step
+0
+2
+4
+6
+8
+10
+Average Count per Sample
+Qwen 2.5 3B
+<think>
+<search>
+<conclusion>
+<summary>
+<backtrack>
+<plan>
+Figure 3: Action-level frequency distributions during RL training across training steps.
+❶Model Component Ablation. We evaluate
+key components of AGENTICRAG-R1 in Table 2
+for RQ2. Removing memory-related actions (w/o
+MemAction) substantially degrades performance,
+e.g., 2Wiki drops from 32.92% to 27.54% and
+HotpotQA from 44.00% to 28.77%. Removing
+information-aware rejection (w/o Reject) also re-
+duces the average score from 33.55% to 25.43%,
+while removing both components further lowers it
+to 24.24%, confirming their complementary contri-
+butions.
+❷Process-level Reward Ablation. Table 2 also
+analyzes reward design for RQ3. Removing the
+RAG reward (w/o rrag) hurts 2Wiki (32.92% to
+23.70%) and HotpotQA (44.00% to 34.71%), while
+removing the memory reward (w/o rmem) weakens
+out-of-domain performance, e.g., MusiQue drops
+from 16.48% to 7.63%. Removing both rewards
+yields the largest drop (Avg 19.94%), showing that
+both signals are necessary for effective reasoning
+and memory utilization.
+❸Sensitivity to Rejection Threshold. We ana-
+lyze the impact of varying the rejection threshold
+on model performance and training behavior (Fig-
+ure 4) to address RQ4. Accuracy, measured by
+F1-Score, initially decreases and reaches a mini-
+mum around a threshold of 0.2, then steadily im-
+proves as the threshold increases, peaking at 0.6
+wo
+0.2
+0.4
+0.6
+0.8
+Threshold
+15
+20
+25
+30
+Accuracy (%)
+Accuracy and Rejected Rollouts vs. Threshold
+Accuracy
+#Rollouts
+0
+5000
+10000
+15000
+20000
+Number of Rollouts
+Figure 4: Sensitivity analysis of Rejection threshold on
+Qwen2.5-3B. The line plot shows F1-Score, and the bar
+chart depicts the number of rejected training samples.
+and 0.8. Correspondingly, the number of rejected
+training samples decreases with higher thresholds,
+from over 20,000 at 0.2 to the fewest at 0.8. This
+trend indicates that moderate to high thresholds ef-
+fectively balance answer generation and rejection.
+❹Long-Horizon Experiments.
+To address RQ5,
+we progressively increase the maximum number of
+allowed steps from 10 to 15, 20, 25, and 30, thereby
+evaluating its capability to perform long-horizon
+reasoning effectively.
+As shown in Table 3, our model exhibits clear
+and consistent gains as the maximum step bud-
+get increases, demonstrating strong scalability in
+long-horizon settings. This trend holds across all
+evaluated datasets, indicating that the model can ef-
+
+
+=== PDF PAGE 9 ===
+Method
+Max Steps
+10
+15
+20
+25
+30
+2Wiki
+ReAct
+18.23
+22.45
+25.17
+27.89
+29.03
+Search-R1
+24.12
+38.02
+37.51
+33.08
+44.27
+TC-RAG
+22.78
+37.35
+36.92
+32.41
+43.10
+AGENTICRAG-R1
+23.91
+31.81
+32.53
+38.61
+47.45
+Bamboogle
+ReAct
+15.67
+18.92
+20.34
+21.76
+22.19
+Search-R1
+37.05
+34.11
+37.02
+28.03
+28.19
+TC-RAG
+36.42
+33.34
+36.36
+27.27
+27.23
+AGENTICRAG-R1
+10.03
+31.81
+14.29
+21.43
+35.47
+TriviaQA
+ReAct
+28.76
+30.12
+31.05
+31.42
+31.68
+Search-R1
+34.21
+36.12
+33.57
+33.09
+32.28
+TC-RAG
+33.57
+35.48
+32.91
+32.44
+31.62
+AGENTICRAG-R1
+37.53
+32.53
+39.45
+43.50
+55.28
+Table 3: Long-horizon performance under different max-
+imum step budgets across multiple datasets.
+Variant
+2Wiki
+HotpotQA
+Avg.
+Full AGENTICRAG-R1
+32.92
+44.00
+33.55
+w/o <Plan>
+31.00
+41.80
+31.60
+w/o <Summary>
+29.90
+40.10
+30.50
+w/o <Backtrack>
+28.80
+38.60
+29.70
+w/o both memory actions
+27.54
+28.77
+27.37
+Table 4: Leave-one-action-out ablation of AGENTI-
+CRAG-R1 on Qwen2.5-3B.
+fectively leverage extended interaction horizons to
+perform deeper multi-step reasoning and retrieval.
+In contrast, TC-RAG shows unstable or even de-
+graded performance when the horizon grows, sug-
+gesting limited ability to accumulate and utilize
+information over long trajectories. These results
+highlight that simply increasing the allowed steps
+is insufficient; rather, the proposed design is cru-
+cial for unlocking effective long-horizon reasoning
+capabilities. Furthermore, compared to ReAct and
+Search-R1, which either plateau early or fluctuate
+inconsistently across step budgets, AGENTICRAG-
+R1 exhibits monotonically improving trends on
+most benchmarks, further validating its effective-
+ness in long-horizon settings.
+❺Individual Action Ablation.
+Table 4
+analyzes the contribution of individual actions.
+Removing <Plan> decreases the average F1
+score by 1.95%, while removing <Summary> and
+<Backtrack> causes larger drops of 3.05% and
+3.85%, respectively.
+Removing both memory
+actions yields the largest degradation (6.18%),
+demonstrating that these actions are complemen-
+tary for error correction and context compression.
+❻Effect of SFT Initialization.
+We com-
+pare SFT only, cold-start RL, and RL with SFT
+initialization on Qwen2.5-3B. Their average F1
+scores across seven benchmarks are 22.40±0.50%,
+33.55 ± 0.42%, and 35.20 ± 0.40%, respectively.
+SFT alone underperforms RL, while SFT initial-
+ization further improves RL performance. These
+results indicate that SFT is not required for our
+framework, but stronger initialization remains ben-
+eficial.
+4
+Related Works
+Reinforcement Learning for LLMs
+Reinforce-
+ment learning has recently shown strong effec-
+tiveness in improving LLM reasoning and tool-
+use capabilities, as demonstrated by OpenAI-
+O1 (OpenAI, 2025) and DeepSeek-R1 (Guo et al.,
+2025). While policy gradient methods such as
+PPO (Schulman et al., 2017) are widely used, they
+incur high computational costs due to repeated on-
+policy updates. Alternative approaches, includ-
+ing DPO (Rafailov et al., 2023) and GRPO (Shao
+et al., 2024), improve training efficiency but face
+challenges such as off-policy bias or limited explo-
+ration. Recent advances target multi-step reason-
+ing and tool interaction, proposing techniques to
+stabilize training and improve exploration (Dong
+et al., 2025a,b; Zhou et al., 2025). Nevertheless,
+existing RL methods remain limited by coarse ac-
+tions, sparse rewards, and error accumulation in
+long-horizon reasoning.
+5
+Conclusion and Future Work
+We presented AGENTICRAG-R1, a reinforce-
+ment learning framework for agentic retrieval-
+augmented reasoning that integrates fine-grained
+agentic actions, structured memory control, and
+action-aware rewards. Experiments across multiple
+reasoning benchmarks show that AGENTICRAG-
+R1 consistently outperforms strong RAG and agen-
+tic baselines while supporting more effective long-
+horizon reasoning. Several challenges remain for
+future work. In particular, jointly optimizing high-
+level actions and their associated arguments, as
+well as resolving conflicts among different agentic
+actions, remains difficult and calls for more princi-
+pled coordination and credit assignment. We also
+plan to evaluate AGENTICRAG-R1 in broader verti-
+cal domains and more open-ended scenarios, such
+as deep research and long-horizon tasks.
+
+
+=== PDF PAGE 10 ===
+Acknowledgments
+This work was supported by the National
+Natural Science Foundation of China (Grant
+No. 62506010).
+Limitations
+Despite the promising results, our framework does
+have some limitations that need to be addressed.
+First, the computational overhead introduced by
+the memory stack system and dynamic retrieval
+processes can be relatively high. While these com-
+ponents are essential for managing complex queries
+and minimizing error accumulation, they do con-
+tribute to increased computational costs. In large-
+scale or real-time applications, this could present
+challenges related to processing speed and effi-
+ciency. Although we have proposed solutions like
+speculative sampling to alleviate some of this over-
+head, further optimization is still needed to enhance
+performance and scalability in time-sensitive envi-
+ronments. Second, our training strategy relies on
+a rejection-based sampling mechanism that prior-
+itizes more challenging examples to enhance rea-
+soning ability. While effective, this approach re-
+quires careful tuning of several hyperparameters, as
+different configurations can lead to varying perfor-
+mance outcomes. This additional tuning effort may
+complicate practical deployment and affect perfor-
+mance when transferring the framework to new
+datasets or tasks. Developing more adaptive or self-
+calibrating sampling strategies to reduce reliance
+on manual hyperparameter selection is therefore an
+important direction for future work.
+Ethical considerations
+To evaluate the performance of the proposed
+method, we carried out experiments exclusively
+on publicly accessible benchmark datasets, such
+as GAIA, HotpotQA, MusiQue, and other widely
+used resources, in accordance with their respective
+licenses and usage policies. We further confirm that
+no personally identifiable information was used in
+this study, and that no human or animal subjects
+were involved in the research.
+References
+Akari Asai, Zeqiu Wu, Yizhong Wang, Avirup Sil, and
+Hannaneh Hajishirzi. 2024. Self-rag: Learning to
+retrieve, generate, and critique through self-reflection.
+In ICLR.
+Meng Cao, Yue Dong, Jiapeng Wu, and Jackie Chi Kit
+Cheung. 2020. Factual error correction for abstrac-
+tive summarization models. In Proceedings of the
+2020 Conference on Empirical Methods in Natural
+Language Processing (EMNLP), pages 6251–6258,
+Online. Association for Computational Linguistics.
+Yupeng Chang, Xu Wang, Jindong Wang, Yuan Wu,
+Linyi Yang, Kaijie Zhu, Hao Chen, Xiaoyuan Yi,
+Cunxiang Wang, Yidong Wang, and 1 others. 2024.
+A survey on evaluation of large language models.
+ACM transactions on intelligent systems and technol-
+ogy, 15(3):1–45.
+Mingyang Chen, Linzhuang Sun, Tianpeng Li, Haoze
+Sun, Yijie Zhou, Chenzheng Zhu, Haofen Wang,
+Jeff Z Pan, Wen Zhang, Huajun Chen, and 1 oth-
+ers. 2025.
+Learning to reason with search for
+llms via reinforcement learning.
+arXiv preprint
+arXiv:2503.19470.
+Tianzhe Chu, Yuexiang Zhai, Jihan Yang, Sheng-
+bang Tong, Saining Xie, Dale Schuurmans, Quoc V
+Le, Sergey Levine, and Yi Ma. 2025a. Sft mem-
+orizes, rl generalizes:
+A comparative study of
+foundation model post-training.
+arXiv preprint
+arXiv:2501.17161.
+Xu Chu, Xinke Jiang, Rihong Qiu, Jiaran Gao, and Jun-
+feng Zhao. 2025b. Model shapley: Find your ideal
+parameter player via one gradient backpropagation.
+In The Thirty-ninth Annual Conference on Neural
+Information Processing Systems.
+Guanting Dong, Licheng Bao, Zhongyuan Wang,
+Kangzhi Zhao, Xiaoxi Li, Jiajie Jin, Jinghan Yang,
+Hangyu Mao, Fuzheng Zhang, Kun Gai, and 1 others.
+2025a. Agentic entropy-balanced policy optimiza-
+tion. arXiv preprint arXiv:2510.14545.
+Guanting Dong, Hangyu Mao, Kai Ma, Licheng Bao,
+Yifei Chen, Zhongyuan Wang, Zhongxia Chen, Ji-
+azhen Du, Huiyang Wang, Fuzheng Zhang, and 1
+others. 2025b. Agentic reinforced policy optimiza-
+tion. arXiv preprint arXiv:2507.19849.
+Mingxuan Du, Benfeng Xu, Chiwei Zhu, Xiaorui Wang,
+and Zhendong Mao. 2025. Deepresearch bench: A
+comprehensive benchmark for deep research agents.
+arXiv preprint arXiv:2506.11763.
+Darren Edge, Ha Trinh, Newman Cheng, Joshua
+Bradley, Alex Chao, Apurva Mody, Steven Truitt,
+and Jonathan Larson. 2024. From local to global: A
+graph rag approach to query-focused summarization.
+Preprint, arXiv:2404.16130.
+Yuchen Fan, Kaiyan Zhang, Heng Zhou, Yuxin Zuo,
+Yanxu Chen, Yu Fu, Xinwei Long, Xuekai Zhu,
+Che Jiang, Yuchen Zhang, and 1 others. 2025. Ssrl:
+Self-search reinforcement learning. arXiv preprint
+arXiv:2508.10874.
+Tao Feng*, Xinke Jiang*, Xinyan Hu, Yonggang Zhang,
+Zhen Tao, Wentao Zhang, Boyang Liu, Wenhao Jiang,
+and Chao Wu. 2026. Trust within? seek beyond?
+
+
+=== PDF PAGE 11 ===
+knowledge boundary aware policy optimization for
+agentic search. In ACL 2026, pages 27664–27682.
+Jiaxuan Gao, Wei Fu, Minyang Xie, Shusheng Xu,
+Chuyi He, Zhiyu Mei, Banghua Zhu, and Yi Wu.
+2025. Beyond ten turns: Unlocking long-horizon
+agentic search with large-scale asynchronous rl.
+Preprint, arXiv:2508.07976.
+Daya Guo, Dejian Yang, Haowei Zhang, Junxiao
+Song, Ruoyu Zhang, Runxin Xu, Qihao Zhu, Shi-
+rong Ma, Peiyi Wang, Xiao Bi, and 1 others. 2025.
+Deepseek-r1: Incentivizing reasoning capability in
+llms via reinforcement learning.
+arXiv preprint
+arXiv:2501.12948.
+Shibo Hao, Yi Gu, Haodi Ma, Joshua Jiahua Hong,
+Zhen Wang, Daisy Zhe Wang, and Zhiting Hu. 2023.
+Reasoning with language model is planning with
+world model. arXiv preprint arXiv:2305.14992.
+Hangfeng He, Hongming Zhang, and Dan Roth. 2022.
+Rethinking with retrieval: Faithful large language
+model inference. Preprint, arXiv:2301.00303.
+Xanh Ho, Anh-Khoa Duong, Quoc-Huy Nguyen, and
+Suong Nguyen. 2020. Constructing a multi-hop qa
+dataset for comprehensive evaluation of reasoning
+steps. In COLING.
+Jakub Hoscilowicz, Bartosz Maj, Bartosz Kozakiewicz,
+Oleksii Tymoshchuk, and Artur Janicki. 2024. Click-
+agent: Enhancing UI location capabilities of au-
+tonomous agents. CoRR, abs/2410.11872.
+Soyeong Jeong, Jinheon Baek, Sukmin Cho, Sung Ju
+Hwang, and Jong C Park. 2024. Adaptive-rag: Learn-
+ing to adapt retrieval-augmented large language mod-
+els through question complexity.
+arXiv preprint
+arXiv:2403.14403.
+Ziwei Ji, Nayeon Lee, Rita Frieske, Tiezheng Yu, Dan
+Su, Yan Xu, Etsuko Ishii, Ye Jin Bang, Andrea
+Madotto, and Pascale Fung. 2023a. Survey of hallu-
+cination in natural language generation. ACM Com-
+puting Surveys, 55(12):1–38.
+Ziwei Ji, Nayeon Lee, Rita Frieske, Tiezheng Yu, Dan
+Su, Yan Xu, Etsuko Ishii, Ye Jin Bang, Andrea
+Madotto, and Pascale Fung. 2023b. Survey of halluci-
+nation in natural language generation. ACM Comput.
+Surv., 55(12).
+Xinke Jiang, Yue Fang, Rihong Qiu, Haoyu Zhang,
+Yongxin Xu, Hao Chen, Wentao Zhang, Ruizhe
+Zhang, Yuchen Fang, Xu Chu, and 1 others. 2024a.
+Tc-rag: Turing-complete rag’s case study on medical
+llm systems. arXiv preprint arXiv:2408.09199.
+Xinke Jiang, Ruizhe Zhang, Yongxin Xu, Rihong Qiu,
+Yue Fang, Zhiyuan Wang, Jinyi Tang, Hongxin Ding,
+Xu Chu, Junfeng Zhao, and Yasha Wang. 2024b.
+Hykge: A hypothesis knowledge graph enhanced
+framework for accurate and reliable medical llms
+responses. Preprint, arXiv:2312.15883.
+Bowen Jin, Hansi Zeng, Zhenrui Yue, Jinsung Yoon,
+Sercan Arik, Dong Wang, Hamed Zamani, and Jiawei
+Han. 2025. Search-R1: Training LLMs to reason and
+leverage search engines with reinforcement learning.
+arXiv preprint arXiv:2503.09516.
+Di Jin, Eileen Pan, Nassim Oufattole, Wei-Hung Weng,
+Hanyi Fang, and Peter Szolovits. 2020. What dis-
+ease does this patient have? a large-scale open do-
+main question answering dataset from medical exams.
+arXiv preprint arXiv:2009.13081.
+Mandar Joshi and 1 others. 2017. Triviaqa: A large
+scale distantly supervised challenge dataset for read-
+ing comprehension. In ACL.
+Nikhil Kandpal, Haikang Deng, Adam Roberts, Eric
+Wallace, and Colin Raffel. 2023. Large language
+models struggle to learn long-tail knowledge. In In-
+ternational Conference on Machine Learning, pages
+15696–15707. PMLR.
+Jared Kaplan, Sam McCandlish, Tom Henighan, Tom B.
+Brown, Benjamin Chess, Rewon Child, Scott Gray,
+Alec Radford, Jeffrey Wu, and Dario Amodei. 2020.
+Scaling laws for neural language models. Preprint,
+arXiv:2001.08361.
+Urvashi Khandelwal, Omer Levy, Dan Jurafsky, Luke
+Zettlemoyer, and Mike Lewis. 2020. Generalization
+through memorization: Nearest neighbor language
+models. Preprint, arXiv:1911.00172.
+Satyapriya Krishna, Kalpesh Krishna, Anhad Mo-
+hananey, Steven Schwarcz, Adam Stambler, Shyam
+Upadhyay, and Manaal Faruqui. 2025. Fact, fetch,
+and reason:
+A unified evaluation of retrieval-
+augmented generation. In Proceedings of the 2025
+Conference of the Nations of the Americas Chap-
+ter of the Association for Computational Linguistics:
+Human Language Technologies (Volume 1: Long Pa-
+pers), pages 4745–4759.
+Tom Kwiatkowski and 1 others. 2019. Natural ques-
+tions: A benchmark for question answering research.
+TACL.
+Hanyu Lai, Xiao Liu, Iat Long Iong, Shuntian Yao, Yux-
+uan Chen, Pengbo Shen, Hao Yu, Hanchen Zhang,
+Xiaohan Zhang, Yuxiao Dong, and 1 others. 2024.
+Autowebglm: A large language model-based web
+navigating agent. In Proceedings of the 30th ACM
+SIGKDD Conference on Knowledge Discovery and
+Data Mining, pages 5295–5306.
+Myeonghwa Lee, Seonho An, and Min-Soo Kim. 2024.
+PlanRAG: A plan-then-retrieval augmented genera-
+tion for generative large language models as decision
+makers. In Proceedings of the 2024 Conference of
+the North American Chapter of the Association for
+Computational Linguistics: Human Language Tech-
+nologies (Volume 1: Long Papers), pages 6537–6555,
+Mexico City, Mexico. Association for Computational
+Linguistics.
+
+
+=== PDF PAGE 12 ===
+Xiaoxi Li, Guanting Dong, Jiajie Jin, Yuyao Zhang,
+Yujia Zhou,
+Yutao Zhu,
+Peitian Zhang,
+and
+Zhicheng Dou. 2025. Search-o1: Agentic search-
+enhanced large reasoning models. arXiv preprint
+arXiv:2501.05366.
+Junlin Liu, Jiangwang Chen, Zixin Song, Shuaiyu Zhou,
+Chunji Lv, Hank Wu, Kailin Jiang, Jinyang Wu, Bo-
+han Yu, and Chenxi Zhou. 2026. From proprietary to
+open-source: Bridging the distribution gap via multi-
+agent protocol distillation in agentic search. arXiv
+preprint arXiv:2607.24280.
+Nelson F. Liu, Kevin Lin, John Hewitt, Ashwin Paran-
+jape, Michele Bevilacqua, Fabio Petroni, and Percy
+Liang. 2023. Lost in the middle: How language mod-
+els use long contexts. Preprint, arXiv:2307.03172.
+Tianqi Liu, Yao Zhao, Rishabh Joshi, Misha Khalman,
+Mohammad Saleh, Peter J Liu, and Jialu Liu. Sta-
+tistical rejection sampling improves preference opti-
+mization. In The Twelfth International Conference
+on Learning Representations.
+Yule Liu, Heyi Zhang, Jinyi Zheng, Zhen Sun, Zifan
+Peng, Jiaheng Wei, Tianshuo Cong, Yilong Yang,
+and Xinlei He. 2025. Auditing data membership in
+reinforcement learning with verifiable rewards. arXiv
+preprint arXiv:2511.14045.
+Chunji Lv, Yangguang Wei, Junlin Liu, Yang Gao, Ming
+Liu, Xinming Wang, Jinyang Wu, Guoren Wang, and
+Changsheng Li. 2026. Pcsd: Persistent consistency
+for self-distillation in agentic reinforcement learning.
+arXiv preprint arXiv:2608.01837.
+Liangbo Ning, Ziran Liang, Zhuohang Jiang, Haohao
+Qu, Yujuan Ding, Wenqi Fan, Xiao-yong Wei, Shanru
+Lin, Hui Liu, Philip S Yu, and 1 others. 2025. A sur-
+vey of webagents: Towards next-generation ai agents
+for web automation with large foundation models.
+In Proceedings of the 31st ACM SIGKDD Confer-
+ence on Knowledge Discovery and Data Mining V. 2,
+pages 6140–6150.
+OpenAI. 2025. Openai-o1. Accessed: 2025-05-16.
+Akshara Prabhakar, Roshan Ram, Zixiang Chen, Silvio
+Savarese, Frank Wang, Caiming Xiong, Huan Wang,
+and Weiran Yao. 2025. Enterprise deep research:
+Steerable multi-agent deep research for enterprise
+analytics. arXiv preprint arXiv:2510.17797.
+Ofir Press, Muru Zhang, Sewon Min, Ludwig Schmidt,
+Noah A Smith, and Mike Lewis. 2022. Measuring
+and narrowing the compositionality gap in language
+models. arXiv preprint arXiv:2210.03350.
+Rafael Rafailov, Archit Sharma, Eric Mitchell, Christo-
+pher D Manning, Stefano Ermon, and Chelsea Finn.
+2023. Direct preference optimization: Your language
+model is secretly a reward model. Advances in neural
+information processing systems, 36:53728–53741.
+Daniel Russo and Benjamin Van Roy. 2014. Learn-
+ing to optimize via posterior sampling. Preprint,
+arXiv:1301.2609.
+Daniel Russo and Benjamin Van Roy. 2013. Eluder
+dimension and the sample complexity of optimistic
+exploration. In Advances in Neural Information Pro-
+cessing Systems, volume 26. Curran Associates, Inc.
+John Schulman, Filip Wolski, Prafulla Dhariwal,
+Alec Radford, and Oleg Klimov. 2017.
+Proxi-
+mal policy optimization algorithms. arXiv preprint
+arXiv:1707.06347.
+Zhihong Shao, Yeyun Gong, Yelong Shen, Minlie
+Huang, Nan Duan, and Weizhu Chen. 2023. Enhanc-
+ing retrieval-augmented large language models with
+iterative retrieval-generation synergy. arXiv preprint
+arXiv:2305.15294.
+Zhihong Shao, Peiyi Wang, Qihao Zhu, Runxin Xu,
+Junxiao Song, Xiao Bi, Haowei Zhang, Mingchuan
+Zhang, YK Li, Y Wu, and 1 others. 2024. Deepseek-
+math: Pushing the limits of mathematical reason-
+ing in open language models.
+arXiv preprint
+arXiv:2402.03300.
+Noah Shinn, Federico Cassano, Ashwin Gopinath,
+Karthik Narasimhan, and Shunyu Yao. 2023. Re-
+flexion: Language agents with verbal reinforcement
+learning. Advances in neural information processing
+systems, 36:8634–8652.
+Mohit Shridhar, Xingdi Yuan, Marc-Alexandre Côté,
+Yonatan Bisk,
+Adam Trischler,
+and Matthew
+Hausknecht. 2021. ALFWorld: Aligning Text and
+Embodied Environments for Interactive Learning.
+In Proceedings of the International Conference on
+Learning Representations (ICLR).
+Harsh Trivedi, Niranjan Balasubramanian, Tushar Khot,
+and Ashish Sabharwal. 2022.
+Musique: Multi-
+hop questions via single-hop question composition.
+Transactions of the Association for Computational
+Linguistics, 10:539–554.
+Harsh Trivedi and 1 others. 2023. Interleaving retrieval
+with chain-of-thought reasoning for knowledge-
+intensive multi-step questions. In ACL.
+Minh Duc Vu, Han Wang, Jieshan Chen, Zhuang Li,
+Shengdong Zhao, Zhenchang Xing, and Chunyang
+Chen. 2024. Gptvoicetasker: Advancing multi-step
+mobile task efficiency through dynamic interface ex-
+ploration and learning. In Proceedings of the 37th
+Annual ACM Symposium on User Interface Software
+and Technology, pages 1–17.
+Chenglong Wang, Yang Gan, Yifu Huo, Yongyu Mu,
+Qiaozhi He, Murun Yang, Bei Li, Tong Xiao, Chun-
+liang Zhang, Tongran Liu, and Jingbo Zhu. 2025a.
+Gram: A generative foundation reward model for
+reward generalization. Preprint, arXiv:2506.14175.
+Liang Wang, Haonan Chen, Nan Yang, Xiaolong Huang,
+Zhicheng Dou, and Furu Wei. 2025b.
+Chain-of-
+retrieval augmented generation.
+arXiv preprint
+arXiv:2501.14342.
+
+
+=== PDF PAGE 13 ===
+Shenzhi Wang, Le Yu, Chang Gao, Chujie Zheng, Shix-
+uan Liu, Rui Lu, Kai Dang, Xionghui Chen, Jianxin
+Yang, Zhenru Zhang, Yuqiong Liu, An Yang, An-
+drew Zhao, Yang Yue, Shiji Song, Bowen Yu, Gao
+Huang, and Junyang Lin. 2025c. Beyond the 80/20
+rule: High-entropy minority tokens drive effective
+reinforcement learning for llm reasoning. Preprint,
+arXiv:2506.01939.
+Jason Wei, Xuezhi Wang, Dale Schuurmans, Maarten
+Bosma, Fei Xia, Ed Chi, Quoc V Le, Denny Zhou,
+and 1 others. 2022a. Chain-of-thought prompting
+elicits reasoning in large language models. Advances
+in neural information processing systems, 35:24824–
+24837.
+Jason Wei, Xuezhi Wang, Dale Schuurmans, Maarten
+Bosma, Fei Xia, Ed Chi, Quoc V Le, Denny Zhou,
+and 1 others. 2022b. Chain-of-thought prompting
+elicits reasoning in large language models. Advances
+in neural information processing systems, 35:24824–
+24837.
+Can Xie, Ruotong Pan, Xiangyu Wu, Zhang Yunfei,
+Jiayi Fu, Tingting Gao, and Guorui Zhou. 2026a.
+Unlocking exploration in rlvr: Uncertainty-aware ad-
+vantage shaping for deeper reasoning. In Findings of
+the Association for Computational Linguistics: ACL
+2026, pages 19057–19076.
+Can Xie, Yuyi Zhou, Wen Yang, Ziyi zhang, Siyao
+Song, Yingzhuo Deng, Shuo Ren, and Jiajun Zhang.
+2026b. Edge: Experience-distillation for guided ex-
+ploration in agentic reinforcement learning. Preprint,
+arXiv:2608.21946.
+Wei Xiong, Jiarui Yao, Yuhui Xu, Bo Pang, Lei Wang,
+Doyen Sahoo, Junnan Li, Nan Jiang, Tong Zhang,
+Caiming Xiong, and 1 others. 2025. A minimalist
+approach to llm reasoning: from rejection sampling
+to reinforce. arXiv preprint arXiv:2504.11343.
+Weimin Xiong, Yifan Song, Xiutian Zhao, Wenhao Wu,
+Xun Wang, Ke Wang, Cheng Li, Wei Peng, and Su-
+jian Li. 2024. Watch every step! llm agent learning
+via iterative step-level process refinement.
+arXiv
+preprint arXiv:2406.11176.
+Yongxin Xu, Xinke Jiang, Xu Chu, Rihong Qiu, Yujie
+Feng, Hongxin Ding, Junfeng Zhao, Yasha Wang,
+and Bing Xie. 2025a. Dearllm: Enhancing personal-
+ized healthcare via large language models-deduced
+feature correlations. In Proceedings of the AAAI Con-
+ference on Artificial Intelligence, volume 39, pages
+941–949.
+Yongxin Xu, Ruizhe Zhang, Xinke Jiang, Yujie Feng,
+Yuzhen Xiao, Xinyu Ma, Runchuan Zhu, Xu Chu,
+Junfeng Zhao, and Yasha Wang. 2025b.
+Parent-
+ing: Optimizing knowledge selection of retrieval-
+augmented language models with parameter decou-
+pling and tailored tuning. In Proceedings of the 63rd
+Annual Meeting of the Association for Computational
+Linguistics (Volume 1: Long Papers), pages 11643–
+11662.
+Reda Yacouby and Dustin Axman. 2020. Probabilis-
+tic extension of precision, recall, and f1 score for
+more thorough evaluation of classification models.
+In Proceedings of the first workshop on evaluation
+and comparison of NLP systems, pages 79–91.
+An Yang, Baosong Yang, Beichen Zhang, Binyuan Hui,
+Bo Zheng, Bowen Yu, Chengyuan Li, Dayiheng Liu,
+Fei Huang, Guanting Dong, Haoran Wei, Huan Lin,
+Jian Yang, Jianhong Tu, Jianwei Zhang, Jianxin Yang,
+Jiaxin Yang, Jingren Zhou, Junyang Lin, and 25
+others. 2024a. Qwen2.5 technical report. ArXiv,
+abs/2412.15115.
+An Yang, Baosong Yang, Beichen Zhang, Binyuan Hui,
+Bo Zheng, Bowen Yu, Chengyuan Li, Dayiheng Liu,
+Fei Huang, Haoran Wei, and 1 others. 2024b. Qwen2.
+5 technical report. arXiv preprint arXiv:2412.15115.
+Songhua Yang, Xinke Jiang, Hanjie Zhao, Wenxuan
+Zeng, Hongde Liu, and Yuxiang Jia. 2024c. Faima:
+Feature-aware in-context learning for multi-domain
+aspect-based sentiment analysis. In COLING.
+Zhibang Yang, Xinke Jiang, Rihong Qiu, Ruiqing Li,
+Yihang Zhang, Yue Fang, Yongxin Xu, Hongxin
+Ding, Xu Chu, Junfeng Zhao, and 1 others. 2026.
+Dfams: Dynamic-flow guided federated alignment
+based multi-prototype search. In Proceedings of the
+64th Annual Meeting of the Association for Compu-
+tational Linguistics (Volume 1: Long Papers), pages
+24728–24752.
+Zhilin Yang, Peng Qi, Saizheng Zhang, and 1 others.
+2018. Hotpotqa: A dataset for diverse, explainable
+multi-hop question answering. In EMNLP.
+Shunyu Yao, Howard Chen, John Yang, and Karthik
+Narasimhan. 2022a. Webshop: Towards scalable
+real-world web interaction with grounded language
+agents. Advances in Neural Information Processing
+Systems, 35:20744–20757.
+Shunyu Yao, Jeffrey Zhao, Dian Yu, Nan Du, Izhak
+Shafran, Karthik Narasimhan, and Yuan Cao. 2022b.
+React: Synergizing reasoning and acting in language
+models. arXiv preprint arXiv:2210.03629.
+Shenghao Ye, Yu Guo, Zhengheng Li, Shuangwu Chen,
+and Jian Yang. 2026.
+Rubric-guided process re-
+ward for stepwise model routing.
+arXiv preprint
+arXiv:2605.29310.
+Yixiao Zhou, Yang Li, Dongzhou Cheng, Hehe Fan, and
+Yu Cheng. 2026. Look inward to explore outward:
+Learning temperature policy from llm internal states
+via hierarchical rl. arXiv preprint arXiv:2602.13035.
+Zijian Zhou, Ao Qu, Zhaoxuan Wu, Sunghwan
+Kim, Alok Prakash, Daniela Rus, Jinhua Zhao,
+Bryan Kian Hsiang Low, and Paul Pu Liang. 2025.
+MEM1: Learning to synergize memory and reason-
+ing for efficient long-horizon agents. arXiv preprint
+arXiv:2506.15841.
+
+
+=== PDF PAGE 14 ===
+Appendix
+Contents
+1
+Introduction
+1
+2
+AGENTICRAG-R1
+3
+2.1
+Action Modeling with Hierarchical
+Rewards . . . . . . . . . . . . . .
+3
+2.2
+Information-Aware
+Trajectories
+Rejection
+. . . . . . . . . . . . .
+5
+3
+Experiments
+6
+3.1
+Experimental Setup . . . . . . . .
+6
+3.2
+Main Result Analysis . . . . . . .
+6
+3.3
+Component Analysis . . . . . . .
+7
+4
+Related Works
+9
+5
+Conclusion and Future Work
+9
+A More Related Work
+14
+A.1
+Reinforcement Learning for LLMs
+14
+B
+Training Algorithm
+15
+C Notations Table
+15
+D Experiment Datasets
+15
+D.1 Training Dataset.
+. . . . . . . . .
+15
+D.2 Testing set.
+. . . . . . . . . . . .
+16
+E
+Baseline Implementation Details
+17
+F
+Implementation Details
+18
+G Prompt
+18
+H Reward Analysis
+19
+I
+Additional Experiments
+19
+J
+Case Study
+22
+K Agentic Hacking Theoretical Analysis
+23
+K.1
+Outcome-Only Reward Bias in
+Multi-Step Reasoning . . . . . . .
+23
+K.2
+Bias Isolation via Pop-Based Stack
+and Context Masking . . . . . . .
+23
+L
+More Method Details: Pop-based Atten-
+tion Mask
+25
+M Broader Generalization
+25
+M.1 Medical Question Answering.
+. .
+26
+M.2 Long-Form Research and Report
+Generation . . . . . . . . . . . . .
+26
+M.3 Interactive Decision-Making Envi-
+ronments. . . . . . . . . . . . . .
+26
+N Computational Resources and Software
+Environment
+26
+O The Use of Large Language Model
+28
+A
+More Related Work
+A.1
+Reinforcement Learning for LLMs
+Reinforcement learning (RL) has emerged as a
+powerful paradigm for improving LLM alignment
+and reasoning, with recent work such as OpenAI-
+O1 (OpenAI, 2025) and DeepSeek-R1 (Guo et al.,
+2025) demonstrating strong performance on com-
+plex tasks (Ye et al., 2026; Zhou et al., 2026; Lv
+et al., 2026; Liu et al., 2025; Xie et al., 2026a,b).
+Methods like PPO (Schulman et al., 2017) have
+been widely adopted, but require multiple rounds
+of on-policy optimization, making them compu-
+tationally expensive and challenging to scale. To
+improve efficiency, alternatives such as Direct Pref-
+erence Optimization (DPO) (Rafailov et al., 2023)
+bypass reward modeling by directly optimizing
+preference loss, but suffer from off-policy bias.
+Group Relative Policy Optimization (GRPO) (Shao
+et al., 2024) offers a compromise by avoiding
+learned value networks and leveraging intra-group
+comparisons for relative rewards.
+Building on
+these, recent RL methods specifically designed for
+multi-step reasoning and tool interaction include
+AEPO (Dong et al., 2025a), which addresses en-
+tropy imbalance and rollout collapse in multi-round
+agents; ARPO (Dong et al., 2025b), which guides
+exploration of uncertain high-entropy tool calls us-
+ing advantage attribution; and MEM1 (Zhou et al.,
+2025), which synergizes memory and reasoning to
+support long-horizon multi-step interactions. De-
+spite these advances, existing RL approaches still
+face key challenges: coarse-grained action mod-
+eling, trajectory-level scalar rewards, limited
+exploration, cumulative errors in multi-step rea-
+soning, and the sparsity of training samples that
+require diverse reasoning behaviors.
+
+
+=== PDF PAGE 15 ===
+B
+Training Algorithm
+Algorithm 1 details the full rollout engine with a
+maximum action budget B.
+Algorithm 1 Dynamic Rollout with Multi-Action
+Reasoning and Stack-Based Memory
+Require: query q, policy πθ, retriever R, budget T.
+Ensure: Generated reasoning trajectory y
+1: Initialize trajectory y ←∅and memory stack M ←∅
+2: while t < T do
+3:
+Initialize action segment token xt ←∅
+4:
+while x is not an action delimiter do
+5:
+Sample token x ∼πθ(· | q, y, M)
+6:
+Append x to xt
+7:
+end while
+8:
+Append xt to trajectory y
+9:
+Parse composed action at ←parse(xt)
+10:
+if at ∈{Plan, Think, Search, Conclusion} then
+11:
+push(M, content of xt)
+12:
+end if
+13:
+if at == Search then
+14:
+Extract query qs
+t ←parse(xt)
+15:
+Retrieve observation ot ←R(qt)
+16:
+Append ⟨Observation⟩ot⟨/Observation⟩to y
+17:
+push(M,⟨Observation⟩ot⟨/Observation⟩)
+18:
+Modify Retrieval Loss Mask
+19:
+else if at == Backtrack then
+20:
+pop(M), push(M, revised reasoning from xt)
+21:
+Modify Pop-based Attention Mask
+22:
+else if at == Summary then
+23:
+pop(M), push(M, summarized content)
+24:
+Modify Pop-based Attention Mask
+25:
+else if at == Conclusion then
+26:
+Return y
+27:
+end if
+28:
+t ←t + 1
+29: end while
+30: Return y
+C
+Notations Table
+Table 5 presents a comprehensive list of key nota-
+tions and symbols used in the AGENTICRAG-R1
+framework.
+D
+Experiment Datasets
+D.1
+Training Dataset.
+A central challenge in RL-based agent training lies
+in the limited difficulty of existing QA datasets.
+Effective supervision requires questions that de-
+mand non-trivial reasoning and long-horizon,
+multi-step retrieval. However, widely used multi-
+hop benchmarks such as HotpotQA and 2WikiMul-
+tiHopQA can often be solved with shallow reason-
+ing and zero or only one retrieval step, making
+them insufficient for learning complex search and
+planning behaviors. As a result, models trained on
+such data tend to overfit short-horizon, template-
+like reasoning patterns and generalize poorly to
+Symbol
+Description
+S
+System state capturing the current reasoning con-
+text
+A
+Set of reasoning actions, consisting of primitive
+actions (push/pop) and composed actions (e.g.,
+Plan, Search)
+M
+Stack-based short-term memory of reasoning units
+δ
+State transition function over system state and
+memory
+st
+System state at reasoning step t
+at
+Reasoning action taken at step t
+Mt
+Memory stack at step t
+q
+Input query sampled from the training dataset D
+y
+Generated reasoning trajectory (a1, . . . , aT )
+πθ
+Policy model parameterized by θ
+πref
+Frozen reference policy for KL regularization
+K
+Number of rollouts generated per input
+R
+External retrieval module or search engine
+rϕ(q, y)
+Scalar reward function evaluating trajectory y
+given input q
+x(k)
+i
+The i-th generated token in the k-th trajectory
+y(k).
+RG
+The set of token-level rewards across all trajecto-
+ries in the current rollout group
+r(k)
+i
+The token-level reward assigned to the token x(k)
+i
+.
+ˆAi,t
+Group-relative advantage for trajectory i at step t
+J (θ)
+The Group Relative Policy Optimization (GRPO)
+objective.
+˜zi,t
+Clipped importance sampling ratio for trajectory i
+at step t
+DKL(·∥·) Kullback–Leibler divergence between policies
+β
+KL regularization coefficient
+r(k)
+out
+Outcome-level reward evaluating final answer
+r(k)
+proc
+Process-level reward in the k-th trajectory
+I(k)
+mask,i
+Indicator function that equals 1 if the token x(i)
+k
+is masked from policy optimization, and 0 other-
+wise.
+I(k)
+act,i
+Indicator function that equals 1 if the token x(i)
+k
+corresponds to an action invocation, and 0 other-
+wise.
+a(k)
+conclusion
+The predicted final answer extracted from the
+<Conclusion> action in the k-th trajectory y(k)
+agold
+The ground-truth answer used for evaluation
+r(k)
+fmt,i
+Action format reward enforcing syntactic correct-
+ness at action level
+r(k)
+rag,i
+Search-based reward evaluating retrieval rele-
+vance
+r(k)
+mem,i
+Memory-aware reward for backtracking or sum-
+marization
+Isyntax(ai) Indicator for whether ai has valid <ACTION>
+tags (1 = valid, 0 = invalid).
+αtype(ai)
+Action weight: 1.0 for CONCLUSION, 0.5 for
+other valid actions, 0 if invalid.
+qs
+i
+Search query issued at step i
+oi
+Retrieved observation at step i
+B
+Mini-batch size (number of input prompts)
+YB
+Set of all rollouts in a batch
+Ykeep
+B
+Rollout subset retained after global selection
+µ(b)
+Mean reward over rollouts for input x(b)
+(σ(b))2
+Reward variance measuring input-level uncer-
+tainty
+˜r(b)
+i
+Information-aware score for rollout τ (b)
+i
+p
+Fraction of top-ranked rollouts retained
+Table 5: Key Notations Used in AGENTICRAG-R1
+
+
+=== PDF PAGE 16 ===
+challenging agentic scenarios.
+To address this limitation, we construct a curated
+training dataset following (Gao et al., 2025) by fil-
+tering instances from HotpotQA and 2Wiki that are
+both solvable and intrinsically require multi-step
+search. Specifically, for each candidate question,
+we prompt the training-free TC-RAG (Jiang et al.,
+2024a) to generate 10 independent trajectories un-
+der identical conditions, and discard questions that
+❶are answered incorrectly in all trials, ❷achieve
+a correctness rate of 50% or higher, or ❸can be
+answered correctly with at most a single retrieval
+step.
+D.2
+Testing set.
+In our experiments, we evaluate our method on 9
+widely used datasets spanning multi-hop reason-
+ing, open-domain question answering, and real-
+world agent evaluation, including HotpotQA (Yang
+et al., 2018), 2WikiMultiHopQA (Ho et al., 2020),
+Bamboogle (Press et al., 2022), FRAMES (Kr-
+ishna et al., 2025), MusiQue (Trivedi et al., 2022),
+NQ (Kwiatkowski et al., 2019) and TriviaQA (Joshi
+et al., 2017)) . Dataset statistics, including the num-
+ber of training, development, and test instances, are
+provided in Table 6:
+• 2WikiMultiHopQA (Ho et al., 2020) is a large-
+scale multi-hop question answering dataset con-
+structed from Wikipedia and Wikidata. It con-
+tains 192,606 question–answer pairs grounded in
+a single database, with 154,878 training exam-
+ples, 12,576 development examples, and 12,576
+test examples. The dataset is designed to evalu-
+ate multi-hop reasoning that requires aggregating
+evidence across multiple documents.
+• HotpotQA (Yang et al., 2018) is a large-scale
+dataset with 112,779 Wikipedia-based question-
+answer pairs requiring multi-hop reasoning over
+multiple documents.
+The dataset is divided
+into several subsets for training and evaluation.
+Specifically, the training set includes 18,089
+single-hop questions (train-easy), 56,814 multi-
+hop questions (train-medium), and 15,661 hard
+multi-hop questions (train-hard). The develop-
+ment set contains 7,405 hard multi-hop questions,
+while the test set is further divided into two set-
+tings: test-distractor with 7,405 hard multi-hop
+questions and test-fullwiki with another 7,405
+hard multi-hop questions. This division allows
+for a comprehensive evaluation of models under
+different conditions. HotpotQA also provides
+sentence-level supporting facts required for rea-
+soning, enabling models to improve performance
+and make explainable predictions.
+• Bamboogle (Press et al., 2022) is a small, hand-
+crafted dataset with 125 questions designed to
+measure the extent to which a question answering
+system can answer varied compositional ques-
+tions. It covers many different types of questions
+on various areas.
+• FRAMES (Krishna et al., 2025) is a high-quality
+dataset designed to test LLMs’factual responses,
+retrieval capabilities, and reasoning in generat-
+ing final answers. It comprises 824 challenging
+multi-hop questions requiring integration of in-
+formation from multiple sources.
+• MuSiQue (Trivedi et al., 2022) is a multihop
+question answering dataset constructed from
+Wikipedia, focusing on questions that require
+connected reasoning across multiple steps. It
+contains 19,938 training examples, 2,417 de-
+velopment examples, and 2,459 test examples.
+MuSiQue is designed to enforce proper multihop
+reasoning by ensuring that each reasoning step
+critically relies on the output of the previous step.
+• Natural Questions (NQ) (Kwiatkowski et al.,
+2019) is a large-scale question answering dataset
+based on real user queries issued.
+Each ex-
+ample pairs a question with a Wikipedia page
+and includes annotated long and short answers.
+The dataset contains 307,373 training examples,
+7,830 development examples, and 7,842 test ex-
+amples.
+• TriviaQA (Joshi et al., 2017) is a large-scale read-
+ing comprehension dataset containing over 650K
+question-answer-evidence triples derived from
+95K question-answer pairs authored by trivia en-
+thusiasts. It includes evidence documents from
+Wikipedia and the Web, with an average of six
+documents per question. The dataset is divided
+into training (61,888 for Wiki, 76,496 for Web),
+development (7,993 for Wiki, 9,951 for Web),
+and test sets (7,701 for Wiki, 9,509 for Web).
+TriviaQA is designed to test models’ ability to
+handle complex questions with significant lex-
+ical and syntactic variability, requiring multi-
+sentence reasoning.
+
+
+=== PDF PAGE 17 ===
+Dataset
+Train
+Dev
+Test
+2Wiki
+154,878
+12,576
+12,576
+HotpotQA
+90,564
+7,405
+14,810
+Bamboogle
+0
+0
+125
+FRAMES
+0
+0
+824
+MuSiQue
+19,938
+2,417
+2,459
+NQ
+307,373
+7,830
+7,842
+TriviaQA
+138,384
+17,944
+17,210
+Table 6: Overview of datasets used in experiments.
+E
+Baseline Implementation Details
+To comprehensively evaluate the effectiveness of
+the proposed method, we compare it against a di-
+verse set of strong baselines covering different
+paradigms of reasoning, retrieval, and agentic inter-
+action. The implementation details are described
+below.
+❶No-RAG.
+This category evaluates the model’s
+capability when no retrieval mechanism is involved,
+serving to assess how well the LLM performs using
+only its internal parametric knowledge.
+• No-RAG. A non-retrieval baseline where
+the LLM directly generates responses based
+solely on its parametric knowledge, without
+access to any external information.
+• CoT (Chain-of-Thought) (Wei et al., 2022b).
+Following prior work, this baseline prompts
+the model to generate explicit intermediate
+reasoning steps before producing the final an-
+swer.
+❷Naive RAG.
+Naive RAG methods incorporate
+retrieval in a heuristic or fixed manner without
+explicit reasoning–retrieval coordination, aiming
+to provide external knowledge through simple re-
+trieval strategies.
+• FS-RAG (Fix Sentence RAG) (Trivedi et al.,
+2023). FS-RAG performs retrieval at the sen-
+tence level, where each sentence in the input
+context is independently used as a retrieval
+query to obtain relevant external knowledge.
+• FL-RAG (Fix Length RAG) (Khandelwal
+et al., 2020). FL-RAG invokes retrieval at
+fixed token intervals, triggering the retrieval
+module every (n) generated tokens using the
+preceding token window as the query.
+❸Agentic RAG.
+Agentic RAG methods rely on
+manually designed prompting strategies to inter-
+leave reasoning and retrieval, enabling the model
+to decide when and how to invoke external tools
+during inference. knowledge through simple re-
+trieval strategies.
+• ReAct (Yao et al., 2022b). ReAct interleaves
+reasoning and action steps, enabling the model
+to interact with external tools or environments
+during inference.
+• IRCOT (Trivedi et al., 2023).
+IRCOT
+alternates between retrieval and Chain-of-
+Thought generation, where intermediate rea-
+soning guides retrieval and retrieved evidence
+is used to refine reasoning.
+• TC-RAG (Jiang et al., 2024a). TC-RAG in-
+troduces a Turing-complete RAG framework
+with a memory stack, allowing the model to
+dynamically control retrieval through push
+and pop.
+❹RL-based Agentic RAG.
+RL-based Agentic
+RAG approaches apply RL to retrieval-augmented
+settings, training models to learn when and how
+to invoke external retrieval tools during multi-step
+reasoning.
+• ReSearch (Chen et al., 2025). ReSearch is
+trained using RL to jointly perform reason-
+ing and search for multi-hop question answer-
+ing, without requiring supervision over inter-
+mediate reasoning steps. We implement this
+baseline using Proximal Policy Optimization
+(PPO) (Schulman et al., 2017).
+• Search-R1 (Jin et al., 2025).
+Search-R1
+trains the LLM via RL to autonomously in-
+teract with a search engine during reasoning.
+It generates multi-round search queries and
+integrates retrieved information for problem
+solving. We train this baseline using Group
+Relative Policy Optimization (GRPO)(Shao
+et al., 2024).
+• AEPO (Dong et al., 2025a). AEPO adopts an
+entropy-balanced policy optimization frame-
+work to stabilize training in high-entropy
+agentic settings by balancing entropy during
+rollout generation and policy updates.
+• ARPO (Dong et al., 2025b). ARPO intro-
+duces an entropy-aware adaptive rollout strat-
+
+
+=== PDF PAGE 18 ===
+egy that dynamically adjusts sampling at high-
+entropy decision points, encouraging diverse
+tool-use behaviors.
+• Mem1 (Zhou et al., 2025). Mem1 is an end-
+to-end RL framework for long-horizon multi-
+turn tasks under constant memory constraints,
+maintaining a compact internal state for rea-
+soning and memory consolidation.
+F
+Implementation Details
+We implement our method using a GRPO-based
+reinforcement learning framework. Training is per-
+formed with a batch size of 16 and a learning rate of
+1 × 10−6, without quantization or KV caching. We
+train for a single GRPO epoch consisting of 300 op-
+timization steps. For each prompt, four stochastic
+generations are sampled with a temperature of 0.7,
+diverse sampling enabled, and a diversity penalty
+of 1.0. Each generation is limited to 2048 new to-
+kens, with a maximum aggregated context length
+of 4096 tokens and up to ten iterative generation
+steps per episode. Rewards are computed at the to-
+ken level. The GRPO optimizer follows a clipped
+objective with β = 0.04, µ = 2, and ϵ = 0.1. All
+hyperparameters are fixed across experiments, as
+training is conducted on a single curated dataset
+(Table 7).
+Hyperparameter
+Value
+Batch Size
+16
+Learning Rate
+1 × 10−6
+GRPO Epochs
+1
+Steps per Epoch
+300
+Number of Generations
+10
+Max New Tokens
+2,048
+Max Context Length
+4,096
+Max Generate Iterations
+10
+Temperature
+0.7
+β (GRPO)
+0.04
+µ (GRPO)
+2
+ϵ (GRPO)
+0.1
+Table 7: Implementation details and hyperparameter
+settings used in all experiments.
+G
+Prompt
+In this section, we provide the prompts used in our
+framework:
+AGENTICRAG-R1 PROMPT TEMPLATE
+Answer the following question to the best of your
+ability. You have access to the tools listed below.
+[Insert tool_descriptions here]
+The reasoning process and final answer should be
+wrapped in the <ACTION> and </ACTION> tags,
+respectively:
+1. That is, "<Think> Write the reasoning process here
+</Think>";
+2. "<Conclusion> Write the final answer here </Con-
+clusion>";
+3. Use the <Backtrack> tag to wrap your reflection
+results;
+4. Use the <Summary> tag to wrap your summary
+results;
+5. During the thinking process, **if necessary, the
+assistant can perform a search** to find uncertain
+knowledge, formatted as "<Search> search query.
+The search system will then provide the assistant
+with the retrieved information in the format "<Obser-
+vation> ...search results... </Observation>".
+Please think strictly according to the described pro-
+cess and use the following Action Format:
+User_Query: . . .
+<Think> . . . </Think>
+<Search> . . . </Search>
+<Summary> . . . </Summary>
+<Backtrack> . . . </Backtrack>
+. . . (repeat <Think> / <Search> / <Summary> /
+<Backtrack> as needed)
+<Think> I now know the final answer. </Think>
+<Conclusion> . . . </Conclusion>
+Begin!
+GRM Relevance Evaluation Prompt
+You are a relevance evaluator. Your task is to assess
+the semantic relevance of the retrieved documents
+with respect to the given question and task context,
+and output a relevance score between 0.0 and 1.0,
+reported to one decimal place (e.g., 0.7).
+Question: {Question}
+Search Arguments: {Search Args}
+Retrieved Documents: {Search Docs}
+Scoring Guidelines:
+• 1.0: Highly relevant; directly answers the question
+and strongly supports reasoning.
+• 0.7–0.9: Mostly relevant and useful, with minor
+noise or redundancy.
+• 0.4–0.6: Partially relevant; indirect, incomplete, or
+weakly aligned.
+• 0.1–0.3: Largely irrelevant or misleading, with
+only marginal relevance.
+• 0.0: Completely irrelevant to the question.
+Response Format:
+Relevance Score:
+
+
+=== PDF PAGE 19 ===
+GRM Memory Evaluation Prompt
+You are a memory-operation evaluator. Your task is
+to assess whether the agent’s memory operation is
+reasonable and beneficial under the current question
+and stack context, and output a quality score between
+0.0 and 1.0, reported to one decimal place (e.g., 0.7).
+Question: {Question}
+Current
+Reasoning
+Context:
+{Reasoning
+Context}
+Memory
+Stack
+Before
+Operation:
+{Stack
+Before}
+Executed Memory Action: {Memory Action}
+Memory Stack After Operation: {Stack After}
+Scoring Guidelines:
+• 1.0: Highly reasonable and highly beneficial; the
+operation clearly improves the current reasoning
+state. For <Backtrack>, it removes misleading,
+redundant, or no-longer-useful memory while pre-
+serving useful information. For <Summary>, it ef-
+fectively compresses prior context while preserving
+key facts needed for future reasoning.
+• 0.7–0.9: Mostly reasonable and useful, with only
+minor information loss, redundancy, or imperfect
+compression/removal.
+• 0.4–0.6: Partially reasonable; the intention is ac-
+ceptable, but the operation is only weakly helpful,
+incomplete, or somewhat misaligned with the cur-
+rent reasoning needs.
+• 0.1–0.3: Largely unreasonable or weakly bene-
+ficial; the operation removes useful information,
+keeps misleading content, or produces an unhelp-
+ful summary.
+• 0.0: Completely unreasonable or harmful; the op-
+eration clearly damages the current reasoning state
+or is irrelevant to the task.
+Evaluation Principles:
+• Judge the operation with respect to the current ques-
+tion and reasoning state.
+• Reward operations that help correct wrong
+branches, reduce distraction, or compress context
+without losing key evidence.
+• Penalize
+operations
+that
+discard
+important
+facts, preserve misleading branches, or produce
+vague/inaccurate summaries.
+• Focus on whether the operation is reasonable and
+beneficial at this step, not whether the final answer
+is ultimately correct.
+Response Format:
+Memory Operation Score:
+H
+Reward Analysis
+Our process rewards (rrag and rmem) are scored by
+a general-purpose LLM judge (GRM) via a fixed
+evaluation prompt, requiring no additional reward
+model training.
+Semantic Reward Analysis.
+To assess whether
+semantic process evaluation is necessary, we re-
+place the LLM judge with heuristic rewards:
+ROUGE-L for retrieval relevance and a positive
+score for any valid memory operation. The average
+F1 score across seven benchmarks decreases from
+33.55 to 29.40, and further drops to 19.94 when
+both rrag and rmem are removed, demonstrating the
+importance of semantic process supervision.
+I
+Additional Experiments
+Metric
+TC-RAG
+AGENTICRAG-R1
+Avg.Time (s)
+11.86
+10.15
+Avg.ResponseLen
+838.14
+880.89
+Avg.Actions
+10.14
+11.38
+Tool-Call Ratio (%)
+91.70
+97.50
+Table 8: Statistical comparison of inference latency,
+response complexity, and tool-use behaviors between
+TC-RAG and AGENTICRAG-R1 on Qwen2.5-3B.
+❶Inference Behavior and Tool Usage.
+Table 8
+compares AGENTICRAG-R1with TC-RAG using
+Qwen2.5-3B. AGENTICRAG-R1reduces average
+inference latency from 11.86 to 10.15 seconds
+(14.4%), while increasing the average number of
+actions by 12.2% and response length by 5.1%. Its
+tool-call rate increases from 91.7% to 97.5%, a
+difference of 5.8 percentage points. Thus, under
+this evaluation setting, the additional interactions
+do not result in higher measured average latency,
+although they produce more actions and slightly
+longer responses.
+❷Action-Specific Importance Analysis
+To ana-
+lyze how different behaviors engage model param-
+eters (Xu et al., 2025b; Chu et al., 2025b; Yang
+et al., 2026), we define a layer-wise importance
+score based on neuron activations. For each action
+token (including both the action token and its argu-
+ment tokens), we extract its hidden representation
+at every transformer layer and count the number of
+neurons with positive activations after the ReLU
+nonlinearity:
+Importance(l) =
+X
+ReLU(embeddingl > 0),
+(9)
+which measures intensity of neuron participation at
+layer l. Each embedding is 2048-dimensional and
+is visualized by averaging every 100 dimensions.
+Importance scores are normalized within each
+action, as shown in the upper panels of Fig. 6. All
+statistics are computed on a challenging reasoning
+dataset collected via rejection sampling, retaining
+only correct-answer trajectories to avoid spurious
+
+
+=== PDF PAGE 20 ===
+Reward
+Entropy
+Resp. Len.
+#Turns
+Rej.=0.2
+Rej.=0.4
+Rej.=0.6
+Rej.=0.8
+No Rej.
+Figure 5: Training dynamics of AGENTICRAG-R1 during GRPO optimization on Qwen2.5-3B under different
+rejection ratios.
+activations from erroneous reasoning. The top six
+heatmaps present the normalized importance pro-
+files of six actions. At a coarse level, these actions
+exhibit broadly similar activation patterns, suggest-
+ing shared use of the model’s representation space.
+However, their importance distributions are not
+identical and encode action-specific differences in
+both magnitude and layer-wise allocation that are
+difficult to discern without direct comparison.
+To make these distinctions explicit, the bottom
+row shows pairwise differences computed from
+unnormalized importance scores. Clear contrasts
+emerge between <Search> and <Think>, as well
+as between <Backtrack> and <Think>, indicating
+substantial divergence in their underlying neuron
+activations. In contrast, the difference between
+<Summary> and <Backtrack> is relatively small,
+suggesting that these memory-related actions rely
+on highly overlapping neural resources. Overall,
+the results indicate that tool invocation (<Search>),
+internal reasoning (<Think>), and memory ma-
+nipulation (<Backtrack>, <Summary>) correspond
+to distinct and largely decoupled activation pat-
+terns. This finding supports explicit action-level
+decomposition and fine-grained optimization,
+rather than treating all behaviors as a single
+homogeneous reasoning process.
+Building on the action-level importance analy-
+
+
+=== PDF PAGE 21 ===
+0
+3
+6
+9
+12
+15
+18
+21
+24
+27
+30
+33
+Layer Index (0-35)
+0
+2
+4
+6
+8
+10
+12
+14
+16
+18
+20
+Neuron Group (0-20)
+<plan>
+1.00
+0.75
+0.50
+0.25
+0.00
+0.25
+0.50
+Importance Score
+0
+3
+6
+9
+12
+15
+18
+21
+24
+27
+30
+33
+Layer Index (0-35)
+0
+2
+4
+6
+8
+10
+12
+14
+16
+18
+20
+Neuron Group (0-20)
+<backtrack>
+1.0
+0.5
+0.0
+0.5
+Importance Score
+0
+3
+6
+9
+12
+15
+18
+21
+24
+27
+30
+33
+Layer Index (0-35)
+0
+2
+4
+6
+8
+10
+12
+14
+16
+18
+20
+Neuron Group (0-20)
+<search>
+0.50
+0.25
+0.00
+0.25
+0.50
+0.75
+1.00
+Importance Score
+0
+3
+6
+9
+12
+15
+18
+21
+24
+27
+30
+33
+Layer Index (0-35)
+0
+2
+4
+6
+8
+10
+12
+14
+16
+18
+20
+Neuron Group (0-20)
+<think>
+1.00
+0.75
+0.50
+0.25
+0.00
+0.25
+0.50
+Importance Score
+0
+3
+6
+9
+12
+15
+18
+21
+24
+27
+30
+33
+Layer Index (0-35)
+0
+2
+4
+6
+8
+10
+12
+14
+16
+18
+20
+Neuron Group (0-20)
+<summary>
+1.0
+0.5
+0.0
+0.5
+Importance Score
+0
+3
+6
+9
+12
+15
+18
+21
+24
+27
+30
+33
+Layer Index (0-35)
+0
+2
+4
+6
+8
+10
+12
+14
+16
+18
+20
+Neuron Group (0-20)
+<conclusion>
+1.0
+0.5
+0.0
+0.5
+Importance Score
+0
+3
+6
+9
+12
+15
+18
+21
+24
+27
+30
+33
+Layer Index (0-35)
+0
+2
+4
+6
+8
+10
+12
+14
+16
+18
+20
+Neuron Group (0-20)
+Difference: <search> - <think>
+-2.0
+0.0
+0.7
+1.3
+2.0
+Importance Score
+0
+3
+6
+9
+12
+15
+18
+21
+24
+27
+30
+33
+Layer Index (0-35)
+0
+2
+4
+6
+8
+10
+12
+14
+16
+18
+20
+Neuron Group (0-20)
+Difference: <backtrack> - <think>
+-2.0
+0.0
+0.7
+1.3
+2.0
+Importance Score
+0
+3
+6
+9
+12
+15
+18
+21
+24
+27
+30
+33
+Layer Index (0-35)
+0
+2
+4
+6
+8
+10
+12
+14
+16
+18
+20
+Neuron Group (0-20)
+Difference: <backtrack> - <summary>
+-2.0
+0.0
+0.7
+1.3
+2.0
+Importance Score
+Figure 6: Neuron-wise importance analysis of different actions. Top two rows: normalized importance scores for
+individual actions. Bottom row: pairwise differences of unnormalized importance scores between actions.
+sis above, we further examine activation patterns
+at a finer action–argument granularity. As shown
+in Fig. 7, we separately compute layer-wise im-
+portance scores for action tokens and their asso-
+ciated argument tokens using the same activation-
+sum metric as before, but aggregating activations
+across layers instead of tokens. While the over-
+all trends remain consistent with the action-level
+results, clear divergences emerge across several
+contiguous layer ranges (highlighted in red), where
+different actions exhibit distinct layer-wise distribu-
+tions for both their action tags and argument tokens.
+Importantly, although both components are consis-
+tently involved across actions, their relative contri-
+butions vary across layers in an action-dependent
+manner. This suggests that different actions are
+characterized by distinct layer allocation patterns
+between action tags and arguments, rather than dif-
+ferences in overall activation magnitude alone.
+❸Action-Specific Optimization with Self-
+Search and Decoupling.
+Motivated by the obser-
+vation that different actions rely on distinct and
+only partially overlapping neural resources, we
+investigate action-specific parameter optimization
+guided by model Shapley analysis. Specifically,
+we identify action-relevant parameters using SP-
+R1 and decouple the optimization by assigning
+different subsets of parameters to the args layer
+and action layer, allowing each action to be up-
+dated independently. We evaluate this approach
+on MedQA under two search paradigms: Exter-
+nal Search (ES), where both training and testing
+rely on external Wiki retrieval, and Self-Search
+(SS) (Fan et al., 2025), which generates candidate
+retrievals during training without external knowl-
+edge and uses external Wiki search only at test
+time. This self-supervised search encourages better
+generalization to unseen questions. Table 9 reports
+the results: incorporating SS alone improves ac-
+curacy over ES (from 65.5% to 67.5%), demon-
+strating its strong effect on generalization, while
+decoupled, action-specific optimization (Decoup)
+further boosts performance to 72.2% under SS and
+68.5% under ES. These results highlight that SS
+significantly enhances generalization by exposing
+the model to diverse self-generated retrievals dur-
+ing training, and that Decoup effectively leverages
+action-specific parameter structure, enabling tar-
+geted optimization per action and yielding consis-
+tent gains across paradigms.
+❹Training-Time Memory-Judge Token Cost.
+We quantify the token overhead of memory-
+
+
+=== PDF PAGE 22 ===
+Figure 7: Layer-wise importance profiles of action to-
+kens and their argument tokens.
+operation evaluation during RL training. As shown
+in Table 10, each judge call consumes approx-
+imately 3,000–4,000 input tokens and 100–200
+output tokens. Across a complete training run,
+memory-operation evaluation consumes approx-
+imately 3.5–4.0 million input tokens and 0.1–
+0.2 million output tokens. This overhead is in-
+curred only during training and excludes retrieval-
+relevance judging.
+❺Cross-Domain Rollout Reward Statistics.
+To examine whether the trajectory rejection strat-
+egy remains effective across different domains and
+model scales, we report the mean and variance of
+rollout rewards. As shown in Table 11, meaningful
+rollout variance is preserved across all domains,
+confirming that the reward distributions do not col-
+lapse into indistinguishable ranges.
+❻Scaling Analysis across Model Sizes.
+We
+compare average performance gains of AGENTI-
+CRAG-R1 over TC-RAG across three model scales.
+Smaller models benefit proportionally more from
+the framework, while larger models achieve the
+Paradigm
+Method
+Acc (%)
+Raw
+Base
+63.5
+React
+65.5
+ES
+AGENTICRAG-R1+ ES
+66.3
+AGENTICRAG-R1+ ES + Decoup
+68.5
+SS
+AGENTICRAG-R1+ SS
+67.5
+AGENTICRAG-R1+ SS+ Decoup
+72.2
+Table 9: Effect of action-specific (decoupled) parameter
+optimization under different search paradigms.
+Component
+Tokens per Call
+Original context
+2,500–3,000
+Generated summary
+300–500
+Evaluation prompt and rubric
+200–300
+Total input
+3,000–4,000
+Output
+100–200
+Table 10: Estimated token consumption per memory-
+operation judge call.
+best absolute performance:
+• Qwen2.5-1.5B: 17.9 →27.6 (+54%)
+• Qwen2.5-3B: 22.2 →33.5 (+50%)
+• Qwen2.5-7B: 30.5 →36.6 (+20%)
+This pattern suggests that the structured action
+space and memory mechanisms are particularly
+effective at compensating for limited parametric
+capacity in smaller models.
+J
+Case Study
+We present a representative case study to illustrate
+the model’s ability to perform adaptive retrieval
+refinement and error correction. As shown in Ta-
+ble 12, the model initially issues broad retrieval
+queries that return irrelevant or noisy information,
+including unrelated medical content and off-topic
+encyclopedic entries. Instead of committing such
+noise to its internal state, the model explicitly in-
+vokes backtracking to revise retrieval keys and pro-
+gressively narrow the search scope. Through multi-
+ple iterations of retrieval, inspection, and memory
+revision, the model correctly determines that Bat-
+tleship is the 2012 military science fiction action
+film directed by Peter Berg in which Jason Snell
+worked. These cases highlight the effectiveness
+of fine-grained memory control and retrieval re-
+finement in mitigating error accumulation during
+multi-step reasoning.
+
+
+=== PDF PAGE 23 ===
+Domain
+Qwen2.5-3B
+Qwen2.5-7B
+Mean
+Var
+Mean
+Var
+Math
+0.44
+0.07
+0.46
+0.09
+Medical
+0.37
+0.10
+0.53
+0.12
+General
+0.41
+0.12
+0.65
+0.11
+Table 11: Rollout reward statistics across domains and
+model scales.
+K
+Agentic Hacking Theoretical Analysis
+K.1
+Outcome-Only Reward Bias in
+Multi-Step Reasoning
+Theorem 1 (Error Amplification under Out-
+come-Only Rewards). Consider a multi-step rea-
+soning trajectory y = (a1, a2, . . . , aT ) generated
+by a policy πθ(at | st) conditioned on an initial
+query q0. Let rout denote an outcome-level reward
+assigned solely based on the correctness of the
+final answer. Under outcome-only reward assign-
+ment without action-level reward decomposition,
+each reasoning step at receives an identical im-
+plicit reward ˜rt = rout
+T , regardless of its semantic
+correctness1. For any erroneous or noisy step ae
+with true marginal contribution ϕe < 0, the policy
+model parameter θk at step k update satisfies that:
+θk+1 = θk + µ · rout
+T
+· ∇θ log πθ(ae | se), (10)
+where µ > 0 is the learning rate, log πθ(ae | se)
+is the output logits. Consequently, the generation
+probability of ae increases whenever rout > 0,
+irrespective of its negative contribution.
+Proof. Under the RL estimator with outcome-only
+rewards, the policy gradient for a trajectory y is:
+∇θE[Ry] = E
+"
+rout
+T
+X
+t=1
+∇θ log πθ(at | st)
+#
+.
+(11)
+By linearity of expectation, this is equivalent to
+assigning each step an identical implicit reward
+˜rt = rout/T:
+∇θE[Ry] = T
+T
+X
+t=1
+E[˜rt · ∇θ log πθ(at | st)] .
+(12)
+This formulation implicitly assumes uniform contri-
+bution across steps. In practice, however, reasoning
+steps exhibit heterogeneous marginal contributions
+1Here we ignore the group-relative advantage normaliza-
+tion for simplicity.
+{ϕt}T
+t=1, where PT
+t=1 ϕt = rout, and some ϕt may
+be negative due to hallucination, spurious infer-
+ence, or retrieval noise. Thus, consider an erro-
+neous step ae with ϕe < 0. The induced parameter
+update is
+∆θ = µ · rout
+T
+· ∇θ log πθk(ae | se).
+(13)
+Applying first-order Taylor expansion to step up-
+date:
+πθk+1(ae) = πθk(ae) + ∇θπθk(ae) · ∆θ + O(µ2)
+= πθk(ae)
+ 
+1 + µ · rout
+T
+∇θ log πθk(ae | se)
+
+2
+2
+!
++ O(µ2).
+where we used the log-derivative identity ∇θπ =
+π∇θ log π. Since rout > 0 for correct outcomes
+and gradient norms are non-negative, the bracketed
+term exceeds unity, implying
+πθk+1(ae) > πθk(ae)
+regardless of ϕe < 0.
+(14)
+To characterize long-term accumulation, define the
+step-level reward allocation error as:
+εe = rout
+T
+−ϕe.
+(15)
+For erroneous steps, εe > 0 whenever rout > 0.
+Over K training iterations, the cumulative bias sat-
+isfies
+E
+h
+∥B(K)
+e
+∥2
+i
+≃εe · K · E
+∇θ log πθ(ae | se)
+
+2
+
+, (16)
+demonstrating monotonic amplification of erro-
+neous reasoning steps (memory-aware actions) in
+the absence of backtracking or summarizing.
+K.2
+Bias Isolation via Pop-Based Stack and
+Context Masking
+Theorem 2 (Structural Isolation via Pop-Based
+Backtracking). Consider a multi-step reasoning
+trajectory y = (a1, a2, . . . , aT ) generated by a
+policy πθ(at | st). Suppose that at step e, an er-
+roneous action ae is detected and removed via a
+pop-based stack mechanism, producing a pruned
+trajectory ˜y. The removal is implemented by mask-
+ing ae from the conditioning context of all subse-
+quent actions. Under this counterfactual trajectory
+˜y, the expected policy gradient update contains no
+contribution from ae:
+E[∇θ log πθ(ae | se) · rout] = 0.
+(17)
+Thus, erroneous reasoning steps do not receive
+outcome-level rewards and are not systematically
+reinforced.
+
+
+=== PDF PAGE 24 ===
+Question
+On which 2012 American military science fiction action film, directed by
+Peter Berg, did Jason Snell work?
+Ground
+Truth
+Battleship
+Output
+<Plan> First, I need to find the 2012 American military science fiction
+action film directed by Peter Berg. Then, I will search for the actors who
+worked on the film to identify Jason Snell. </Plan>
+<Search> [Wiki_RAG]: Peter Berg’s films </Search>
+<Observation> ’1. Gerald T. Olson is an American film producer best
+known for films such as House Party, Bloody Birthday and Dumb &
+Dumber. The San Francisco State alum relocated...’</Observation>
+<Backtrack> While the tool did provide some information about films
+directed by Peter Berg, it didn’t specify the 2012 military science fiction
+action film I was looking for... Let me search for the 2012 military science
+fiction action film directed by Peter Berg. </Backtrack>
+<Search>[Wiki_RAG]: Search for detailed information about the 2012
+military sci-fi action film Peter Berg</Search>
+<Observation> ’Wu Junyong (; born 1978) is a Chinese artist born in
+Putian, a city in Fujian province, China...’</Observation>
+<Backtrack> The tool didn’t provide the information about the 2012
+military science fiction action film directed by Peter Berg. I will now try
+searching for that specific film. </Backtrack>
+<Search> [Wiki_RAG]: Peter Berg movies 2012 </Search>
+<Observation> ’1. House Party -1991 - drama 2. Bloody Birthday -1992
+- horror 3. Dumb & Dumber -1994 - comedy 4. The Rundown -2003 -
+action 5. Patriots Day -2016 - drama The Hidden -1999 - horror Fast &
+Furious 6 -2013 - action’ </Observation>
+<Backtrack> From the previous searches, no information about a 2012
+military science fiction action film directed by Peter Berg and which Ja-
+son Snell worked on was retrieved. This information needs to be carefully
+re-evaluated and corrected. </Backtrack>
+<Search> [Wiki_RAG]: 2012 military science fiction action film directed
+by Peter Berg Jason Snell worked</Search>
+<Observation> ’1. Peter Berg (born March 11, 1964) is an American
+director, producer, writer, and actor... the military science fiction war
+film Battleship (2012)...’ </Observation>
+<Think> From the search result, I see that the 2012 movie directed by
+Peter Berg is "Battleship". However, the query mentions Jason Snell
+worked in it. Let me verify if Jason Snell indeed played a role in this film.
+</Think>
+<Search> [Wiki_RAG]: Jason Snell in Battleship</Search>
+<Observation> ’1. Jason H. Snell is an American special... Indiana Jones
+and the Kingdom of the Battleship (2012)...’</Observation>
+<Summary> After verifying with the search results, it is clear that
+"Battleship" (2012) is the 2012 military science fiction action film di-
+rected by Peter Berg and in which Jason Snell worked. He played a role
+in this film.</Summary>
+<Conclusion> The 2012 military science fiction action film directed by
+Peter Berg in which Jason Snell worked is "Battleship".</Conclusion>
+Table 12: A Case Study of a Wiki Problem on AGENTICRAG-R1.
+
+
+=== PDF PAGE 25 ===
+Proof. Under outcome-only rewards, the standard
+advantage estimator is
+∇θE[Ry] = E
+"
+rout
+T
+X
+t=1
+∇θ log πθ(at | st)
+#
+.
+(18)
+Pop-based backtracking and context masking.
+When ae is removed, all subsequent actions are
+generated or evaluated under a masked context in
+which ae is excluded. The resulting trajectory is
+˜y = (a1, . . . , ae−1, a′
+e+1, . . . , a′
+T ).
+(19)
+The attention mask ensures that ae does not con-
+tribute to hidden states or logits involved in pro-
+ducing the final answer, effectively addressing the
+problem of reward hacking from outcome reward
+to be allocated the harmless popped actions.
+Counterfactual
+independence.
+Under
+the
+masked context, the outcome distribution satisfies
+pθ(aT | a1, . . . , ae−1,
+ae, . . .) = pθ(aT | ˜y),
+(20)
+implying that rout depends only on ˜y and is condi-
+tionally independent of ae.
+Vanishing gradient contribution.
+The policy
+gradient under ˜y becomes
+∇θE[R˜y] = E
+
+rout
+X
+t∈˜y
+∇θ log πθ(at | st)
+
+.
+(21)
+Since ae /∈˜y, the corresponding score-function
+term never appears. Equivalently,
+E[∇θ log πθ(ae | se) · rout] = 0.
+(22)
+Therefore, erroneous reasoning steps are struc-
+turally isolated from outcome-level rewards.
+Discussion.
+Rather than numerically redistribut-
+ing rewards, the pop-based stack mechanism cor-
+rects outcome-only reward bias through structural
+isolation. By explicitly removing erroneous ac-
+tions from the conditioning context via attention
+masking, policy gradients are evaluated on a coun-
+terfactual trajectory in which these actions never
+occurred, eliminating the error amplification effect
+identified in Section K.1.
+L
+More Method Details: Pop-based
+Attention Mask
+We extend the standard causal attention mecha-
+nism with a pop-based attention mask to handle
+dynamic context updates induced by <summary>
+and <backtrack> operations (<pop>). In autore-
+gressive Transformers, causal attention ensures that
+each token at position ( i ) can only attend to to-
+kens at positions ( j ≤i ). However, in our setting,
+causal ordering alone is insufficient, since tokens
+that appear earlier in the sequence may have been
+explicitly removed from the active context via a
+pop operation and should no longer be accessible.
+Consider the example shown in Figur 2 Part 4,
+where the sequence follows an Action–Summary
+pattern: Act. 1 →Act. 2 →Sum. 3 →Act. 4. The
+summary token Sum. 3 aggregates the information
+of Act. 2, after which Act. 2 is popped from the
+active memory. As a result, when generating Act.
+4, the model should be allowed to attend to Sum.
+3, but must be prevented from directly attending
+to Act. 2, even though Act. 2 appears earlier in
+the sequence. Thus, the attention mask between
+Act. 2 and Act. 4 should be False. This constraint
+is indicated as Mask after POP in the attention
+matrix. Formally, let ( Mcausal ) denote the standard
+causal mask:
+Mcausal
+i,j
+=
+(
+0,
+j ≤i
+−∞,
+j > i
+(23)
+We introduce an additional pop-based mask ( Mpop
+), where a token ( j ) is masked if it has been popped
+before step ( i ):
+Mpop
+i,j =
+(
+−∞,
+ifj is popped before i
+0,
+otherwise
+(24)
+The final attention mask is defined as:
+Mi,j = Mcausal
+i,j
++ Mpop
+i,j .
+(25)
+This formulation ensures that once an action has
+been summarized and popped, its information is
+only accessible through the corresponding sum-
+mary token in all subsequent steps.
+M
+Broader Generalization
+To evaluate the effectiveness of AGENTICRAG-
+R1across different application scenarios, we con-
+duct additional experiments on MedQA, DeepRe-
+search Bench, ALFWorld, and WebShop, covering
+medical question answering, long-form report gen-
+eration, and interactive decision making.
+
+
+=== PDF PAGE 26 ===
+Method
+Format Acc (%)
+Answer Acc (%)
+Base
+39%
+84%
+ReAct
+56%
+79%
+AGENTICRAG-R1
+92%
+87%
+Table 13: Results on the MedQA test set. The Qwen2.5-
+7B-Instruct model is evaluated using Qwen2.5-72B as
+the judge.
+M.1
+Medical Question Answering.
+Recent work has demonstrated the potential of
+LLMs for domain-specific healthcare applica-
+tions (Xu et al., 2025a; Jiang et al., 2024a; Feng*
+et al., 2026). To evaluate the generalization of
+AGENTICRAG-R1in a domain-specific setting, we
+conduct experiments on MedQA (Jin et al., 2020).
+Table 13 reports the performance of different meth-
+ods using Qwen2.5-72B as the judge. Compared
+with the base model, ReAct improves format accu-
+racy from 39% to 56% but reduces answer accuracy
+from 84% to 79%. In contrast, AGENTICRAG-
+R1achieves 92% format accuracy and 87% answer
+accuracy, outperforming both the base model and
+ReAct on both metrics. These results demonstrate
+that AGENTICRAG-R1generalizes effectively to
+domain-specific medical question answering while
+improving format compliance without sacrificing
+answer quality.
+M.2
+Long-Form Research and Report
+Generation
+Figure 8 presents the report-generation perfor-
+mance of AGENTICRAG-R1 on the 7B model,
+inferred with the query: “Give me a report of topic
+<RAG’s Future in Medical Domain>.” As shown,
+after multiple rounds of retrieval, the model pro-
+duces a high-quality report accompanied by well-
+aligned citations. This result further demonstrates
+the strong generalization capability of our rein-
+forcement learning–based agent training strategy.
+To quantitatively evaluate the generalization of
+AGENTICRAG-R1 to long-horizon agentic scenar-
+ios beyond QA, we benchmark on DeepResearch
+Bench (Du et al., 2025), a multi-document report
+generation task that requires sustained multi-step
+retrieval, information aggregation, and structured
+composition. We evaluate using RACE (report
+quality) and FACT (factual consistency, includ-
+ing effective citation accuracy and claim-level ac-
+curacy). As shown in Table 14, AGENTICRAG-
+R1 substantially outperforms all baselines, includ-
+ing RAG, ReACT, and EDR (Prabhakar et al.,
+2025), achieving the highest RACE score (43.60)
+and a significant margin on FACT metrics (+8.14
+on Eff.c. and +8.56 on C.acc. over the best base-
+line).
+Method
+RACE
+FACT (Eff.c.)
+FACT (C.acc.)
+RAG
+36.68
+2.93
+10.86
+ReACT
+42.21
+4.69
+23.78
+EDR
+40.99
+12.28
+23.70
+Ours
+43.60
+20.42
+32.34
+Table 14: Results on DeepResearch Bench for multi-
+document report generation.
+M.3
+Interactive Decision-Making
+Environments.
+We further evaluate AGENTICRAG-R1on inter-
+active long-horizon decision making with ALF-
+World (Shridhar et al., 2021) and WebShop (Yao
+et al., 2022a). These environments require agents
+to maintain state, incorporate feedback, and adapt
+strategies over extended trajectories.
+AGENTI-
+CRAG-R1improves ALFWorld success rate from
+36.5% to 51.1%, WebShop task score from 14.7
+to 27.8, and WebShop success rate from 0.8% to
+2.3%. Despite category-level variations on ALF-
+World, these results demonstrate that AGENTI-
+CRAG-R1generalizes beyond static QA to sequen-
+tial interactive environments.
+N
+Computational Resources and
+Software Environment
+Experiments were carried out on a server equipped
+with two Intel Xeon Platinum 8488C proces-
+sors, comprising 96 physical cores and 192 hard-
+ware threads in total.
+The system was config-
+ured with two NVIDIA A800 GPUs, each pro-
+viding 80 GB of GPU memory, and 503 GB of
+system RAM. All experiments were conducted
+on Ubuntu 22.04.5 LTS. The software environ-
+ment was based on Python 3.11.11, with pack-
+age management handled through Conda (ver-
+sion 23.5.2). Model implementation and training
+were performed using PyTorch 2.6.0 with CUDA
+support, together with HuggingFace Transform-
+ers 4.51.3 and SpaCy 3.8.4. Unless otherwise spec-
+ified, all models and libraries were used with their
+default parameter settings. The total training time
+for our method was approximately 21,582 seconds
+under the above hardware configuration. The com-
+putational cost of training, data preprocessing, and
+
+
+=== PDF PAGE 27 ===
+(a) Report Part (1/2)
+(b) Report Part (2/2)
+Figure 8: Report Generation for query "Give me a report of topic <RAG’s Future in Medical Domain>"
+
+
+=== PDF PAGE 28 ===
+Method
+ALFWorld
+WebShop
+Pick
+Look
+Clean
+Heat
+Cool
+Pick2
+Overall
+Score
+SR
+Prompt
+45.8
+48.4
+34.5
+41.0
+19.6
+31.7
+36.5
+14.7
+0.8
+AGENTICRAG-R1
+84.7
+80.6
+24.1
+33.3
+37.0
+51.2
+51.1
+27.8
+2.3
+Table 15: Generalization of AGENTICRAG-R1to interactive decision-making environments. ALFWorld reports
+task-specific and overall success rates (%); WebShop reports the official task score and success rate (SR, %).
+inference varied depending on the experimental
+configuration and dataset scale, and all reported
+results were obtained under the same hardware and
+software setup.
+O
+The Use of Large Language Model
+In this study, generative AI software tools were
+used solely as auxiliary support for language refine-
+ment, programming-related assistance, and figure
+visualization. Specifically, large language models
+were employed to improve grammatical accuracy,
+readability, and overall writing quality, as well as to
+provide general coding suggestions or debugging
+guidance. In addition, AI-based image generation
+tools were used to enhance the visual appearance
+of figure 1; however, the figure design, initial draft,
+and final verification were entirely performed by
+the authors. All AI-assisted outputs were carefully
+reviewed and validated by the authors prior to in-
+clusion. The research conception, methodological
+design, and analysis of experimental results were
+conducted exclusively by the authors, and genera-
+tive AI tools did not contribute to the formulation
+of research ideas or the derivation of conclusions.

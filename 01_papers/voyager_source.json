@@ -1,0 +1,27 @@
+{
+  "slug": "voyager",
+  "title": "Voyager: An Open-Ended Embodied Agent with Large Language Models",
+  "venue": "TMLR 2024",
+  "venue_verification_url": "https://rpl.cs.utexas.edu/publications/2024/03/14/wang-tmlr24-voyager/",
+  "source_url": "https://rpl.cs.utexas.edu/publications/2024/03/14/wang-tmlr24-voyager/",
+  "pdf_url": "https://arxiv.org/pdf/2305.16291",
+  "pdf_path": "01_papers/voyager.pdf",
+  "pdf_page_1based": 2,
+  "figure_number": 2,
+  "crop_coordinates_pdf_points": [
+    102,
+    34,
+    510,
+    282
+  ],
+  "verified": true,
+  "verification_status": "Verified: downloaded PDF; rendered full page and crop; inspected crop and 680px proof; caption and adjacent method text checked",
+  "figure_path": "02_figures/voyager_fig2_pdfp2.png",
+  "full_page_path": "02_figures/voyager_pdfp2_full.png",
+  "paper_scale_path": "02_figures/voyager_fig2_180mm96dpi.png",
+  "technical_relevance_1to5": 4,
+  "visual_transfer_value_1to5": 5,
+  "access_date": "2026-09-23",
+  "notes": "会议身份校正：TMLR March 2024，不是ICLR2024。图来自arXiv作者原文。",
+  "sha256": "769a4e33ddeeb73870849232eece49afe882c2d146362e33917ccb432ba0efb8"
+}

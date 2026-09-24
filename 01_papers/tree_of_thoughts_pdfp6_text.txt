@@ -1,0 +1,88 @@
+Method
+Success
+IO prompt
+7.3%
+CoT prompt
+4.0%
+CoT-SC (k=100)
+9.0%
+ToT (ours) (b=1)
+45%
+ToT (ours) (b=5)
+74%
+IO + Refine (k=10)
+27%
+IO (best of 100)
+33%
+CoT (best of 100)
+49%
+Table 2: Game of 24 Results.
+0
+25
+50
+75
+100
+0.2
+0.4
+0.6
+(a) Success rate with nodes visited
+IO (best of k)
+CoT (best of k)
+ToT (b=1...5)
+1
+2
+3
+4
+Correct
+0.0
+0.2
+0.4
+0.6
+(b) Samples failed at each step
+CoT
+ToT (b=5)
+Figure 3: Game of 24 (a) scale analysis & (b) error analysis.
+Results. As shown in Table 2, IO, CoT, and CoT-SC prompting methods perform badly on the task,
+achieving only 7.3%, 4.0%, and 9.0% success rates. In contrast, ToT with a breadth of b = 1 already
+achieves a success rate of 45%, while b = 5 achieves 74%. We also consider an oracle setup for
+IO/CoT, by calculating the success rate using best of k samples (1 ≤k ≤100). To compare IO/CoT
+(best of k) with ToT, we consider calculating the tree nodes visited per task in ToT across b = 1 · · · 5,
+and map the 5 success rates in Figure 3(a), treating IO/CoT (best of k) as visiting k nodes in a bandit.
+Not surprisingly, CoT scales better than IO, and best of 100 CoT samples achieve a success rate of
+49%, but still much worse than exploring more nodes in ToT (b > 1).
+Error analysis. Figure 3(b) breaks down at which step CoT and ToT samples fail the task, i.e. the
+thought (in CoT) or all b thoughts (in ToT) are invalid or impossible to reach 24. Notably, around
+60% of CoT samples already failed the task after generating the first step, or equivalently, the first
+three words (e.g. “4 + 9”). This highlights the issues with direct left-to-right decoding.
+4.2
+Creative writing
+Next, we invent a creative writing task where the input is 4 random sentences and the output should
+be a coherent passage with 4 paragraphs that end in the 4 input sentences respectively. Such a task is
+open-ended and exploratory, and challenges creative thinking as well as high-level planning.
+Task setup. We sample random sentences from randomwordgenerator.com to form 100 inputs, and
+there is no groundtruth passage for each input constraint. As we find that GPT-4 can follow the
+input constraints most of the time, we focus on evaluating passage coherency in two ways: using a
+GPT-4 zero-shot prompt to provide a 1-10 scalar score, or using human judgments to compare pairs
+of outputs from different methods. For the former, we sample 5 scores and average them for each task
+output, and we find these 5 scores usually consistent, with a standard deviation of around 0.56 on
+average across outputs. For the latter, we employ a subset of the authors in a blind study to compare
+the coherency of CoT vs. ToT generated passage pairs, where the order of passages is random flipped
+over 100 inputs.
+Baselines. Given the creative nature of the task, both IO and CoT prompts are zero-shot. While the
+former prompts the LM to directly generate a coherent passage given input constraints, the latter
+prompts the LM to first make a brief plan then write the passage, i.e. the plan serves as the intermediate
+thought step. We generate 10 IO and CoT samples per task. We also consider an iterative-refine
+(k ≤5) method on top of a random IO sample for each task, where the LM is conditioned on input
+constraints and the last generated passage to decide if the passage is already “perfectly coherent”,
+and if not generate a refined one.
+ToT setup. We build a ToT with depth 2 (and only 1 intermediate thought step) — the LM first
+generates k = 5 plans and votes for the best one (Figure 4), then similarly generate k = 5 passages
+based on the best plan then vote for the best one. Here the breadth limit b = 1, as only one choice is
+kept per step. A simple zero-shot vote prompt (“analyze choices below, then conclude which is most
+promising for the instruction”) is used to sample 5 votes at both steps.
+Results. Figure 5(a) shows average GPT-4 scores across 100 tasks, where ToT (7.56) is deemed to
+generate more coherent passages than IO (6.19) and CoT (6.93) on average. While such an automatic
+metric might be noisy, Figure 5(b) confirms the finding by showing that humans prefer ToT over
+CoT in 41 out of 100 passage pairs, while only prefer CoT over ToT in 21 (other 38 pairs are found
+“similarly coherent”). Lastly, iterative-refine is more effective on this natural language task, where
+6

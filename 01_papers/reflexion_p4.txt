@@ -1,0 +1,75 @@
+Action
+Obs / Reward
+Trajectory
+(short-term memory)
+Experience
+(long-term memory)
+Self-reflection (LM)
+Agent
+Actor (LM)
+Environment
+Evaluator (LM)
+External feedback
+Internal
+feedback
+Reflective
+text
+Algorithm 1 Reinforcement via self-reflection
+Initialize Actor, Evaluator, Self-Reflection:
+Ma, Me, Msr
+Initialize policy πθ(ai|si), θ = {Ma, mem}
+Generate initial trajectory using πθ
+Evaluate τ0 using Me
+Generate initial self-reflection sr0 using Msr
+Set mem ←[sr0]
+Set t = 0
+while Me not pass or t < max trials do
+Generate τt = [a0, o0, . . . ai, oi] using πθ
+Evaluate τt using Me
+Generate self-reflection srt using Msr
+Append srt to mem
+Increment t
+end while
+return
+Figure 2: (a) Diagram of Reflexion. (b) Reflexion reinforcement algorithm
+of text and action generation within the Reflexion framework, providing valuable insights into their
+performance and effectiveness. In addition, we also add a memory component mem that provides
+additional context to this agent. This adaption was inspired by Brooks et al. [3], who suggest a policy
+iteration approach using in-context learning. Details on how this is populated are provided below.
+Evaluator
+The Evaluator component of the Reflexion framework plays a crucial role in assessing
+the quality of the generated outputs produced by the Actor. It takes as input a generated trajectory
+and computes a reward score that reflects its performance within the given task context. Defining
+effective value and reward functions that apply to semantic spaces is difficult, so we investigate
+several variants of the Evaluator model. For reasoning tasks, we explore reward functions based
+on exact match (EM) grading, ensuring that the generated output aligns closely with the expected
+solution. In decision-making tasks, we employ pre-defined heuristic functions that are tailored to
+specific evaluation criteria. Additionally, we experiment with using a different instantiation of an
+LLM itself as an Evaluator, generating rewards for decision-making and programming tasks. This
+multi-faceted approach to Evaluator design allows us to examine different strategies for scoring
+generated outputs, offering insights into their effectiveness and suitability across a range of tasks.
+Self-reflection
+The Self-Reflection model instantiated as an LLM, plays a crucial role in the
+Reflexion framework by generating verbal self-reflections to provide valuable feedback for future
+trials. Given a sparse reward signal, such as a binary success status (success/fail), the current trajectory,
+and its persistent memory mem, the self-reflection model generates nuanced and specific feedback.
+This feedback, which is more informative than scalar rewards, is then stored in the agent’s memory
+(mem). For instance, in a multi-step decision-making task, when the agent receives a failure signal, it
+can infer that a specific action ai led to subsequent incorrect actions ai+1 and ai+2. The agent can
+then verbally state that it should have taken a different action, a′
+i, which would have resulted in a′
+i+1
+and a′
+i+2, and store this experience in its memory. In subsequent trials, the agent can leverage its past
+experiences to adapt its decision-making approach at time t by choosing action a′
+i. This iterative
+process of trial, error, self-reflection, and persisting memory enables the agent to rapidly improve its
+decision-making ability in various environments by utilizing informative feedback signals.
+Memory
+Core components of the Reflexion process are the notion of short-term and long-term
+memory. At inference time, the Actor conditions its decisions on short and long-term memory, similar
+to the way that humans remember fine-grain recent details while also recalling distilled important
+experiences from long-term memory. In the RL setup, the trajectory history serves as the short-term
+memory while outputs from the Self-Reflection model are stored in long-term memory. These two
+memory components work together to provide context that is specific but also influenced by lessons
+4

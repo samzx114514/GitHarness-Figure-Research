@@ -1,0 +1,42 @@
+{
+  "title": "Language Agent Tree Search Unifies Reasoning, Acting, and Planning in Language Models",
+  "venue": "ICML 2024",
+  "venue_verification_source": "https://proceedings.mlr.press/v235/zhou24r.html",
+  "source_url": "https://proceedings.mlr.press/v235/zhou24r.html",
+  "pdf_url": "https://raw.githubusercontent.com/mlresearch/v235/main/assets/zhou24r/zhou24r.pdf",
+  "verified_date": "2026-09-23",
+  "verification_status": "Verified: downloaded original PDF; rendered and visually inspected; caption and nearby method read",
+  "figures": [
+    {
+      "figure": 1,
+      "pdf_page_1based": 1,
+      "crop_pdf_points": [
+        330,
+        188,
+        513,
+        299
+      ],
+      "screenshot": "02_figures/lats_fig1_pdfp1.png",
+      "original_page": "02_figures/lats_pdfp1_page.png",
+      "paper_scale_preview": "02_figures/lats_fig1_180mm_150dpi.png"
+    },
+    {
+      "figure": 2,
+      "pdf_page_1based": 5,
+      "crop_pdf_points": [
+        52,
+        66,
+        562,
+        244
+      ],
+      "screenshot": "02_figures/lats_fig2_pdfp5.png",
+      "original_page": "02_figures/lats_pdfp5_page.png",
+      "paper_scale_preview": "02_figures/lats_fig2_180mm_150dpi.png",
+      "paper_scale_preview_96dpi": "02_figures/lats_fig2_180mm_96dpi.png"
+    }
+  ],
+  "technical_relevance": 4,
+  "visual_value": 4,
+  "score_scale": "1 low to 5 high; subjective design assessment",
+  "paper_scale_check": "Both 180mm at 150dpi and approximately 180mm at 96dpi (680px wide) rendered and visually inspected; no physical print check."
+}
