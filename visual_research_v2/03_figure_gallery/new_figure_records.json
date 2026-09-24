@@ -1,0 +1,182 @@
+[
+  {
+    "slug": "graph_of_thoughts",
+    "title": "Graph of Thoughts: Solving Elaborate Problems with Large Language Models",
+    "venue": "AAAI 2024",
+    "primary": false,
+    "publication_record": "https://ojs.aaai.org/index.php/AAAI/article/view/29720",
+    "pdf_url": "https://arxiv.org/pdf/2308.09687",
+    "local_pdf": "02_verified_papers/graph_of_thoughts.pdf",
+    "pdf_sha256": "73caa3c05813105e5db38edfbb58e1b660771a00dfdb74768c8845e15263c5da",
+    "figure": 1,
+    "pdf_page_1based": 3,
+    "crop_pdf_points": [
+      47,
+      43,
+      564,
+      235
+    ],
+    "crop": "03_figure_gallery/graph_of_thoughts_fig1_pdfp3.png",
+    "preview": "03_figure_gallery/graph_of_thoughts_fig1_680px.png"
+  },
+  {
+    "slug": "graph_of_thoughts",
+    "title": "Graph of Thoughts: Solving Elaborate Problems with Large Language Models",
+    "venue": "AAAI 2024",
+    "primary": false,
+    "publication_record": "https://ojs.aaai.org/index.php/AAAI/article/view/29720",
+    "pdf_url": "https://arxiv.org/pdf/2308.09687",
+    "local_pdf": "02_verified_papers/graph_of_thoughts.pdf",
+    "pdf_sha256": "73caa3c05813105e5db38edfbb58e1b660771a00dfdb74768c8845e15263c5da",
+    "figure": 2,
+    "pdf_page_1based": 3,
+    "crop_pdf_points": [
+      316,
+      274,
+      566,
+      427
+    ],
+    "crop": "03_figure_gallery/graph_of_thoughts_fig2_pdfp3.png",
+    "preview": "03_figure_gallery/graph_of_thoughts_fig2_680px.png"
+  },
+  {
+    "slug": "rap",
+    "title": "Reasoning with Language Model is Planning with World Model",
+    "venue": "EMNLP 2023",
+    "primary": true,
+    "publication_record": "https://aclanthology.org/2023.emnlp-main.507/",
+    "pdf_url": "https://aclanthology.org/2023.emnlp-main.507.pdf",
+    "local_pdf": "02_verified_papers/rap.pdf",
+    "pdf_sha256": "f67d075c889d885db80355f6d398fb2aa6830406340c365140e234af05056dc3",
+    "figure": 1,
+    "pdf_page_1based": 2,
+    "crop_pdf_points": [
+      98,
+      50,
+      500,
+      276
+    ],
+    "crop": "03_figure_gallery/rap_fig1_pdfp2.png",
+    "preview": "03_figure_gallery/rap_fig1_680px.png"
+  },
+  {
+    "slug": "octo",
+    "title": "Octo: An Open-Source Generalist Robot Policy",
+    "venue": "RSS 2024",
+    "primary": true,
+    "publication_record": "https://www.roboticsproceedings.org/rss20/p090.html",
+    "pdf_url": "https://www.roboticsproceedings.org/rss20/p090.pdf",
+    "local_pdf": "02_verified_papers/octo.pdf",
+    "pdf_sha256": "2ad80d52e9ce79b6d3e052724631e4767a96a356850e48a5e5ef655a3b09a9c6",
+    "figure": 1,
+    "pdf_page_1based": 1,
+    "crop_pdf_points": [
+      44,
+      202,
+      570,
+      498
+    ],
+    "crop": "03_figure_gallery/octo_fig1_pdfp1.png",
+    "preview": "03_figure_gallery/octo_fig1_680px.png"
+  },
+  {
+    "slug": "vima",
+    "title": "VIMA: Robot Manipulation with Multimodal Prompts",
+    "venue": "ICML 2023",
+    "primary": true,
+    "publication_record": "https://proceedings.mlr.press/v202/jiang23b.html",
+    "pdf_url": "https://proceedings.mlr.press/v202/jiang23b/jiang23b.pdf",
+    "local_pdf": "02_verified_papers/vima.pdf",
+    "pdf_sha256": "bbd044f3d0cf9025430c9595086eaa2eccd69488c3c3d0d7b661eb19e8459e50",
+    "figure": 1,
+    "pdf_page_1based": 2,
+    "crop_pdf_points": [
+      53,
+      66,
+      548,
+      319
+    ],
+    "crop": "03_figure_gallery/vima_fig1_pdfp2.png",
+    "preview": "03_figure_gallery/vima_fig1_680px.png"
+  },
+  {
+    "slug": "var",
+    "title": "Visual Autoregressive Modeling: Scalable Image Generation via Next-Scale Prediction",
+    "venue": "NeurIPS 2024 Best Paper",
+    "primary": true,
+    "publication_record": "https://proceedings.neurips.cc/paper_files/paper/2024/hash/9a24e284b187f662681440ba15c416fb-Abstract-Conference.html",
+    "pdf_url": "https://proceedings.neurips.cc/paper_files/paper/2024/file/9a24e284b187f662681440ba15c416fb-Paper-Conference.pdf",
+    "local_pdf": "02_verified_papers/var.pdf",
+    "pdf_sha256": "bd6b3002cbf81f2006e68abd489c0bf2008ee076cbfe66086b7450e8aab56a06",
+    "figure": 2,
+    "pdf_page_1based": 2,
+    "crop_pdf_points": [
+      103,
+      65,
+      510,
+      262
+    ],
+    "crop": "03_figure_gallery/var_fig2_pdfp2.png",
+    "preview": "03_figure_gallery/var_fig2_680px.png"
+  },
+  {
+    "slug": "autogen",
+    "title": "AutoGen: Enabling Next-Gen LLM Applications via Multi-Agent Conversation",
+    "venue": "COLM 2024",
+    "primary": false,
+    "publication_record": "https://openreview.net/forum?id=BAakY1hNKS",
+    "pdf_url": "https://arxiv.org/pdf/2308.08155",
+    "local_pdf": "02_verified_papers/autogen.pdf",
+    "pdf_sha256": "fcf8b1acae6b1bd6f14c92463caa9726828bf998234ba9f10c2411087897c96b",
+    "figure": 1,
+    "pdf_page_1based": 1,
+    "crop_pdf_points": [
+      103,
+      291,
+      510,
+      445
+    ],
+    "crop": "03_figure_gallery/autogen_fig1_pdfp1.png",
+    "preview": "03_figure_gallery/autogen_fig1_680px.png"
+  },
+  {
+    "slug": "openvla",
+    "title": "OpenVLA: An Open-Source Vision-Language-Action Model",
+    "venue": "CoRL 2024",
+    "primary": false,
+    "publication_record": "https://mlanthology.org/corl/2024/kim2024corl-openvla/",
+    "pdf_url": "https://arxiv.org/pdf/2406.09246",
+    "local_pdf": "02_verified_papers/openvla.pdf",
+    "pdf_sha256": "353c37df34458f12f969b14dfd8b77175b727b9cddea7bb891759beddeefe1be",
+    "figure": 1,
+    "pdf_page_1based": 1,
+    "crop_pdf_points": [
+      98,
+      195,
+      522,
+      416
+    ],
+    "crop": "03_figure_gallery/openvla_fig1_pdfp1.png",
+    "preview": "03_figure_gallery/openvla_fig1_680px.png"
+  },
+  {
+    "slug": "diffusion_policy",
+    "title": "Diffusion Policy: Visuomotor Policy Learning via Action Diffusion",
+    "venue": "RSS 2023",
+    "primary": false,
+    "publication_record": "https://www.roboticsproceedings.org/rss19/p026.html",
+    "pdf_url": "https://www.roboticsproceedings.org/rss19/p026.pdf",
+    "local_pdf": "02_verified_papers/diffusion_policy.pdf",
+    "pdf_sha256": "723a030b809be1958d03b06472ac79934fd64e5a890cdfeffd9508a353101a25",
+    "figure": 3,
+    "pdf_page_1based": 3,
+    "crop_pdf_points": [
+      39,
+      44,
+      568,
+      205
+    ],
+    "crop": "03_figure_gallery/diffusion_policy_fig3_pdfp3.png",
+    "preview": "03_figure_gallery/diffusion_policy_fig3_680px.png"
+  }
+]

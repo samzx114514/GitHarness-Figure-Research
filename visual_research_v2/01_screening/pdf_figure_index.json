@@ -1,0 +1,412 @@
+[
+  {
+    "slug": "autogen",
+    "pages": 43,
+    "caption_lines": [
+      {
+        "page": 1,
+        "line": "Figure 1: AutoGen enables diverse LLM-based applications using multi-agent conversations. (Left) AutoGen agents are conversable, customizable, and can be based on LLMs, tools, humans, or even a combination of them. (Top-middle) Agents can converse to solve tasks. (Right) They can form"
+      },
+      {
+        "page": 4,
+        "line": "Figure 2: Illustration of how to use AutoGen to program a multi-agent conversation. The top sub- figure illustrates the built-in agents provided by AutoGen, which have unified conversation interfaces and can be customized. The middle sub-figure shows an example of using AutoGen to develop"
+      },
+      {
+        "page": 6,
+        "line": "Figure 3: Six examples of diverse applications built using AutoGen. Their conversation patterns show AutoGen’s flexibility and power. A1: Math Problem Solving"
+      },
+      {
+        "page": 7,
+        "line": "Figure 4: Performance on four applications A1-A4. (a) shows that AutoGen agents can be used out of the box to achieve the most competitive performance on math problem solving tasks; (b) shows that AutoGen can be used to realize effective retrieval augmentation and realize a novel"
+      }
+    ],
+    "contact_sheet": "01_screening/page_contacts/autogen_p1-6.jpg"
+  },
+  {
+    "slug": "diffusion_policy",
+    "pages": 16,
+    "caption_lines": [
+      {
+        "page": 1,
+        "line": "Fig. 1: Policy Representations. a) Explicit policy with different types of action representations. b) Implicit policy learns an energy function conditioned on both action and observation and optimizes for actions that minimize the energy landscape c) Diffusion policy refines noise into actions via a learned gradient field. This formulation provides"
+      },
+      {
+        "page": 2,
+        "line": "Fig. 2: Realworld Benchmarks. We deployed Diffusion Policy on two different robot platforms (UR5 and Franka) for 4 challenging tasks: under-actuate precise pushing (Push-T), 6DoF mug flipping,"
+      },
+      {
+        "page": 3,
+        "line": "Fig. 3: Diffusion Policy Overview a) General formulation. At time step t, the policy takes the latest To steps of observation data Ot as input and outputs Ta steps of actions At. b) In the CNN-based Diffusion Policy, FiLM (Feature-wise Linear Modulation) [35] conditioning of the observation feature Ot is applied to every convolution layer, channel-"
+      },
+      {
+        "page": 4,
+        "line": "Fig. 4: Multimodal behavior. At the given state, the end-effector (blue) can either go left or right to push the block. Diffusion Policy"
+      },
+      {
+        "page": 5,
+        "line": "Fig. 5: Velocity v.s. Position Control. The performance differ- ence when switching from velocity to position control. While both BCRNN and BET performance decrease, Diffusion Policy is able to"
+      },
+      {
+        "page": 5,
+        "line": "Fig. 6: Diffusion Policy Ablation Study. Change (difference) in success rate relative to the maximum for each task is shown on the Y- axis. Left: trade-off between temporal consistency and responsiveness"
+      },
+      {
+        "page": 6,
+        "line": "Fig. 7: Training Stability. Left: IBC fails to infer training actions with increasing accuracy despite smoothly decreasing training loss for energy function. Right: IBC’s evaluation success rate oscillates,"
+      },
+      {
+        "page": 9,
+        "line": "Fig. 8: Realworld Push-T Comparisons. Columns 1-4 show action trajectories based on key events. The last column shows averaged images of the end state. A: Diffusion policy (End2End) achieves more accurate and consistent end states. B: Diffusion Policy (R3M) gets stuck initially but later recovers and finishes the task. C: LSTM-GMM fails to reach th"
+      },
+      {
+        "page": 9,
+        "line": "Fig. 9: Robustness Test for Diffusion Policy. Left: A waving hand in front of the camera for 3 seconds causes slight jitter, but the predicted actions still function as expected. Middle: Diffusion Policy"
+      },
+      {
+        "page": 9,
+        "line": "Fig. 10: 6DoF Mug Flipping Task. The robot needs to 1⃝Pickup a randomly placed mug and place it lip down (marked orange). 2⃝ Rotate the mug such that its handle is pointing left."
+      },
+      {
+        "page": 10,
+        "line": "Fig. 11: Realworld Sauce Manipulation. [Left] 6DoF pouring Task. The robot needs to 1⃝dip the ladle to scoop sauce from the"
+      }
+    ],
+    "contact_sheet": "01_screening/page_contacts/diffusion_policy_p1-6.jpg"
+  },
+  {
+    "slug": "generative_agents",
+    "pages": 22,
+    "caption_lines": [
+      {
+        "page": 1,
+        "line": "Figure 1: Generative agents are believable simulacra of human behavior for interactive applications. In this work, we demonstrate generative agents by populating a sandbox environment, reminiscent of The Sims, with twenty-five agents. Users can observe and intervene as agents plan their days, share news, form relationships, and coordinate group act"
+      },
+      {
+        "page": 5,
+        "line": "Figure 2: The Smallville sandbox world, with areas labeled. The root node describes the entire world, children describe areas (e.g., houses, cafe, stores), and leaf nodes describe objects (e.g., table, bookshelf). Agents remember a subgraph that reflects the parts of the world they have seen, maintaining the state of those parts as they observed th"
+      },
+      {
+        "page": 7,
+        "line": "Figure 3: A morning in the life of a generative agent, John Lin. John wakes up around 6 am and completes his morning routine, which includes brushing his teeth, taking a shower, and eating breakfast. He briefly catches up with his wife, Mei, and son, Eddy, before heading out to begin his workday."
+      },
+      {
+        "page": 7,
+        "line": "Figure 4: At the beginning of the simulation, one agent is initialized with an intent to organize a Valentine’s Day party. Despite many possible points of failure in the ensuing chain"
+      },
+      {
+        "page": 8,
+        "line": "Figure 5: Our generative agent architecture. Agents perceive their environment, and all perceptions are saved in a comprehensive record of the agent’s experiences called the memory stream. Based on their perceptions, the architecture retrieves relevant memories and uses those retrieved actions to determine an action. These retrieved memories are al"
+      },
+      {
+        "page": 9,
+        "line": "Figure 6: The memory stream comprises a large number of observations that are relevant and irrelevant to the agent’s current situation. Retrieval identifies a subset of these observations that should be passed to the language model to condition its response to the situation."
+      },
+      {
+        "page": 10,
+        "line": "Figure 7: A reflection tree for Klaus Mueller. The agent’s observations of the world, represented in the leaf nodes, are recursively synthesized to derive Klaus’s self-notion that he is highly dedicated to his research. recognize Maria putting in effort into her own research (albeit in"
+      }
+    ],
+    "contact_sheet": "01_screening/page_contacts/generative_agents_p1-6.jpg"
+  },
+  {
+    "slug": "graph_of_thoughts",
+    "pages": 63,
+    "caption_lines": [
+      {
+        "page": 3,
+        "line": "Figure 1: Comparison of Graph of Thoughts (GoT) to other prompting strategies. Formally, GoT can be modeled as a tuple (G, T , E, R), where G is the “LLM reasoning process” (i.e., all the LLM"
+      },
+      {
+        "page": 3,
+        "line": "Figure 2: Examples of aggregation and generation thought transformations. graph-enabled transformations. For example, in writing,"
+      },
+      {
+        "page": 5,
+        "line": "Figure 3: The system architecture of GoT, and the APIs of respective modules. The user can straightforwardly extend the design towards new prompting schemes, experiment with novel thought transformations, and plug in different LLMs. The blue part of the figure contains the architecture overview, the green part lists the API, and the red part contai"
+      },
+      {
+        "page": 6,
+        "line": "Figure 4: An example graph decomposition of the sorting use case in GoT. All used operations (Generate, Aggregate, Score, KeepBest) are described in Figure 3."
+      },
+      {
+        "page": 8,
+        "line": "Figure 5: Number of errors and cost in sorting tasks with ChatGPT-3.5. L and k indicate the structure of ToT (see Sections 3.2 and 6). Used LLMs Due to budget restrictions, we focus on GPT-"
+      },
+      {
+        "page": 9,
+        "line": "Figure 6: Number of errors and cost in set intersection tasks with ChatGPT-3.5. L and k indicate the structure of ToT (see Sections 3.2 and 6). IO"
+      },
+      {
+        "page": 9,
+        "line": "Figure 7: Number of errors and cost in keyword counting with ChatGPT-3.5. L and k indicate the structure of ToT (see Sections 3.2 and 6)."
+      },
+      {
+        "page": 9,
+        "line": "Figure 8: Score and cost in document merging with ChatGPT-3.5. L and k indicate the structure of ToT (see Sec- tions 3.2 and 6). Number of samples: 50; context size: 16k"
+      }
+    ],
+    "contact_sheet": "01_screening/page_contacts/graph_of_thoughts_p1-6.jpg"
+  },
+  {
+    "slug": "octo",
+    "pages": 13,
+    "caption_lines": [
+      {
+        "page": 1,
+        "line": "Fig. 1: We introduce Octo, an open-source, generalist policy for robotic manipulation. Octo is a transformer-based policy pretrained on 800k diverse robot episodes from the Open X-Embodiment dataset [67]. It supports flexible task and observation definitions and can be quickly finetuned to new observation and action spaces."
+      },
+      {
+        "page": 3,
+        "line": "Fig. 2: Model architecture. Left: Octo tokenizes task descriptions (green) and input observations (blue) using a pretrained language model and a lightweight CNN, respectively. Top: The transformer backbone processes the sequence of task and observation tokens and produces readout tokens (purple) that get passed to output heads to produce actions. B"
+      },
+      {
+        "page": 4,
+        "line": "Fig. 3: Training dataset composition. We curate a subset of 25 datasets from the Open X-Embodiment dataset that have image observations, end-effector actions, and show diverse"
+      },
+      {
+        "page": 6,
+        "line": "Fig. 4: Evaluation Tasks. We evaluate Octo on 9 real robot setups across 4 institutions. Our evaluations capture diverse object interactions (e.g., “WidowX BridgeV2”), long task horizons (e.g., “Stanford Coffee”) and precise manipulation (e.g., “Berkeley Peg Insertion”). We evaluate Octo’s capabilities to control robots in environments from the pre"
+      },
+      {
+        "page": 6,
+        "line": "Fig. 5: Zero-Shot Evaluation. Out-of-the-box, Octo can control multiple robots in environments from the pretraining data. When using natural language to specify tasks, Octo outperforms"
+      },
+      {
+        "page": 8,
+        "line": "Fig. 6: Model Scaling. The performance of Octo improves with larger model sizes on both UR5 and WidowX tasks. Success rates are averaged over 10 trials on one language-conditioned"
+      }
+    ],
+    "contact_sheet": "01_screening/page_contacts/octo_p1-6.jpg"
+  },
+  {
+    "slug": "openvla",
+    "pages": 37,
+    "caption_lines": [
+      {
+        "page": 1,
+        "line": "Figure 1: We present OpenVLA, a 7B-parameter open-source vision-language-action model (VLA), trained on 970k robot episodes from the Open X-Embodiment dataset [1]. OpenVLA sets a new state of the art for generalist robot manipulation policies. It supports controlling multiple robots out of the box and can be quickly"
+      },
+      {
+        "page": 4,
+        "line": "Figure 2: OpenVLA model architecture. Given an image observation and a language instruction, the model predicts 7-dimensional robot control actions. The architecture consists of three key components: (1) a vision encoder that concatenates Dino V2 [25] and SigLIP [79] features, (2) a projector that maps visual features to"
+      },
+      {
+        "page": 7,
+        "line": "Figure 3: BridgeData V2 WidowX robot evaluation tasks and results. We evaluate OpenVLA and prior state-of-the-art generalist robot policies on a comprehensive suite of tasks covering several axes of generalization, as well as tasks that specifically assess language conditioning ability. OpenVLA achieves highest overall perfor-"
+      },
+      {
+        "page": 8,
+        "line": "Figure 4: Google robot evaluation results. We evaluate generalist robot policies on in-distribution and out-of- distribution (OOD) tasks on the mobile manipulator used"
+      },
+      {
+        "page": 9,
+        "line": "Figure 5: Adapting to new robot setups. We evaluate the state-of-the-art Diffusion Policy trained from scratch on seven Franka Emika Panda tasks (10–150 demonstrations each), as well as generalist robot policies Octo and OpenVLA fine-tuned on the same data. Diffusion Policy exhibits strong performance on narrow"
+      },
+      {
+        "page": 10,
+        "line": "Figure 6: OpenVLA inference speed for various GPUs. Both bfloat16 and int4 quantization achieve high throughput, especially on GPUs with Ada Lovelace architecture (RTX 4090, H100). Fur-"
+      }
+    ],
+    "contact_sheet": "01_screening/page_contacts/openvla_p1-6.jpg"
+  },
+  {
+    "slug": "rap",
+    "pages": 20,
+    "caption_lines": [
+      {
+        "page": 2,
+        "line": "Figure 1: An overview of Reasoning via Planning (RAP). Compared with previous LLM reasoning methods like Chain-of-Thought (Wei et al., 2022), we explicitly model the world state from a world model (repurposed from the language model), and leverage advanced planning algorithms to solve the reasoning problems."
+      },
+      {
+        "page": 3,
+        "line": "Figure 2: RAP for plan generation in Blocksworld (left), math reasoning in GSM8K (middle), and logical reasoning in PrOntoQA (right). search, like depth-/breadth-first search, for better"
+      },
+      {
+        "page": 5,
+        "line": "Figure 3: An illustration of the four phases in an iteration in MCTS planning (Section 3.3). to expand and explore the most promising nodes of the tree, the algorithm maintains a state-action"
+      },
+      {
+        "page": 7,
+        "line": "Figure 4: Comparing reasoning traces in Blocksworld from CoT (left) and RAP (right). Method 2-step"
+      },
+      {
+        "page": 8,
+        "line": "Figure 5: Results on GSM-8K, with different numbers of sampled paths or iterations. impact of the reasoning path’s length on the reward,"
+      }
+    ],
+    "contact_sheet": "01_screening/page_contacts/rap_p1-6.jpg"
+  },
+  {
+    "slug": "rt2",
+    "pages": 26,
+    "caption_lines": [],
+    "contact_sheet": "01_screening/page_contacts/rt2_p1-6.jpg"
+  },
+  {
+    "slug": "saycan",
+    "pages": 32,
+    "caption_lines": [
+      {
+        "page": 1,
+        "line": "Figure 1: LLMs have not interacted with their environment and observed the outcome of their responses, and thus are not grounded in the world. SayCan grounds LLMs via value functions of pretrained skills, allowing them to execute real-world, abstract, long-horizon commands on robots."
+      },
+      {
+        "page": 4,
+        "line": "Figure 2: Given a high-level instruction,"
+      },
+      {
+        "page": 5,
+        "line": "Figure 3: The experiments were performed in an ofﬁce kitchen and a mock kitchen mirroring this setup, with 5 locations and 15 objects. The robot is a mobile manipulator with policies trained from an RGB observation. Experimental Setup. We evaluate SayCan with a mobile manipulator and a set of object manipula-"
+      },
+      {
+        "page": 6,
+        "line": "Figure 4: Timelapse of rollouts to two long-horizon queries. The robot interacts with a large portion of the kitchen environment and successfully performs sequences of manipulation and navigation skills. Figure 5 highlights SayCan’s decision making, along with its interpretability. The decision making"
+      },
+      {
+        "page": 6,
+        "line": "Figure 5: Visualization of SayCan’s decision making, where the top combined score chooses the correct skill. When comparing the performance of different instruction families in Table 2 (see Table 1 for an explanation of families), we see that the natural language nouns performed worse than natural lan-"
+      },
+      {
+        "page": 7,
+        "line": "Figure 15. Over 21 queries we found a planning rate of 100% and an execution rate of 33% (due to failures of the chained manipulation policy), with no loss in performance for other instructions. Chain of Thought Reasoning (Appendix E.3). SayCan can be integrated with recent work im-"
+      }
+    ],
+    "contact_sheet": "01_screening/page_contacts/saycan_p1-6.jpg"
+  },
+  {
+    "slug": "self_refine",
+    "pages": 61,
+    "caption_lines": [
+      {
+        "page": 2,
+        "line": "Figure 1: Given an input ( 0⃝), SELF-REFINE starts by generating an output and passing it back to the same model M to get feedback ( 1⃝). The feedback is passed back to M, which refines the previously generated output ( 2⃝). Steps ( 1⃝) and ( 2⃝) iterate until a stopping condition is met. SELF-REFINE is"
+      },
+      {
+        "page": 3,
+        "line": "Figure 2: Examples of SELF-REFINE: an initial output generated by the base LLM and then passed back to the same LLM to receive feedback"
+      },
+      {
+        "page": 3,
+        "line": "Figure 3: The SELF-REFINE algorithm. See (§2) for a discussion of each component. For example, in Figure 2(d), the model generates functionally correct code for the given input. Here, pgen is a task-specific few-shot prompt (or instruction) for an initial generation, and ∥denotes"
+      },
+      {
+        "page": 7,
+        "line": "Figure 4: Left: Iteration-wise score improvements. Early iterations significantly improve output quality, and scores generally keep improving with more iterations. Right: SELF-REFINE Perfor- mance improvements with iterations. Most gains(∆) are in the initial iterations for both Code Opt."
+      },
+      {
+        "page": 7,
+        "line": "Figure 5: Comparison of code generated by Madaan et al. (2023) (left) and the output after applying SELF-REFINE (right). The initial code by the baseline, which is nearly identical to the slower input program, fails to improve the efficiency and merely alters the logic for reading input. SELF-REFINE"
+      }
+    ],
+    "contact_sheet": "01_screening/page_contacts/self_refine_p1-6.jpg"
+  },
+  {
+    "slug": "swe_agent",
+    "pages": 125,
+    "caption_lines": [
+      {
+        "page": 1,
+        "line": "Figure 1: SWE-agent is an LM interacting with a computer through an agent-computer interface (ACI), which includes the commands the agent uses and the format of the feedback from the computer. ∗Equal contribution. Correspondence to johnby@stanford.edu, carlosej@princeton.edu."
+      },
+      {
+        "page": 2,
+        "line": "Figure 2: Specialized applications like IDEs (e.g., VSCode, PyCharm) make scientists and software engineers more efficient and effective at computer tasks. Similarly, ACI design aims to create a suitable interface that makes LM agents more effective at digital work such as software engineering."
+      },
+      {
+        "page": 4,
+        "line": "Figure 3: The file viewer and edit command are integrated. (a) The file viewer shows the agent the open file’s content with line numbers. (b) The agent invokes the edit function to replace lines 404-407 in the open file. After the edit, the file viewer shows the agent the now updated version of the file."
+      },
+      {
+        "page": 6,
+        "line": "Figure 4: SWE-agent w/ GPT-4 Turbo Pass@k performance across 6 runs on SWE-bench Lite."
+      },
+      {
+        "page": 7,
+        "line": "Figure 5: Three different Search interfaces for task instance pvlib__pvlib-python-1224. In Shell-only, an agent performs localization using only standard bash commands and utilities. Compared to Iterative search, Summarized search shows an exhaustive list of search results and"
+      },
+      {
+        "page": 7,
+        "line": "Figure 6: Three different Edit interfaces for task instance sympy__sympy-24102. Editing with bash commands requires several actions to successfully modify a file. The Editing component defines an edit command that leverages the File Viewer component to replace the bash style of editing"
+      },
+      {
+        "page": 8,
+        "line": "Figure 7: The frequency with which actions are invoked at each turn by SWE-agent w/ GPT-4 for task instances that it solved on the SWE-bench"
+      },
+      {
+        "page": 8,
+        "line": "Figure 8: Failure mode distribution for SWE- agent w/ GPT-4 Turbo trajectories of unresolved instances. Each instance is labeled automatically"
+      }
+    ],
+    "contact_sheet": "01_screening/page_contacts/swe_agent_p1-6.jpg"
+  },
+  {
+    "slug": "var",
+    "pages": 27,
+    "caption_lines": [
+      {
+        "page": 1,
+        "line": "Figure 1: Generated samples from Visual AutoRegressive (VAR) transformers trained on ImageNet. We show 512×512 samples (top), 256×256 samples (middle), and zero-shot image editing results (bottom). Abstract"
+      },
+      {
+        "page": 2,
+        "line": "Figure 2: Standard autoregressive modeling (AR) vs. our proposed visual autoregressive modeling (VAR). (a) AR applied to language: sequential text token generation from left to right, word by word; (b) AR applied to images: sequential visual token generation in a raster-scan order, from left to right, top to bottom; (c) VAR"
+      },
+      {
+        "page": 2,
+        "line": "Figure 3: Scaling behavior of different model fami- lies on ImageNet 256×256 generation benchmark. The FID of the validation set serves as a reference lower"
+      },
+      {
+        "page": 5,
+        "line": "Figure 4: VAR involves two separated training stages. Stage 1: a multi-scale VQ autoencoder encodes an image into K token maps R = (r1, r2, . . . , rK) and is trained by a compound loss (5). For details on “Multi-scale quantization” and “Embedding”, check Algorithm 1 and 2. Stage 2: a VAR transformer is trained"
+      },
+      {
+        "page": 8,
+        "line": "Figure 5: Scaling laws with VAR transformer size N, with power-law fits (dashed) and equations (in legend). Small, near-zero exponents α suggest a smooth decline in both test loss L and token error rate Err when scaling up VAR transformer. Axes are all on a logarithmic scale. The Pearson correlation coefficients near −0.998"
+      },
+      {
+        "page": 9,
+        "line": "Figure 6: Scaling laws with optimal training compute Cmin. Line color denotes different model sizes. Red dashed lines are power-law fits with equations in legend. Axes are on a logarithmic scale. Pearson coefficients near −0.99 indicate strong linear relationships between log(Cmin) vs. log(L) or log(Cmin) vs. log(Err)."
+      },
+      {
+        "page": 12,
+        "line": "Figure 7: Scaling model size N and training compute C improves visual fidelity and soundness. Zoom in for a better view. Samples are drawn from VAR models of 4 different sizes and 3 different training stages. 9 class labels (from left to right, top to bottom) are: flamingo 130, arctic wolf 270, macaw 88, Siamese cat 284,"
+      }
+    ],
+    "contact_sheet": "01_screening/page_contacts/var_p1-6.jpg"
+  },
+  {
+    "slug": "vima",
+    "pages": 48,
+    "caption_lines": [
+      {
+        "page": 2,
+        "line": "Figure 1: Multimodal prompts for task specification. We observe that many robot manipulation tasks can be expressed as multimodal prompts that interleave language and image/video frames. We introduce VIMA, an embodied agent capable of processing mulitimodal prompts (left) and controlling a robot arm to solve the task (right)."
+      },
+      {
+        "page": 3,
+        "line": "Figure 2: Evaluation Protocol in VIMA-BENCH. We design 4 levels of evaluation settings to systematically measure the zero-shot generalization capability of an agent. Each level deviates more from the training distribution, and thus is strictly more challenging than the previous level."
+      },
+      {
+        "page": 4,
+        "line": "Figure 3: VIMA Architecture. We encode the multimodal prompts with a pre-trained T5 model, and condition the robot controller on the prompt through cross-attention layers. The controller is a causal transformer decoder consisting of alternating self and cross attention layers that predicts motor commands conditioned on prompts and interaction histo"
+      },
+      {
+        "page": 5,
+        "line": "Figure 4: Scaling model and data. Top: We compare performance of different methods with model sizes ranging from 2M to 200M parameters. Across all model sizes and generalization levels, VIMA outperforms baseline variants. Bottom: For a fixed model size of 92M parameters we compare the effect of imitation learning dataset size with 0.1%, 1%, 10%, an"
+      },
+      {
+        "page": 6,
+        "line": "Figure 5: VIMA incurs much less performance drop than baselines as we evaluate on progressively harder settings. 5.2. Evaluation Results"
+      },
+      {
+        "page": 7,
+        "line": "Figure 6: Ablation on visual tokenizers. We compare the performance of VIMA-200M model across different visual tokenizers. Our proposed object tokens outperform all methods that learn directly from raw pixels, and Object Perceiver that downsamples the object sequence to a fixed number of tokens."
+      },
+      {
+        "page": 8,
+        "line": "Figure 7: Ablation on prompt conditioning. We compare our method (xattn: cross-attention prompt conditioning) with a vanilla transformer decoder (gpt-decoder) across different model sizes. Cross-attention is especially helpful in low-parameter regime and for harder generalization tasks."
+      }
+    ],
+    "contact_sheet": "01_screening/page_contacts/vima_p1-6.jpg"
+  }
+]

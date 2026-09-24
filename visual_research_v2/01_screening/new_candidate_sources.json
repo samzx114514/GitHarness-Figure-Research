@@ -1,0 +1,148 @@
+[
+  {
+    "slug": "graph_of_thoughts",
+    "title": "Graph of Thoughts: Solving Elaborate Problems with Large Language Models",
+    "venue": "AAAI 2024",
+    "publication_record": "https://ojs.aaai.org/index.php/AAAI/article/view/29720",
+    "pdf_url": "https://arxiv.org/pdf/2308.09687",
+    "local_pdf": "02_verified_papers/graph_of_thoughts.pdf",
+    "download": "ok: author/arXiv version fallback; original proceedings PDF endpoint inaccessible",
+    "original_pdf_url": "https://ojs.aaai.org/index.php/AAAI/article/download/29720/31236",
+    "bytes": 3128193,
+    "sha256": "73caa3c05813105e5db38edfbb58e1b660771a00dfdb74768c8845e15263c5da"
+  },
+  {
+    "slug": "swe_agent",
+    "title": "SWE-agent: Agent-Computer Interfaces Enable Automated Software Engineering",
+    "venue": "NeurIPS 2024",
+    "publication_record": "https://proceedings.neurips.cc/paper_files/paper/2024/hash/5a7c947568c1b1328ccc5230172e1e7c-Abstract-Conference.html",
+    "pdf_url": "https://proceedings.neurips.cc/paper_files/paper/2024/file/5a7c947568c1b1328ccc5230172e1e7c-Paper-Conference.pdf",
+    "local_pdf": "02_verified_papers/swe_agent.pdf",
+    "bytes": 4411168,
+    "sha256": "0116614120ddfaa37e7c944b7205b4f05523a2415e11846081c08dd0d848ea05",
+    "download": "ok"
+  },
+  {
+    "slug": "vima",
+    "title": "VIMA: Robot Manipulation with Multimodal Prompts",
+    "venue": "ICML 2023",
+    "publication_record": "https://proceedings.mlr.press/v202/jiang23b.html",
+    "pdf_url": "https://proceedings.mlr.press/v202/jiang23b/jiang23b.pdf",
+    "local_pdf": "02_verified_papers/vima.pdf",
+    "bytes": 10036950,
+    "sha256": "bbd044f3d0cf9025430c9595086eaa2eccd69488c3c3d0d7b661eb19e8459e50",
+    "download": "ok"
+  },
+  {
+    "slug": "var",
+    "title": "Visual Autoregressive Modeling: Scalable Image Generation via Next-Scale Prediction",
+    "venue": "NeurIPS 2024 Best Paper",
+    "publication_record": "https://proceedings.neurips.cc/paper_files/paper/2024/hash/9a24e284b187f662681440ba15c416fb-Abstract-Conference.html",
+    "pdf_url": "https://proceedings.neurips.cc/paper_files/paper/2024/file/9a24e284b187f662681440ba15c416fb-Paper-Conference.pdf",
+    "local_pdf": "02_verified_papers/var.pdf",
+    "bytes": 6208706,
+    "sha256": "bd6b3002cbf81f2006e68abd489c0bf2008ee076cbfe66086b7450e8aab56a06",
+    "download": "ok"
+  },
+  {
+    "slug": "generative_agents",
+    "title": "Generative Agents: Interactive Simulacra of Human Behavior",
+    "venue": "UIST 2023",
+    "publication_record": "https://doi.org/10.1145/3586183.3606763",
+    "pdf_url": "https://3dvar.com/Park2023Generative.pdf",
+    "local_pdf": "02_verified_papers/generative_agents.pdf",
+    "bytes": 1295748,
+    "sha256": "7ac6ab16e597b9209ab0d39f4a6b3507ba1f0c350a6bcc93ec72cf6b95f92e06",
+    "download": "ok"
+  },
+  {
+    "slug": "autogen",
+    "title": "AutoGen: Enabling Next-Gen LLM Applications via Multi-Agent Conversation",
+    "venue": "COLM 2024",
+    "publication_record": "https://openreview.net/forum?id=BAakY1hNKS",
+    "pdf_url": "https://arxiv.org/pdf/2308.08155",
+    "local_pdf": "02_verified_papers/autogen.pdf",
+    "download": "ok: author/arXiv version fallback; original proceedings PDF endpoint inaccessible",
+    "original_pdf_url": "https://openreview.net/attachment?id=BAakY1hNKS&name=pdf",
+    "bytes": 3571809,
+    "sha256": "fcf8b1acae6b1bd6f14c92463caa9726828bf998234ba9f10c2411087897c96b"
+  },
+  {
+    "slug": "self_refine",
+    "title": "Self-Refine: Iterative Refinement with Self-Feedback",
+    "venue": "NeurIPS 2023",
+    "publication_record": "https://proceedings.neurips.cc/paper_files/paper/2023/hash/91edff07232fb1b55a505a9e9f6c0ff3-Abstract-Conference.html",
+    "pdf_url": "https://proceedings.neurips.cc/paper_files/paper/2023/file/91edff07232fb1b55a505a9e9f6c0ff3-Paper-Conference.pdf",
+    "local_pdf": "02_verified_papers/self_refine.pdf",
+    "bytes": 1865721,
+    "sha256": "a07dfc5ada4ff818c77812dd581065a4e3e40f5736f2f36a97787a66da6e7825",
+    "download": "ok"
+  },
+  {
+    "slug": "openvla",
+    "title": "OpenVLA: An Open-Source Vision-Language-Action Model",
+    "venue": "CoRL 2024",
+    "publication_record": "https://mlanthology.org/corl/2024/kim2024corl-openvla/",
+    "pdf_url": "https://arxiv.org/pdf/2406.09246",
+    "local_pdf": "02_verified_papers/openvla.pdf",
+    "download": "ok: author/arXiv version fallback; original proceedings PDF endpoint inaccessible",
+    "original_pdf_url": "https://openreview.net/pdf/abf32802eb323064805ffb39688f56254876b4be.pdf",
+    "bytes": 13240309,
+    "sha256": "353c37df34458f12f969b14dfd8b77175b727b9cddea7bb891759beddeefe1be"
+  },
+  {
+    "slug": "rap",
+    "title": "Reasoning with Language Model is Planning with World Model",
+    "venue": "EMNLP 2023",
+    "publication_record": "https://aclanthology.org/2023.emnlp-main.507/",
+    "pdf_url": "https://aclanthology.org/2023.emnlp-main.507.pdf",
+    "local_pdf": "02_verified_papers/rap.pdf",
+    "bytes": 731988,
+    "sha256": "f67d075c889d885db80355f6d398fb2aa6830406340c365140e234af05056dc3",
+    "download": "ok"
+  },
+  {
+    "slug": "octo",
+    "title": "Octo: An Open-Source Generalist Robot Policy",
+    "venue": "RSS 2024",
+    "publication_record": "https://www.roboticsproceedings.org/rss20/p090.html",
+    "pdf_url": "https://www.roboticsproceedings.org/rss20/p090.pdf",
+    "local_pdf": "02_verified_papers/octo.pdf",
+    "bytes": 3411632,
+    "sha256": "2ad80d52e9ce79b6d3e052724631e4767a96a356850e48a5e5ef655a3b09a9c6",
+    "download": "ok"
+  },
+  {
+    "slug": "diffusion_policy",
+    "title": "Diffusion Policy: Visuomotor Policy Learning via Action Diffusion",
+    "venue": "RSS 2023",
+    "publication_record": "https://www.roboticsproceedings.org/rss19/p026.html",
+    "pdf_url": "https://www.roboticsproceedings.org/rss19/p026.pdf",
+    "local_pdf": "02_verified_papers/diffusion_policy.pdf",
+    "bytes": 5811288,
+    "sha256": "723a030b809be1958d03b06472ac79934fd64e5a890cdfeffd9508a353101a25",
+    "download": "ok"
+  },
+  {
+    "slug": "saycan",
+    "title": "Do As I Can, Not As I Say: Grounding Language in Robotic Affordances",
+    "venue": "CoRL 2022",
+    "publication_record": "https://proceedings.mlr.press/v205/ichter23a.html",
+    "pdf_url": "https://proceedings.mlr.press/v205/ichter23a/ichter23a.pdf",
+    "local_pdf": "02_verified_papers/saycan.pdf",
+    "bytes": 12745682,
+    "sha256": "9e1def538639b144c84d10dc5b3fe411c48b0955a4d9284ad4d231fc6f45a8ab",
+    "download": "ok"
+  },
+  {
+    "slug": "rt2",
+    "title": "RT-2: Vision-Language-Action Models Transfer Web Knowledge to Robotic Control",
+    "venue": "CoRL 2023",
+    "publication_record": "https://mlanthology.org/corl/2023/zitkovich2023corl-rt2/",
+    "pdf_url": "https://robotics-transformer2.github.io/assets/rt2.pdf",
+    "local_pdf": "02_verified_papers/rt2.pdf",
+    "bytes": 15622751,
+    "sha256": "616292b0e0f06c0a6d2f41a12249457e6eeec81837553cf176cb5b56c02dc404",
+    "download": "ok"
+  }
+]
